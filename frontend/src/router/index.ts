@@ -1,0 +1,84 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
+
+const routes: RouteRecordRaw[] = [
+  // ---- 메인 랜딩 (LandingLayout — 원페이지 스크롤 스냅) ----
+  {
+    path: '/',
+    component: () => import('@/layouts/LandingLayout.vue'),
+    children: [
+      { path: '', name: 'Home', component: () => import('@/views/HomeView.vue') },
+    ],
+  },
+
+  // ---- 서비스 페이지 (DefaultLayout — 헤더 + 푸터 포함) ----
+  {
+    path: '/',
+    component: () => import('@/layouts/DefaultLayout.vue'),
+    children: [
+      {
+        path: 'products',
+        name: 'ProductList',
+        component: () => import('@/views/products/ProductListView.vue'),
+      },
+      {
+        path: 'products/:id',
+        name: 'ProductDetail',
+        component: () => import('@/views/products/ProductDetailView.vue'),
+        props: true,
+      },
+      {
+        path: 'portfolio/:id',
+        name: 'PortfolioDetail',
+        component: () => import('@/views/PortfolioDetailView.vue'),
+      },
+      {
+        path: 'selection/:id',
+        name: 'SelectionDetail',
+        component: () => import('@/views/SelectionDetailView.vue'),
+      },
+      { path: 'portfolio', name: 'Portfolio', component: () => import('@/views/PortfolioView.vue') },
+      { path: 'notice', name: 'Notice', component: () => import('@/views/NoticeView.vue') },
+      { path: 'showroom', name: 'Showroom', component: () => import('@/views/ShowroomView.vue') },
+      { path: 'reservation', name: 'Reservation', component: () => import('@/views/ReservationView.vue') },
+      { path: 'cart', name: 'Cart', component: () => import('@/views/CartView.vue') },
+      { path: 'login', name: 'Login', component: () => import('@/views/LoginView.vue') },
+      { path: 'register', name: 'Register', component: () => import('@/views/RegisterView.vue') },
+      { path: 'mypage', name: 'MyPage', component: () => import('@/views/MyPageView.vue') },
+      // 랜딩의 섹션들에서 사용하던 별도 페이지들 — DefaultLayout 하위로 이동
+      { path: 'brand', name: 'Brand', component: () => import('@/views/BrandView.vue') },
+      { path: 'interior', name: 'Interior', component: () => import('@/views/InteriorView.vue') },  // legacy route
+    ],
+  },
+
+  // ---- 관리자 페이지 (AdminLayout) ----
+  {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { requiresAdmin: true },
+    children: [
+      { path: '', name: 'AdminDashboard', component: () => import('@/views/admin/DashboardView.vue') },
+    ],
+  },
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to) {
+    // 랜딩 페이지 내 앵커 이동은 ScrollSnapContainer에서 담당하므로 기본 스크롤 복원 제외
+    if (to.hash) return false
+    return { top: 0 }
+  },
+})
+
+// Navigation Guard
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return { name: 'Login' }
+  }
+})
+
+export default router

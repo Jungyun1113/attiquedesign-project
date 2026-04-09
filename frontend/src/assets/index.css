@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Raleway:wght@200;300;400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Nanum+Myeongjo:wght@400;700;800&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════
+   Design System v3.0 — High-end Editorial Magazine
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --color-primary: #2B1D1B;
+  --color-secondary: #6D6059;
+  --color-burgundy: #8B0000;
+  --color-burgundy-dark: #6B0000;
+  --color-background: #FDFBF8;
+  --color-surface: #F9F8F6;
+  --color-border: #E8E2D7;
+  --color-overlay: #8B0000;
+  --color-cream: #F5E6D3;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-primary bg-background antialiased;
+    letter-spacing: 0.01em;
+  }
+  /* 영문 제목: Cormorant Garamond / Playfair Display */
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', 'Playfair Display', 'Nanum Myeongjo', serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply max-w-7xl mx-auto px-4 md:px-8 lg:px-12;
+  }
+  .section-gap {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+  /* 핵심 CTA 버튼 */
+  .btn-primary {
+    @apply bg-brand text-white text-xs tracking-[0.2em] uppercase
+           px-12 py-5
+           transition-all duration-700 ease-out hover:bg-accent;
+  }
+  .btn-outline {
+    @apply border border-primary text-primary text-xs tracking-[0.2em] uppercase
+           px-10 py-4
+           transition-all duration-700 ease-out hover:bg-primary hover:text-white;
+  }
+  .btn-ghost {
+    @apply text-primary text-xs tracking-[0.2em] uppercase
+           px-6 py-3
+           transition-all duration-700 ease-out hover:text-brand;
+  }
+  /* 언더라인 CTA */
+  .btn-underline {
+    @apply relative inline-block text-white text-xs tracking-[0.25em] uppercase pb-2
+           transition-colors duration-500 ease-out;
+  }
+  .btn-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-px bg-white
+           transition-all duration-700 ease-out;
+  }
+  .btn-underline:hover::after {
+    @apply w-full;
+  }
+}
+
+/* 전역 스크롤바 숨김 */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 유틸리티: 캐러셀/가로 스크롤 숨김 */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -64,3 +64,26 @@
 - `user_id`: UUID (Nullable)
 - `contact_method`: VARCHAR (Email or Phone)
 - `status`: ENUM ('PENDING', 'NOTIFIED')
+
+### 3.8. Portfolios (포트폴리오)
+- `id`: UUID (Primary Key)
+- `category`: VARCHAR (Unique)
+- `title`: VARCHAR
+- `description`: TEXT
+- `cover_image_url`: VARCHAR
+
+### 3.9. Selections (공간 전시 아카이브)
+- `id`: UUID (Primary Key)
+- `title`: VARCHAR
+- `subtitle`: VARCHAR
+- `description`: TEXT
+
+### 3.10. Selection_Images (공간 스타일링 샷 최대 3장)
+- `selection_id`: UUID (Foreign Key)
+- `image_url`: VARCHAR
+- `display_order`: INT
+
+### 3.11. Selection_Products (공간 내 전시 오브제)
+- `selection_id`: UUID (Foreign Key)
+- `product_id`: UUID (Foreign Key)
+- `display_order`: INT

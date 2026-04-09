@@ -46,3 +46,11 @@
 
 ### 3.5. Webhooks (/api/v1/webhooks)
 - `POST /payments`: 가상계좌 입금, 결제 성공/실패 통보 수신용 (포트원/토스 웹훅)
+
+### 3.6. Portfolios (/api/v1/portfolios)
+- `GET /`: 포트폴리오 목록 조회
+- `GET /{id}`: 특정 포트폴리오 상세 조회
+
+### 3.7. Selections (/api/v1/selections)
+- `GET /`: 공간 전시 리스트 및 스타일링 샷(최대 3장), 소속 상품 목록 조회
+- `GET /{selection_id}/products/{product_id}`: 단일 오브제 타겟 상세 조회
