@@ -96,7 +96,7 @@ function goBack() {
 .selection-detail-page {
   width: 100vw;
   min-height: 100vh;
-  background: #FDFBF8;
+  background: #F5F0E8;
   color: #111;
   display: flex;
   justify-content: center;

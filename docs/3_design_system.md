@@ -20,13 +20,15 @@
 ### 2.1. Colors
 - `--color-primary`: `#2B1D1B` (메인 텍스트 — 따뜻한 차콜브라운)
 - `--color-secondary`: `#6D6059` (서브 텍스트, 비활성)
-- `--color-burgundy`: `#8B0000` (딥 버건디 — 브랜드 핵심 포인트)
-- `--color-burgundy-dark`: `#6B0000` (호버 시 더 깊은 버건디)
-- `--color-background`: `#FDFBF8` (전체 배경 — 따뜻한 아이보리)
-- `--color-surface`: `#F9F8F6` (섹션 배경 — 톤다운 베이지)
+- `--color-burgundy`: `#953735` (브랜드 핵심 포인트 버건디 — 구현 적용값)
+- `--color-burgundy-dark`: `#953735` (호버 상태 — 현재 동일값 적용, 추후 분리 예정)
+- `--color-background`: `#F5F0E8` (전체 배경 — 크림. 사이트 전역 통일)
+- `--color-surface`: `#F5F0E8` (섹션 배경 — 배경과 통일)
 - `--color-border`: `#E8E2D7` (은은한 구분선)
-- `--color-overlay`: `#8B0000` (풀스크린 오버레이 메뉴 배경)
-- `--color-cream`: `#F5E6D3` (오버레이 메뉴 호버 텍스트)
+- `--color-overlay`: `#953735` (오버레이/강조 배경)
+- `--color-cream`: `#F5E6D3` (보조 크림 텍스트)
+
+> **[원안 대비 변경]** 기존 딥 버건디 `#8B0000` 대신 `#953735`(밝은 버건디/갈색 계열)를 전체 구현에 적용. `index.css` 및 모든 컴포넌트 스타일 일치.
 
 ### 2.2. Typography
 | 용도 | 폰트 | 비고 |
@@ -56,32 +58,27 @@
 
 ## 3. Core Components (Vue Component 레벨)
 
-### 3.1. 삭제/폐지된 컴포넌트
-- ~~`VerticalSideNav.vue`~~: 기존 우측 세로 네비 → **삭제**. 햄버거 메뉴 오버레이로 대체.
+### 3.1. 삭제/폐지된 컴포넌트 (v4.0 기준)
+- ~~`VerticalSideNav.vue`~~: 기존 우측 세로 네비 → **삭제**.
+- ~~`HamburgerMenu.vue`~~: 풀스크린 오버레이 네비 → **삭제**. GlobalHeader로 대체.
+- ~~`ScrollDrivenLogo.vue`~~: 스크롤 드리븐 로고 애니메이션 → **삭제**.
+- ~~`ScrollSnapContainer.vue`~~: 원페이지 스크롤 스냅 컨테이너 → **삭제**.
+- ~~`FullScreenSection.vue`~~: 100vh 섹션 래퍼 → **삭제**.
+- ~~`LandingLayout.vue`~~: 랜딩 전용 레이아웃 → **삭제**. DefaultLayout으로 통합.
 
-### 3.2. 신규 컴포넌트
+### 3.2. 핵심 컴포넌트
 
-#### `HamburgerMenu.vue` (Navigation)
-우측 상단 고정 햄버거 메뉴 버튼 + 풀스크린 오버레이 네비게이션.
-- **버튼 디자인:** 극도로 얇은 선 2줄 (높이 1px, 너비 28px, 간격 6px).
-- **배경 적응:** 어두운 섹션에서는 흰색, 밝은 섹션에서는 검정.
-- **클릭 시:** X자 모프 + `#8B0000` 배경 풀스크린 오버레이.
-- **메뉴 링크:** 거대한 타이포그래피 (Playfair Display, 48~72px).
-- **호버 효과:** 텍스트 컬러 크림 전환 + `translateX(8px)` 미세 이동.
+#### `GlobalHeader.vue` (Navigation — v4.0 신규)
+상단 고정(`position: sticky`) 글로벌 헤더.
+- **로고:** 헤더 정중앙 배치. `/logo.svg` 사용. 스크롤 시 `scale(0.65)` 축소 + transition.
+- **GNB:** 로고 아래 수평 나열. Philosophy / Interior / Selection / Portfolio / Contact.
+- **폰트:** Raleway, 11px, letter-spacing 0.3em, uppercase.
+- **Active 조건:** Selection은 `?view=grid` 쿼리일 때만 활성화. 나머지는 경로 prefix 매칭.
+- **스크롤 반응:** `scrollY > 20`이면 `.is-scrolled` 클래스 → padding 축소 + 미세 shadow.
 
-#### `ScrollDrivenLogo.vue` (Section 0 전용)
-랜딩 섹션의 스크롤 드리븐 로고 애니메이션.
-- **초기 상태:** 화면 정중앙, `font-size: 7rem`, `letter-spacing: 0.22em`.
-- **스크롤 시:** 점진적으로 크기 축소(`scale`) + 상단 좌측으로 위치 이동 + Sticky 고정.
-- **구현:** Scroll 이벤트 → `scrollProgress` (0~1) 계산 → `transform` 인터폴레이션.
-
-#### `ScrollSnapContainer.vue` (Layout — 기존 유지, 강화)
-전체 원페이지를 감싸는 최상위 스크롤 스냅 컨테이너.
-- **추가:** `scroll-behavior: smooth` 기본 적용.
-- **추가:** ease-in-out 가속도 커브 적용.
-
-#### `FullScreenSection.vue` (Layout — 기존 유지)
-변경 없음. `height: 100vh`, `scroll-snap-align: start`.
+#### `DefaultLayout.vue` (Layout)
+모든 서비스 페이지 공통 레이아웃. GlobalHeader + `<router-view>` + Footer 포함.
+- **Footer:** 버건디(`#953735`) 배경. 브랜드 로고, Contact 정보, Social 링크, 사업자 정보, 저작권 표기.
 
 ### 3.3. 기존 유지 컴포넌트 (Atoms)
 - `BaseButton.vue`, `BaseInput.vue` 유지.
@@ -94,43 +91,31 @@
 
 ---
 
-## 4. 컴포넌트 계층 구조 (Component Hierarchy)
+## 4. 컴포넌트 계층 구조 (Component Hierarchy — v4.0 구현 기준)
 
 ```text
 App.vue
-├── [랜딩 페이지 "/" 라우트]
-│   ├── LandingLayout.vue
-│   │   ├── HamburgerMenu.vue              ← 햄버거 메뉴 + 풀스크린 오버레이
-│   │   └── ScrollSnapContainer.vue        ← 스크롤 스냅 최상위 래퍼
-│   │       ├── FullScreenSection#intro    ← Section 0: Landing
-│   │       │   ├── <video> (배경 비디오)
-│   │       │   └── ScrollDrivenLogo.vue   ← 스크롤 드리븐 로고
-│   │       ├── FullScreenSection#philosophy ← Section 1: Philosophy
-│   │       │   └── (Overlapping Editorial Layout)
-│   │       ├── FullScreenSection#portfolio  ← Section 2: Portfolio
-│   │       │   └── (비대칭 그리드 + Shared Element Transition)
-│   │       ├── FullScreenSection#selection  ← Section 3: Selection
-│   │       │   └── (좌: 공간 갤러리 최대 3장 / 우: 오브제 스크롤 전시)
-│   │       └── FullScreenSection#contact    ← Section 4: Contact
-│   │           ├── (미니멀 타이포그래피)
-│   │           ├── (네이버 예약 링크)
-│   │           ├── (카카오톡 채널 링크)
-│   │           └── (Footer 통합)
-│
-├── [별도 라우트 — 기존 레이아웃 유지]
-│   ├── DefaultLayout.vue (간소화된 헤더 + Footer)
-│   │   ├── /products         → PLP
-│   │   ├── /products/:id     → PDP
-│   │   ├── /portfolio/:id    → 포트폴리오 상세
-│   │   ├── /selection/:id    → 셀렉션 상세
-│   │   ├── /cart              → 장바구니
-│   │   ├── /login             → 로그인
-│   │   ├── /mypage            → 마이페이지
-│   │   └── /reservation       → 전체 예약 폼
-│   └── AdminLayout.vue
-│       └── /admin/*           → 관리자 백오피스
-│
-└── ToastContainer.vue                    ← 전역 알림
+└── DefaultLayout.vue                     ← 모든 서비스 페이지 공통 레이아웃
+    ├── GlobalHeader.vue                  ← 중앙 로고 + GNB (sticky)
+    ├── <router-view>
+    │   ├── /           → redirect /selection?view=hero
+    │   ├── /selection  → SelectionView.vue
+    │   │   ├── Hero View   (?view=hero)  ← 히어로 슬라이더 + 브랜드텍스트 + 오브제 슬라이더
+    │   │   └── Grid View   (?view=grid)  ← 3열 그리드 아카이브
+    │   ├── /philosophy → PhilosophyView.vue (오버래핑 에디토리얼)
+    │   ├── /interior   → InteriorView.vue  (프로세스 3단 + 예약 CTA)
+    │   ├── /portfolio  → PortfolioView.vue (탭 카테고리 + 세로 프로젝트 목록)
+    │   ├── /contact    → ContactView.vue   (스플릿 레이아웃 + 카카오/네이버)
+    │   ├── /portfolio/:id → PortfolioDetailView.vue
+    │   ├── /selection/:id → SelectionDetailView.vue
+    │   ├── /products      → ProductListView.vue
+    │   ├── /products/:id  → ProductDetailView.vue
+    │   ├── /login / /register / /mypage / /cart / /reservation
+    │   └── /notice / /showroom / /brand
+    └── Footer (DefaultLayout 내 포함)    ← 사업자 정보 + 저작권
+
+AdminLayout.vue
+└── /admin/* → DashboardView.vue
 ```
 
 ---

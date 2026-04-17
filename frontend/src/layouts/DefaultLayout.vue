@@ -1,59 +1,10 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <!-- 서비스 페이지 헤더 (간소화 — 로고 + 아이콘만) -->
-    <header
-      :class="[
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-background border-b border-border/60',
-        scrolled ? 'shadow-sm shadow-black/5' : ''
-      ]"
-    >
-      <div class="container-page flex items-center justify-between h-14 md:h-16">
-        <!-- 로고 — 클릭 시 랜딩 홈으로 이동 -->
-        <router-link to="/" class="flex items-center">
-          <img src="/logo.png" alt="ATTIQUE DESIGN" class="h-7 md:h-9 object-contain" />
-        </router-link>
-
-        <!-- 아이콘 영역 (장바구니 + 마이페이지/로그인) -->
-        <div class="flex items-center gap-5">
-          <!-- 뒤로가기: 서비스 페이지에서 유용 -->
-          <button
-            class="hidden md:flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-secondary hover:text-primary transition-colors"
-            @click="$router.back()"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back
-          </button>
-
-          <!-- 장바구니 -->
-          <router-link to="/cart" class="relative text-primary/70 hover:text-primary transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span
-              v-if="cartCount > 0"
-              class="absolute -top-1.5 -right-1.5 bg-brand text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium"
-            >
-              {{ cartCount }}
-            </span>
-          </router-link>
-
-          <!-- 마이페이지 / 로그인 -->
-          <router-link
-            :to="isLoggedIn ? '/mypage' : '/login'"
-            class="text-primary/70 hover:text-primary transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </router-link>
-        </div>
-      </div>
-    </header>
+    <!-- Global Header (Logo Center + GNB) -->
+    <GlobalHeader />
 
     <!-- Main content -->
-    <main class="flex-1 pt-14 md:pt-16">
+    <main class="flex-1">
       <router-view />
     </main>
 
@@ -62,8 +13,11 @@
       <div class="container-page">
         <div class="footer-top">
           <div class="footer-brand">
-            <h4 class="footer-logo">ATTIQUE DESIGN</h4>
-            <p class="footer-tagline">When Preference Becomes Lifestyle.</p>
+            <p class="footer-logo-text">
+              <span class="logo-line-attique">ATTIQUE</span>
+              <span class="logo-line-design">DESIGN</span>
+              <span class="logo-line-korean">아띠끄 디자인</span>
+            </p>
           </div>
           
           <div class="footer-nav">
@@ -96,33 +50,52 @@
 
 <style scoped>
 .footer-global {
-  background-color: #6D2122; /* 로고 버건디 색상 적용 */
-  color: #F1EFE7; /* 아이보리/크림 색상 텍스트 */
-  padding: 6rem 0 4rem;
+  background-color: #953735;
+  color: #F1EFE7;
+  padding: 3rem 0 2.5rem;
   font-family: 'Montserrat', 'Pretendard', sans-serif;
 }
 
 .footer-top {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 5rem;
+  margin-bottom: 2rem;
   border-bottom: 1px solid rgba(241, 239, 231, 0.1);
-  padding-bottom: 3rem;
+  padding-bottom: 1.5rem;
 }
 
-.footer-logo {
-  font-size: 20px;
-  letter-spacing: 0.25em;
-  margin-bottom: 0.8rem;
+.footer-logo-text {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 300;
+  font-size: 1.4rem;
+  line-height: 1.25;
   color: #F1EFE7;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }
 
-.footer-tagline {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 14px;
-  opacity: 0.7;
-  letter-spacing: 0.05em;
+.logo-line-attique {
+  display: block;
+  letter-spacing: 0.19em;
+}
+
+.logo-line-design {
+  display: block;
+  letter-spacing: 0.27em;
+}
+
+.logo-line-korean {
+  display: block;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 0.975rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  opacity: 1;
+  color: #F1EFE7;
+  margin-top: 0.5rem;
 }
 
 .footer-nav {
@@ -134,15 +107,15 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  margin-bottom: 1.5rem;
-  opacity: 0.5;
+  margin-bottom: 0.8rem;
+  opacity: 0.75;
 }
 
 .footer-nav-col p {
   font-size: 12px;
   line-height: 1.8;
   font-weight: 300;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .social-links {
@@ -155,7 +128,7 @@
   font-size: 12px;
   text-decoration: none;
   color: inherit;
-  opacity: 0.8;
+  opacity: 1;
   transition: opacity 0.3s ease;
 }
 
@@ -166,7 +139,7 @@
 .footer-bottom {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.6rem;
 }
 
 .business-info-grid {
@@ -186,7 +159,7 @@
   font-size: 9px;
   letter-spacing: 0.15em;
   opacity: 0.3;
-  margin-top: 1rem;
+  margin-top: 0.4rem;
 }
 
 @media (max-width: 768px) {
@@ -199,28 +172,28 @@
     gap: 2.5rem;
   }
   .footer-global {
-    padding: 4rem 0 3rem;
+    padding: 2.5rem 0 2rem;
+  }
+  .footer-logo-text {
+    font-size: 1.12rem;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .logo-line-korean {
+    font-size: 0.78rem;
   }
 }
 </style>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { storeToRefs } from 'pinia'
+import GlobalHeader from '@/components/navigation/GlobalHeader.vue'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
 const { totalCount: cartCount } = storeToRefs(cartStore)
 const { isLoggedIn } = storeToRefs(authStore)
 
-const scrolled = ref(false)
-
-function handleScroll() {
-  scrolled.value = window.scrollY > 10
-}
-
-onMounted(() => window.addEventListener('scroll', handleScroll))
-onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 </script>

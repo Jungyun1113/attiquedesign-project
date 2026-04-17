@@ -3,20 +3,23 @@ import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 
 const routes: RouteRecordRaw[] = [
-  // ---- 메인 랜딩 (LandingLayout — 원페이지 스크롤 스냅) ----
+  // ---- 초기 진입 시 /selection으로 리다이렉트 ----
   {
     path: '/',
-    component: () => import('@/layouts/LandingLayout.vue'),
-    children: [
-      { path: '', name: 'Home', component: () => import('@/views/HomeView.vue') },
-    ],
+    redirect: '/selection?view=hero'
   },
 
-  // ---- 서비스 페이지 (DefaultLayout — 헤더 + 푸터 포함) ----
+  // ---- 메인 서비스 페이지 (DefaultLayout — 전역 헤더 + 푸터 포함) ----
   {
     path: '/',
     component: () => import('@/layouts/DefaultLayout.vue'),
     children: [
+      { path: 'selection', name: 'Selection', component: () => import('@/views/SelectionView.vue') },
+      { path: 'philosophy', name: 'Philosophy', component: () => import('@/views/PhilosophyView.vue') },
+      { path: 'interior', name: 'Interior', component: () => import('@/views/InteriorView.vue') },
+      { path: 'portfolio', name: 'Portfolio', component: () => import('@/views/PortfolioView.vue') },
+      { path: 'contact', name: 'Contact', component: () => import('@/views/ContactView.vue') },
+      
       {
         path: 'products',
         name: 'ProductList',
@@ -38,7 +41,6 @@ const routes: RouteRecordRaw[] = [
         name: 'SelectionDetail',
         component: () => import('@/views/SelectionDetailView.vue'),
       },
-      { path: 'portfolio', name: 'Portfolio', component: () => import('@/views/PortfolioView.vue') },
       { path: 'notice', name: 'Notice', component: () => import('@/views/NoticeView.vue') },
       { path: 'showroom', name: 'Showroom', component: () => import('@/views/ShowroomView.vue') },
       { path: 'reservation', name: 'Reservation', component: () => import('@/views/ReservationView.vue') },
@@ -46,9 +48,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'login', name: 'Login', component: () => import('@/views/LoginView.vue') },
       { path: 'register', name: 'Register', component: () => import('@/views/RegisterView.vue') },
       { path: 'mypage', name: 'MyPage', component: () => import('@/views/MyPageView.vue') },
-      // 랜딩의 섹션들에서 사용하던 별도 페이지들 — DefaultLayout 하위로 이동
       { path: 'brand', name: 'Brand', component: () => import('@/views/BrandView.vue') },
-      { path: 'interior', name: 'Interior', component: () => import('@/views/InteriorView.vue') },  // legacy route
     ],
   },
 
