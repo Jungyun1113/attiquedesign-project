@@ -23,7 +23,7 @@
           <div class="footer-nav">
             <div class="footer-nav-col">
               <h5>Contact</h5>
-              <p>Showroom. 서울시 용산구 한남대로 21길 27<br>T. 02-3443-8170<br>E. info@attiquedesign.com</p>
+              <p>Showroom. 서울시 용산구 한남대로 21길 27<br>T. 02-3443-8170<br>E. attique_@naver.com</p>
             </div>
             <div class="footer-nav-col">
               <h5>Social</h5>
@@ -38,7 +38,7 @@
 
         <div class="footer-bottom">
           <div class="business-info-grid">
-            <p>(주) 아띠끄디자인 | 대표이사 홍민영 | 사업자등록번호 123-45-67890 | 통신판매업신고번호 제2026-서울용산-0000호</p>
+            <p>(주) 아띠끄디자인 | 대표이사 홍민영 | 사업자등록번호 116-01-39525</p>
             <p>주소: 서울시 용산구 한남대로 21길 27 | 개인정보관리책임자: 홍민영</p>
           </div>
           <p class="copyright">© 2026 ATTIQUE DESIGN. All rights reserved.</p>
