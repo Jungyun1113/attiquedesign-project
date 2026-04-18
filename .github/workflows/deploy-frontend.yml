@@ -1,41 +1,44 @@
-name: Deploy Backend
+name: Deploy Frontend
 
 on:
   push:
     branches: [main]
     paths:
-      - 'backend/**'
-      - '.github/workflows/deploy-backend.yml'
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Python
-        uses: actions/setup-python@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
-          
-      - name: Install Dependencies
-        working-directory: backend
+          node-version: '25'
+
+      - name: Install & Build
+        working-directory: frontend
         run: |
-          pip install -r requirements.txt
-          pip install chalice
-          
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+          npm ci
+          npm run build
+
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-          
-      - name: Setup Chalice Config
-        working-directory: backend
-        run: |
-          echo '${{ secrets.CHALICE_CONFIG_JSON }}' > .chalice/config.json
-          
-      - name: Deploy with Chalice
-        working-directory: backend
-        run: chalice deploy --stage prod
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: 'frontend/dist'
+
+      - name: Invalidate CloudFront
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          PATHS: '/*'
+          AWS_REGION: 'us-east-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
