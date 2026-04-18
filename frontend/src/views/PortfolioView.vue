@@ -1,81 +1,96 @@
 <template>
   <div class="portfolio-page">
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- Page Header                                  -->
-    <!-- ═══════════════════════════════════════════ -->
     <div class="portfolio-header">
       <h2 class="portfolio-title">Curated <em class="portfolio-title-accent">Spaces</em>.</h2>
       <p class="portfolio-subtitle">아띠끄 디자인의 시선으로 완성한 공간들.</p>
     </div>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- Tab Navigation                               -->
-    <!-- ═══════════════════════════════════════════ -->
-    <div class="portfolio-nav">
-      <ul class="tab-list">
-        <li
-          v-for="cat in portfolioData"
-          :key="cat.id"
-          class="tab-item"
-          :class="{ 'is-active': activeCategoryId === cat.id }"
-          @click="activeCategoryId = cat.id"
-        >
-          <span class="tab-text">{{ cat.name }}</span>
-        </li>
-      </ul>
+    <div v-if="loading" class="portfolio-content">
+      <p style="font-family: 'Pretendard', sans-serif; font-size: 13px; color: #6D6059;">불러오는 중...</p>
     </div>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- Content                                      -->
-    <!-- ═══════════════════════════════════════════ -->
-    <div class="portfolio-content">
-      <p class="category-desc">{{ activeCategory.description }}</p>
-
-      <div class="projects-list">
-        <section
-          v-for="project in activeCategory.projects"
-          :key="project.id"
-          class="project-card"
-        >
-          <div class="project-title-row">
-            <h2 class="project-title">{{ project.title }}</h2>
-          </div>
-
-          <!-- 2-column Gallery -->
-          <div class="project-gallery">
-            <div
-              v-for="(img, idx) in project.images.slice(0, 2)"
-              :key="idx"
-              class="gallery-item"
-            >
-              <img :src="img" :alt="project.title + ' ' + (idx + 1)" loading="lazy" />
-            </div>
-          </div>
-
-          <div class="project-footer">
-            <router-link :to="`/portfolio/${project.slug}`" class="view-detail-link">
-              View Project Details
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-            </router-link>
-          </div>
-        </section>
+    <template v-else-if="categories.length">
+      <div class="portfolio-nav">
+        <ul class="tab-list">
+          <li
+            v-for="cat in categories"
+            :key="cat.id"
+            class="tab-item"
+            :class="{ 'is-active': activeCategoryId === cat.id }"
+            @click="activeCategoryId = cat.id"
+          >
+            <span class="tab-text">{{ cat.name }}</span>
+          </li>
+        </ul>
       </div>
+
+      <div class="portfolio-content">
+        <p class="category-desc">{{ activeCategory?.description }}</p>
+
+        <div class="projects-list">
+          <section
+            v-for="portfolio in activeCategory?.portfolios"
+            :key="portfolio.id"
+            class="project-card"
+          >
+            <div class="project-title-row">
+              <h2 class="project-title">{{ portfolio.title }}</h2>
+            </div>
+
+            <div class="project-gallery">
+              <div
+                v-for="(img, idx) in portfolio.images.slice(0, 2)"
+                :key="idx"
+                class="gallery-item"
+              >
+                <img :src="img.image_url" :alt="portfolio.title + ' ' + (idx + 1)" loading="lazy" />
+              </div>
+              <div v-if="portfolio.images.length === 0 && portfolio.cover_image_url" class="gallery-item">
+                <img :src="portfolio.cover_image_url" :alt="portfolio.title" loading="lazy" />
+              </div>
+            </div>
+
+            <div class="project-footer">
+              <router-link :to="`/portfolio/${portfolio.id}`" class="view-detail-link">
+                View Project Details
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+              </router-link>
+            </div>
+          </section>
+        </div>
+      </div>
+    </template>
+
+    <div v-else class="portfolio-content">
+      <p style="font-family: 'Pretendard', sans-serif; font-size: 13px; color: #6D6059;">등록된 포트폴리오가 없습니다.</p>
     </div>
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { portfolioData as rawData } from '@/data/portfolioData'
+import { ref, computed, onMounted } from 'vue'
+import { portfolioService, type PortfolioCategory } from '@/services/portfolio.service'
 
-const portfolioData = ref(rawData)
+const categories = ref<PortfolioCategory[]>([])
+const loading = ref(true)
+const activeCategoryId = ref('')
 
-const activeCategoryId = ref('residential')
-const activeCategory = computed(() => {
-  return portfolioData.value.find(c => c.id === activeCategoryId.value) || portfolioData.value[0]
+onMounted(async () => {
+  try {
+    categories.value = await portfolioService.getGroupedByCategory()
+    if (categories.value.length) activeCategoryId.value = categories.value[0].id
+  } catch {
+    categories.value = []
+  } finally {
+    loading.value = false
+  }
 })
+
+const activeCategory = computed(() =>
+  categories.value.find(c => c.id === activeCategoryId.value) ?? categories.value[0]
+)
 </script>
 
 <style scoped>
@@ -84,9 +99,6 @@ const activeCategory = computed(() => {
   min-height: calc(100vh - 160px);
 }
 
-/* ═══════════════════════════════════════════
-   Page Header
-   ═══════════════════════════════════════════ */
 .portfolio-header {
   max-width: 1400px;
   margin: 0 auto;
@@ -125,9 +137,6 @@ const activeCategory = computed(() => {
   word-break: keep-all;
 }
 
-/* ═══════════════════════════════════════════
-   Tab Navigation
-   ═══════════════════════════════════════════ */
 .portfolio-nav {
   max-width: 1400px;
   margin: 0 auto;
@@ -165,13 +174,6 @@ const activeCategory = computed(() => {
   transition: color 0.3s ease;
 }
 
-.tab-count {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 9px;
-  color: rgba(49, 46, 45, 0.25);
-  transition: color 0.3s ease;
-}
-
 .tab-item:hover .tab-text {
   color: #312E2D;
 }
@@ -181,17 +183,10 @@ const activeCategory = computed(() => {
   font-weight: 600;
 }
 
-.tab-item.is-active .tab-count {
-  color: rgba(149, 55, 53, 0.45);
-}
-
 .tab-item.is-active {
   border-bottom-color: #953735;
 }
 
-/* ═══════════════════════════════════════════
-   Content Area
-   ═══════════════════════════════════════════ */
 .portfolio-content {
   max-width: 1400px;
   margin: 0 auto;
@@ -234,7 +229,6 @@ const activeCategory = computed(() => {
   margin: 0;
 }
 
-/* 2-column Gallery */
 .project-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -284,9 +278,6 @@ const activeCategory = computed(() => {
   border-bottom-color: #953735;
 }
 
-/* ═══════════════════════════════════════════
-   Mobile Responsive
-   ═══════════════════════════════════════════ */
 @media (max-width: 768px) {
   .portfolio-header {
     padding: 1.5rem 1.5rem 0;

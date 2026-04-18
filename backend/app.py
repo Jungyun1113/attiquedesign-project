@@ -1,29 +1,27 @@
 from chalice import Chalice
 
-app = Chalice(app_name='my-app')
+from chalicelib.api.auth import auth_bp
+from chalicelib.api.products import products_bp
+from chalicelib.api.orders import orders_bp
+from chalicelib.api.reservations import reservations_bp
+from chalicelib.api.portfolios import portfolios_bp
+from chalicelib.api.selections import selections_bp
+from chalicelib.api.uploads import uploads_bp
+from chalicelib.api.webhooks import webhooks_bp
+
+app = Chalice(app_name="attique-project")
+app.debug = True
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(products_bp)
+app.register_blueprint(orders_bp)
+app.register_blueprint(reservations_bp)
+app.register_blueprint(portfolios_bp)
+app.register_blueprint(selections_bp)
+app.register_blueprint(uploads_bp)
+app.register_blueprint(webhooks_bp)
 
 
-@app.route('/')
-def index():
-    return {'hello': 'world'}
-
-
-# The view function above will return {"hello": "world"}
-# whenever you make an HTTP GET request to '/'.
-#
-# Here are a few more examples:
-#
-# @app.route('/hello/{name}')
-# def hello_name(name):
-#    # '/hello/james' -> {"hello": "james"}
-#    return {'hello': name}
-#
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     # This is the JSON body the user sent in their POST request.
-#     user_as_json = app.current_request.json_body
-#     # We'll echo the json body back to the user in a 'user' key.
-#     return {'user': user_as_json}
-#
-# See the README documentation for more examples.
-#
+@app.route("/health", methods=["GET"], cors=True)
+def health():
+    return {"status": "ok"}

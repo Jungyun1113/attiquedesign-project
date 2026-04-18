@@ -8,7 +8,6 @@
 
       <!-- ── 섹션 1: 히어로 슬라이더 ── -->
       <section class="sec-hero" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
-        <!-- PC: 4슬라이드 (마지막은 2분할) -->
         <template v-if="!isMobile">
           <div
             v-for="(slide, idx) in pcSlides"
@@ -27,7 +26,6 @@
             </template>
           </div>
         </template>
-        <!-- 모바일: 4슬라이드 (마지막은 2분할, PC와 동일) -->
         <template v-else>
           <div
             v-for="(slide, idx) in pcSlides"
@@ -72,17 +70,17 @@
         <div class="prod-slider-wrap" ref="sliderWrapRef">
           <div class="prod-track" :style="trackStyle">
             <div
-              v-for="item in allObjects"
+              v-for="item in allProducts"
               :key="item.id"
               class="archive-item"
               :style="itemStyle"
             >
               <div class="archive-img-wrap">
-                <img :src="item.img" :alt="item.name" loading="lazy" />
+                <img :src="item.thumbnail_url ?? ''" :alt="item.name ?? ''" loading="lazy" />
               </div>
               <div class="archive-info">
                 <h3 class="archive-name">{{ item.name }}</h3>
-                <button class="archive-btn" @click="enquireObject(item.id)">VIEW DETAILS</button>
+                <button class="archive-btn" @click="viewSelection(item.selectionId)">VIEW DETAILS</button>
               </div>
             </div>
           </div>
@@ -103,16 +101,16 @@
 
       <div class="grid-container">
         <div
-          v-for="item in allObjects"
+          v-for="item in allProducts"
           :key="item.id"
           class="archive-item"
         >
           <div class="archive-img-wrap">
-            <img :src="item.img" :alt="item.name" loading="lazy" />
+            <img :src="item.thumbnail_url ?? ''" :alt="item.name ?? ''" loading="lazy" />
           </div>
           <div class="archive-info">
             <h3 class="archive-name">{{ item.name }}</h3>
-            <button class="archive-btn" @click="enquireObject(item.id)">VIEW DETAILS</button>
+            <button class="archive-btn" @click="viewSelection(item.selectionId)">VIEW DETAILS</button>
           </div>
         </div>
       </div>
@@ -124,6 +122,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { selectionService, type Selection } from '@/services/selection.service'
 
 const router = useRouter()
 const route = useRoute()
@@ -177,56 +176,44 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
   updateWrapWidth()
   startAutoplay()
+  loadSelections()
 })
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   stopAutoplay()
 })
 
-// --- Space Data ---
-interface SpaceObject { id: string; name: string; img: string }
-interface SelectionSpace { id: string; title: string; subtitle: string; objects: SpaceObject[] }
+// ── Selection 데이터 ──────────────────────────
+interface FlatProduct {
+  id: string
+  selectionId: string
+  name?: string
+  thumbnail_url?: string
+}
 
-const selectionSpaces: SelectionSpace[] = [
-  {
-    id: 'warm-sanctuary',
-    title: 'Warm Sanctuary',
-    subtitle: 'A curated space where dark walnut meets burgundy textiles',
-    objects: [
-      { id: 'obj-1', name: 'Walnut Console', img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=85' },
-      { id: 'obj-2', name: 'Linen Armchair', img: 'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600&q=85' },
-      { id: 'obj-3', name: 'Ceramic Vase', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=600&q=85' },
-      { id: 'obj-4', name: 'Wool Rug', img: 'https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=600&q=85' },
-      { id: 'obj-5', name: 'Brass Lamp', img: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&q=85' },
-    ]
-  },
-  {
-    id: 'nordic-calm',
-    title: 'Nordic Calm',
-    subtitle: 'Scandinavian minimalism with warm undertones',
-    objects: [
-      { id: 'obj-6', name: 'Oak Dining Table', img: 'https://images.unsplash.com/photo-1549497538-303791108f95?w=600&q=85' },
-      { id: 'obj-7', name: 'Pendant Light', img: 'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=600&q=85' },
-      { id: 'obj-8', name: 'Wool Throw', img: 'https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=600&q=85' },
-      { id: 'obj-9', name: 'Minimal Vase', img: 'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=600&q=85' },
-    ]
-  },
-  {
-    id: 'modern-noir',
-    title: 'Maison Noir',
-    subtitle: 'Bespoke luxury living with curated dark accents',
-    objects: [
-      { id: 'obj-10', name: 'Black Marble Table', img: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=600&q=85' },
-      { id: 'obj-11', name: 'Silver Sculpture', img: 'https://images.unsplash.com/photo-1554188248-986adbb73be4?w=600&q=85' },
-      { id: 'obj-12', name: 'Leather Sofa', img: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600&q=85' },
-    ]
-  },
-]
+const selections = ref<Selection[]>([])
 
-const allObjects = computed(() => selectionSpaces.flatMap(s => s.objects))
+const allProducts = computed<FlatProduct[]>(() =>
+  selections.value.flatMap(sel =>
+    sel.products.map(p => ({
+      id: p.id,
+      selectionId: sel.id,
+      name: p.name,
+      thumbnail_url: p.thumbnail_url,
+    }))
+  )
+)
 
-function enquireObject(id: string) {
-  router.push(`/selection/${id}`)
+async function loadSelections() {
+  try {
+    selections.value = await selectionService.getSelections()
+  } catch {
+    selections.value = []
+  }
+}
+
+function viewSelection(selectionId: string) {
+  router.push(`/selection/${selectionId}`)
 }
 
 // ── 제품 슬라이더 ──────────────────────────
@@ -235,7 +222,7 @@ const wrapWidth = ref(0)
 const prodOffset = ref(0)
 
 const itemsPerView = computed(() => isMobile.value ? 2 : 3)
-const maxOffset = computed(() => Math.max(0, allObjects.value.length - itemsPerView.value))
+const maxOffset = computed(() => Math.max(0, allProducts.value.length - itemsPerView.value))
 
 const GAP = 16
 
@@ -268,12 +255,10 @@ function updateWrapWidth() {
 </script>
 
 <style scoped>
-/* ─── 전체 페이지 ─────────────────────────────── */
 .selection-page {
   background-color: #F5F0E8;
 }
 
-/* ─── 섹션 1: 히어로 슬라이더 ────────────────── */
 .sec-hero {
   position: relative;
   width: 100%;
@@ -325,7 +310,6 @@ function updateWrapWidth() {
   display: block;
 }
 
-/* ─── 섹션 2: 브랜드 텍스트 ──────────────────── */
 .sec-brand {
   display: flex;
   flex-direction: row;
@@ -375,7 +359,6 @@ function updateWrapWidth() {
   word-break: keep-all;
 }
 
-/* ─── 섹션 3: 제품 슬라이더 ─────────────────── */
 .sec-selection {
   padding: 3rem 4rem 4rem;
   background-color: #F5F0E8;
@@ -438,7 +421,6 @@ function updateWrapWidth() {
   cursor: default;
 }
 
-/* 슬라이더 트랙 */
 .prod-slider-wrap {
   overflow: hidden;
   width: 100%;
@@ -450,7 +432,6 @@ function updateWrapWidth() {
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* ─── Archive Item ───────────────────────────── */
 .archive-item {
   flex: 0 0 auto;
   cursor: pointer;
@@ -510,7 +491,6 @@ function updateWrapWidth() {
   color: #F5F0E8;
 }
 
-/* ─── Grid Exhibition View ───────────────────── */
 .sel-grid-view {
   padding-top: 1.5rem;
   padding-bottom: 8rem;
@@ -549,9 +529,7 @@ function updateWrapWidth() {
   gap: 2rem 1.5rem;
 }
 
-/* ─── 모바일 (max-width: 768px) ──────────────── */
 @media (max-width: 768px) {
-  /* 섹션 1: 슬라이더 */
   .sec-hero {
     height: auto;
     aspect-ratio: 3 / 2;
@@ -564,7 +542,6 @@ function updateWrapWidth() {
     height: 100%;
   }
 
-  /* 섹션 2: 브랜드 텍스트 */
   .sec-brand {
     flex-direction: column;
     height: auto;
@@ -588,7 +565,6 @@ function updateWrapWidth() {
     font-size: 13px;
   }
 
-  /* 섹션 3: 제품 슬라이더 */
   .sec-selection {
     padding: 2rem 1rem 2.5rem;
   }
@@ -613,7 +589,6 @@ function updateWrapWidth() {
     font-size: 18px;
   }
 
-  /* Grid View */
   .grid-title {
     font-size: 28px;
   }

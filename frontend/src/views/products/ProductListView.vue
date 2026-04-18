@@ -40,11 +40,11 @@ import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProductCard from '@/components/domain/ProductCard.vue'
 import { productService } from '@/services/product.service'
-import type { Product, Category } from '@/types/api.d'
+import type { Product } from '@/types/api.d'
 
 const route = useRoute()
 const products = ref<Product[]>([])
-const categories = ref<Category[]>([])
+const categories = ref(productService.getCategories())
 const selectedCategory = ref('')
 const selectedSort = ref('latest')
 
@@ -57,15 +57,13 @@ async function loadProducts() {
   else pageTitle.value = 'All Products'
 
   const res = await productService.getProducts({
-    type: typeFilter,
-    category_id: selectedCategory.value || undefined,
+    category: selectedCategory.value || undefined,
     sort: selectedSort.value,
   })
   products.value = res.data
 }
 
 onMounted(() => {
-  categories.value = productService.getCategories()
   loadProducts()
 })
 

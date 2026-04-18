@@ -55,7 +55,7 @@ export interface Product {
   id: string
   sku: string
   name: string
-  type: ProductType
+  type?: ProductType
   price: number | null
   stock_quantity: number
   status: ProductStatus

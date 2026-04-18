@@ -1,41 +1,78 @@
 # Backend Architecture (AWS Chalice + SQLModel)
 
-## 1. 구조 설계 원칙
-- **Serverless 최적화:** AWS Chalice 특성상 Cold Start를 줄이기 위해 전역 로드 최소화.
-- **의존성 분리 (Separation of Concerns):** 라우터(Controller), 비즈니스 로직(Service), 데이터/ORM(Repository/CRUD) 분리.
-- **공통 처리 로직 중앙화:** 예외 처리와 로깅을 미들웨어(Chalice Decorator 형식)로 공통화하여 일관된 API Spec 응답 보장.
+## 1. 설계 원칙
+- **Serverless 최적화:** Cold Start 최소화를 위해 전역 로드 최소화.
+- **고수준 DB 헬퍼:** Django ORM 스타일의 공통 헬퍼(`helpers/db.py`)를 통해 join, filter, pagination을 단일 인터페이스로 처리. 특수 쿼리가 아닌 경우 서비스 계층은 이 헬퍼만 사용.
+- **선언적 권한 제어:** `@require_auth`, `@require_admin` 데코레이터로 라우트에 권한을 선언적으로 부여. 반복 구현 금지.
+- **공통 에러 처리:** 모든 예외를 `{ success, error }` 구조로 통일하는 미들웨어 데코레이터 중앙화.
 
 ## 2. 디렉토리 구조
 ```text
 /backend
-├── app.py                  # Chalice Application 엔트리포인트 (Blueprint 등록)
+├── app.py                      # Chalice 엔트리포인트 (Blueprint 등록)
 ├── chalicelib/
-│   ├── api/                # 블루프린트 라우터 정의 (도메인별 분리)
+│   ├── api/                    # 블루프린트 라우터 (도메인별)
 │   │   ├── auth.py
 │   │   ├── products.py
+│   │   ├── orders.py
 │   │   ├── reservations.py
+│   │   ├── portfolios.py
+│   │   ├── selections.py
+│   │   ├── uploads.py          # S3 Presigned URL 발급
 │   │   └── webhooks.py
-│   ├── core/               # 시스템 코어 (설정, 디비 커넥션, 예외 처리기)
-│   │   ├── config.py       # 환경변수(SSM/Secrets 연동) 설정
-│   │   ├── db.py           # SQLModel 엔진 및 Session 관리
-│   │   └── exceptions.py   # 자체 Custom Exception 클래스 정의 및 응답 포맷터
-│   ├── models/             # SQLModel DB 모델 정의 (1_database_model.md 기반)
-│   │   ├── base.py         # 포함: id, created_at, updated_at
+│   ├── core/                   # 시스템 코어
+│   │   ├── config.py           # python-dotenv 기반 Settings 싱글턴
+│   │   ├── db.py               # SQLModel 엔진 및 Session 관리
+│   │   ├── auth.py             # JWT 검증 + @require_auth / @require_admin 데코레이터
+│   │   └── exceptions.py       # Custom Exception 및 공통 에러 응답 포맷터
+│   ├── helpers/
+│   │   └── db.py               # 고수준 DB 헬퍼: fetch / bulk_fetch / insert / update / delete
+│   │                           # — join, filter, pagination, soft-delete를 내재한 단일 인터페이스
+│   ├── models/                 # SQLModel DB 모델 (1_database_model.md 기반)
+│   │   ├── base.py
+│   │   ├── user.py
 │   │   ├── product.py
-│   │   └── ...
-│   ├── schemas/            # Pydantic 기반 Request/Response 밸리데이션 모델
+│   │   ├── order.py
+│   │   ├── reservation.py
+│   │   ├── portfolio.py
+│   │   └── selection.py
+│   ├── schemas/                # Pydantic Request/Response 스키마
 │   │   ├── requests/
 │   │   └── responses/
-│   ├── crud/               # DB 쿼리 전담 계층 (SQLModel select/exec)
-│   │   ├── crud_product.py
-│   │   └── ...
-│   └── services/           # 비즈니스 로직 (ex: PG결제 검증용, CRM 노티스 발송)
-│       └── payment_service.py
-├── requirements.txt
-└── .chalice/               # Chalice 설정 파일 (config.json)
+│   └── services/               # 외부 시스템 연동 비즈니스 로직
+│       ├── payment_service.py  # PG 결제 검증
+│       └── storage_service.py  # S3 Presigned URL 생성
+├── .env                        # 로컬 환경변수 (git 제외)
+├── .env.example                # 환경변수 키 목록 (git 포함)
+└── requirements.txt
 ```
 
-## 3. 역방향 검토에 따른 보완 요소 (Frontend/API 연계 고려)
-- **에러 파서 보완:** `chalicelib/core/exceptions.py` 에서는 발생한 Exception을 캐치하여 무조건 API Spec의 `{ success: false, error: { code, message } }` 구조로 리턴하는 커스텀 핸들러(`@app.middleware('http')` 또는 데코레이터 패턴) 구현 필수.
-- **Transaction 관리:** `crud/` 계층 내 쿼리는 다중 수정 시 무결성을 위해 `session.begin()` 등 SQLModel 기반 트랜잭션 Safe 로직 추가.
-- **Dynamic Data 처리:** `models/reservation.py` 에서 `dynamic_data` 칼럼은 JSON 타입과 대응되도록 SQLModel/SQLAlchemy JSONB 타잎 명시적 지정.
+## 3. 핵심 구현 지침
+
+### 환경변수 관리 (`core/config.py`)
+- `python-dotenv`로 `.env`를 로드하는 `Settings` 싱글턴 클래스.
+- `DATABASE_URL`, `JWT_SECRET`, `S3_BUCKET`, `AWS_REGION` 등 모든 설정값을 이 객체로 접근.
+- AWS SSM/Secrets Manager는 사용하지 않음.
+
+### DB 헬퍼 (`helpers/db.py`)
+서비스 계층이 직접 SQLModel `select()`를 작성하지 않도록, 아래 인터페이스를 구현:
+- `fetch(Model, **filters)` — 단건 조회 (없으면 None 또는 예외)
+- `bulk_fetch(Model, filters, joins, order_by, page, size)` — 다건 + 페이징
+- `insert(Model, data)` — 생성 후 반환
+- `update(instance, data)` — 부분 업데이트 후 반환
+- `delete(instance, soft=True)` — Soft Delete 기본, hard delete 옵션
+
+### 권한 데코레이터 (`core/auth.py`)
+- `@require_auth`: JWT 유효성 검증, `request.context`에 user 주입.
+- `@require_admin`: `@require_auth` + role=ADMIN 검증. 미충족 시 표준 에러 응답 반환.
+- 데코레이터 미적용 라우트는 비회원 공개 접근 허용.
+
+### S3 이미지 업로드 흐름
+1. 클라이언트 → `POST /uploads/presign` (Admin 전용) → 서버가 Presigned PUT URL 반환.
+2. 클라이언트 → S3에 직접 PUT 업로드.
+3. 클라이언트 → 해당 모델 API(PATCH /products/{id} 등)에 `object_key`를 포함해 저장 요청.
+- 구현: `services/storage_service.py`에서 `boto3.client('s3').generate_presigned_url` 사용.
+
+### 트랜잭션 관리
+- 다중 write 작업(주문 생성 + 재고 차감 등)은 `session.begin()` 컨텍스트 내에서 처리.
+- 헬퍼 함수가 세션을 인자로 받아 트랜잭션 경계를 서비스 계층에서 제어.

@@ -12,7 +12,8 @@
     <!-- 주문 내역 -->
     <section class="mb-10">
       <h2 class="font-serif text-xl mb-4">주문 내역</h2>
-      <div v-if="orders.length" class="divide-y divide-surface">
+      <div v-if="loadingOrders" class="text-sm text-secondary">불러오는 중...</div>
+      <div v-else-if="orders.length" class="divide-y divide-surface">
         <div v-for="order in orders" :key="order.id" class="py-4">
           <div class="flex justify-between items-start mb-2">
             <p class="text-sm font-medium">주문 #{{ order.id.slice(-6) }}</p>
@@ -30,20 +31,7 @@
     <!-- 예약 현황 -->
     <section class="mb-10">
       <h2 class="font-serif text-xl mb-4">상담 예약 현황</h2>
-      <div v-if="reservations.length" class="divide-y divide-surface">
-        <div v-for="res in reservations" :key="res.id" class="py-4">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-sm font-medium">{{ typeLabel(res.reservation_type) }}</p>
-              <p class="text-xs text-secondary mt-1">{{ new Date(res.expected_date).toLocaleString('ko-KR') }}</p>
-            </div>
-            <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-accent/10 text-accent">
-              {{ resStatusLabel(res.status) }}
-            </span>
-          </div>
-        </div>
-      </div>
-      <p v-else class="text-sm text-secondary">예약 내역이 없습니다.</p>
+      <p class="text-sm text-secondary">예약 내역이 없습니다.</p>
     </section>
 
     <!-- 위시리스트 -->
@@ -51,36 +39,34 @@
       <h2 class="font-serif text-xl mb-4">위시리스트</h2>
       <p class="text-sm text-secondary">위시리스트에 담긴 상품이 없습니다.</p>
     </section>
-
-    <!-- 1:1 문의 내역 -->
-    <section>
-      <h2 class="font-serif text-xl mb-4">1:1 문의 내역</h2>
-      <div class="divide-y divide-surface">
-        <div class="py-4 flex justify-between items-start">
-          <div>
-            <p class="text-sm font-medium">배송 일정 문의</p>
-            <p class="text-xs text-secondary mt-1">2026.03.15</p>
-          </div>
-          <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-success/10 text-success">답변 완료</span>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/store/auth'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { MOCK_ORDERS, MOCK_RESERVATIONS } from '@/mocks/data'
+import { orderService } from '@/services/order.service'
+import type { Order } from '@/types/api.d'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const { user } = storeToRefs(authStore)
 
-// Mock data
-const orders = MOCK_ORDERS
-const reservations = MOCK_RESERVATIONS
+const orders = ref<Order[]>([])
+const loadingOrders = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await orderService.getMyOrders()
+    orders.value = res.data
+  } catch {
+    orders.value = []
+  } finally {
+    loadingOrders.value = false
+  }
+})
 
 function logout() {
   authStore.logout()
@@ -97,14 +83,6 @@ function statusClass(s: string) {
 }
 function statusLabel(s: string) {
   const map: Record<string, string> = { PENDING: '결제 대기', PAID: '결제 완료', SHIPPED: '배송 중', DELIVERED: '수령 완료', CANCELLED: '취소' }
-  return map[s] || s
-}
-function typeLabel(t: string) {
-  const map: Record<string, string> = { INTERIOR: '인테리어 설계/시공', FURNITURE: '가구/홈스타일링', TOTAL: '토탈 솔루션' }
-  return map[t] || t
-}
-function resStatusLabel(s: string) {
-  const map: Record<string, string> = { RECEIVED: '접수', IN_PROGRESS: '상담 진행', QUOTED: '견적 발송', CONTRACTED: '계약 완료', NOSHOW: '노쇼' }
   return map[s] || s
 }
 </script>

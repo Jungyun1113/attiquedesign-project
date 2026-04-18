@@ -1,59 +1,72 @@
-// ============================================================
-// Product Service — 상품 API
-// Mock 모드: MOCK_PRODUCTS를 반환
-// ============================================================
-// import api from './api'
+import api from './api'
 import type { Product, ApiSuccessResponse, PaginationMeta } from '@/types/api.d'
-import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '@/mocks/data'
 
-const USE_MOCK = true // TODO: 실제 API 연동 시 false로 변경
+const STATIC_CATEGORIES = [
+  { id: 'Sofa', name: 'Sofa' },
+  { id: 'Chair / Stool', name: 'Chair / Stool' },
+  { id: 'Table / Desk', name: 'Table / Desk' },
+  { id: 'Cabinet / Storage', name: 'Cabinet / Storage' },
+  { id: 'Bed', name: 'Bed' },
+  { id: 'Lighting', name: 'Lighting' },
+  { id: 'Fabric', name: 'Fabric' },
+  { id: 'Object / Decor', name: 'Object / Decor' },
+  { id: 'Kitchen / Dining', name: 'Kitchen / Dining' },
+]
+
+function mapProduct(item: Record<string, unknown>): Product {
+  return {
+    id: item.id as string,
+    sku: item.sku as string,
+    name: item.name as string,
+    price: item.price as number | null,
+    stock_quantity: item.stock_quantity as number,
+    status: item.status as Product['status'],
+    thumbnail_url: item.thumbnail_url as string,
+    type: item.type as Product['type'],
+    hover_image_url: item.hover_image_url as string | undefined,
+    images: item.images as Product['images'],
+    description: item.description as string | undefined,
+    designer_story: item.designer_story as string | undefined,
+    category_id: (item.category_id ?? item.category) as string ?? '',
+    category_name: (item.category_name ?? item.category) as string ?? '',
+  }
+}
 
 export const productService = {
   async getProducts(params?: {
     page?: number
     limit?: number
-    type?: string
-    category_id?: string
+    category?: string
     sort?: string
   }): Promise<ApiSuccessResponse<Product[]>> {
-    if (USE_MOCK) {
-      let filtered = [...MOCK_PRODUCTS]
-      if (params?.type) filtered = filtered.filter((p) => p.type === params.type)
-      if (params?.category_id) filtered = filtered.filter((p) => p.category_id === params.category_id)
-      if (params?.sort === 'price_asc') filtered.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity))
-      if (params?.sort === 'price_desc') filtered.sort((a, b) => (b.price ?? 0) - (a.price ?? 0))
-
-      const page = params?.page ?? 1
-      const limit = params?.limit ?? 12
-      const start = (page - 1) * limit
-      const paginated = filtered.slice(start, start + limit)
-      const meta: PaginationMeta = {
-        page,
-        size: limit,
-        total_pages: Math.ceil(filtered.length / limit),
-        total_count: filtered.length,
-      }
-      return new Promise((resolve) =>
-        setTimeout(() => resolve({ success: true, data: paginated, meta }), 300),
-      )
+    const backendParams: Record<string, unknown> = {
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 20,
     }
-    // const { data } = await api.get('/products', { params })
-    // return data as ApiSuccessResponse<Product[]>
-    throw new Error('Real API not implemented')
+    if (params?.category) backendParams.category = params.category
+    if (params?.sort === 'price_asc') {
+      backendParams.sort = 'price'
+      backendParams.order = 'asc'
+    } else if (params?.sort === 'price_desc') {
+      backendParams.sort = 'price'
+      backendParams.order = 'desc'
+    } else {
+      backendParams.sort = 'created_at'
+      backendParams.order = 'desc'
+    }
+
+    const { data } = await api.get('/products', { params: backendParams })
+    const meta: PaginationMeta = data.meta
+    const products: Product[] = (data.data as Record<string, unknown>[]).map(mapProduct)
+    return { success: true, data: products, meta }
   },
 
   async getProductById(id: string): Promise<Product> {
-    if (USE_MOCK) {
-      const product = MOCK_PRODUCTS.find((p) => p.id === id)
-      if (!product) throw new Error('Product not found')
-      return new Promise((resolve) => setTimeout(() => resolve(product), 200))
-    }
-    // const { data } = await api.get(`/products/${id}`)
-    // return data.data as Product
-    throw new Error('Real API not implemented')
+    const { data } = await api.get(`/products/${id}`)
+    return mapProduct(data.data as Record<string, unknown>)
   },
 
   getCategories() {
-    return MOCK_CATEGORIES
+    return STATIC_CATEGORIES
   },
 }

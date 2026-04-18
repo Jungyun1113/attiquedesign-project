@@ -2,55 +2,46 @@
   <div class="detail-page">
     <div class="detail-container" :class="{ 'is-visible': isVisible }">
 
-      <!-- ① 뒤로가기 -->
       <router-link to="/portfolio" class="back-link">
         <span class="back-arrow">←</span>
         <span class="back-label">Portfolio</span>
       </router-link>
 
-      <!-- 프로젝트를 찾지 못한 경우 -->
-      <div v-if="!project" class="not-found">
+      <div v-if="loading" class="not-found">
+        <p>불러오는 중...</p>
+      </div>
+
+      <div v-else-if="!portfolio" class="not-found">
         <p>프로젝트를 찾을 수 없습니다.</p>
         <router-link to="/portfolio" class="back-link">← 포트폴리오로 돌아가기</router-link>
       </div>
 
       <template v-else>
-        <!-- ② 프로젝트 헤더 -->
         <header class="project-header">
-          <h1 class="project-title">{{ project.title }}</h1>
-          <p class="project-desc">{{ project.description }}</p>
+          <h1 class="project-title">{{ portfolio.title }}</h1>
+          <p v-if="portfolio.description" class="project-desc">{{ portfolio.description }}</p>
         </header>
 
-        <!-- ③ 이미지 갤러리 -->
         <section class="gallery-section">
-          <!-- 첫 번째 이미지: 전체 너비 -->
-          <div v-if="project.images.length > 0" class="gallery-hero-wrap">
-            <img
-              :src="project.images[0]"
-              :alt="project.title + ' — 1'"
-              class="gallery-hero-image"
-              loading="lazy"
-            />
+          <div v-if="portfolio.cover_image_url && portfolio.images.length === 0" class="gallery-hero-wrap">
+            <img :src="portfolio.cover_image_url" :alt="portfolio.title" class="gallery-hero-image" loading="lazy" />
           </div>
 
-          <!-- 나머지 이미지: 2열 그리드 -->
-          <div v-if="project.images.length > 1" class="gallery-grid">
+          <div v-if="portfolio.images.length > 0" class="gallery-hero-wrap">
+            <img :src="portfolio.images[0].image_url" :alt="portfolio.title + ' — 1'" class="gallery-hero-image" loading="lazy" />
+          </div>
+
+          <div v-if="portfolio.images.length > 1" class="gallery-grid">
             <div
-              v-for="(img, idx) in project.images.slice(1)"
-              :key="idx"
+              v-for="(img, idx) in portfolio.images.slice(1)"
+              :key="img.id"
               class="gallery-grid-item"
             >
-              <img
-                :src="img"
-                :alt="project.title + ' — ' + (idx + 2)"
-                class="gallery-grid-image"
-                loading="lazy"
-              />
+              <img :src="img.image_url" :alt="portfolio.title + ' — ' + (idx + 2)" class="gallery-grid-image" loading="lazy" />
             </div>
           </div>
         </section>
 
-        <!-- ④ 하단 CTA -->
         <footer class="detail-cta">
           <div class="cta-divider"></div>
           <p class="cta-eyebrow">이 공간이 마음에 드신다면.</p>
@@ -65,26 +56,27 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { findProjectBySlug } from '@/data/portfolioData'
-import type { Project } from '@/data/portfolioData'
+import { portfolioService, type Portfolio } from '@/services/portfolio.service'
 
 const route = useRoute()
 const isVisible = ref(false)
+const loading = ref(true)
+const portfolio = ref<Portfolio | null>(null)
 
-const project = ref<Project | undefined>(
-  findProjectBySlug(route.params.id as string)
-)
-
-onMounted(() => {
+onMounted(async () => {
+  try {
+    portfolio.value = await portfolioService.getPortfolioById(route.params.id as string)
+  } catch {
+    portfolio.value = null
+  } finally {
+    loading.value = false
+  }
   window.scrollTo(0, 0)
-  setTimeout(() => {
-    isVisible.value = true
-  }, 80)
+  setTimeout(() => { isVisible.value = true }, 80)
 })
 </script>
 
 <style scoped>
-/* ─── Page Shell ────────────────────────────────── */
 .detail-page {
   background-color: #F5F0E8;
   min-height: calc(100vh - 160px);
@@ -104,7 +96,6 @@ onMounted(() => {
   transform: translateY(0);
 }
 
-/* ─── ① 뒤로가기 ────────────────────────────────── */
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -129,37 +120,8 @@ onMounted(() => {
   line-height: 1;
 }
 
-/* ─── ② 프로젝트 헤더 ────────────────────────────── */
 .project-header {
   margin-bottom: 1.5rem;
-}
-
-.project-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.2rem;
-}
-
-.case-number {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #953735;
-}
-
-.meta-divider {
-  color: rgba(49, 46, 45, 0.25);
-  font-size: 12px;
-}
-
-.project-year {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  color: rgba(49, 46, 45, 0.45);
 }
 
 .project-title {
@@ -182,7 +144,6 @@ onMounted(() => {
   word-break: keep-all;
 }
 
-/* ─── ③ 이미지 갤러리 ───────────────────────────── */
 .gallery-section {
   display: flex;
   flex-direction: column;
@@ -190,7 +151,6 @@ onMounted(() => {
   margin-bottom: 4rem;
 }
 
-/* 첫 번째 이미지 — 전체 너비 */
 .gallery-hero-wrap {
   width: 100%;
   aspect-ratio: 16/9;
@@ -211,7 +171,6 @@ onMounted(() => {
   transform: scale(1.03);
 }
 
-/* 나머지 이미지 — 2열 그리드 */
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -237,7 +196,6 @@ onMounted(() => {
   transform: scale(1.03);
 }
 
-/* ─── ④ 하단 CTA ────────────────────────────────── */
 .detail-cta {
   text-align: center;
   padding-top: 3rem;
@@ -279,7 +237,6 @@ onMounted(() => {
   letter-spacing: 0.34em;
 }
 
-/* ─── Not Found ─────────────────────────────────── */
 .not-found {
   text-align: center;
   padding: 6rem 0;
@@ -288,7 +245,6 @@ onMounted(() => {
   color: #6D6059;
 }
 
-/* ─── Mobile ────────────────────────────────────── */
 @media (max-width: 768px) {
   .detail-container {
     padding: 1rem 1.5rem 6rem;
