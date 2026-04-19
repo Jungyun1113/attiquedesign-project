@@ -19,7 +19,10 @@
             @click="selectSelection(s)"
           >
             <div class="item-info">
-              <span class="project-name">{{ s.title }}</span>
+              <span class="project-name">
+                {{ s.title }}
+                <span v-if="s.title.toLowerCase().includes('hero') || s.title.toLowerCase().includes('slider')" class="hero-badge">메인 슬라이더</span>
+              </span>
               <span v-if="s.subtitle" class="project-sub">{{ s.subtitle }}</span>
             </div>
             <div class="item-actions">
@@ -382,7 +385,8 @@ onMounted(loadSelections)
 .project-item:hover { background: #f8f8f8; }
 .project-item.active { background: #f0f0f0; }
 .item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
-.project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.hero-badge { background: #333; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: normal; flex-shrink: 0; }
 .project-sub { font-size: 11px; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 8px; }
 .image-count { font-size: 11px; color: #aaa; margin-right: 2px; }

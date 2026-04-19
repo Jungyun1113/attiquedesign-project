@@ -191,16 +191,38 @@ onUnmounted(() => {
 
 // ── Selection 데이터 ──────────────────────────
 const selections = ref<Selection[]>([])
+const heroSelections = ref<Selection[]>([])
+const productSelections = ref<Selection[]>([])
 
 async function loadSelections() {
   try {
-    selections.value = await selectionService.getSelections()
-    const apiImages = selections.value.flatMap(s => s.images ?? [])
+    const allSelections = await selectionService.getSelections()
+    
+    // 조건 1: 백엔드 필드에 명시적 category나 type이 "hero", "slider" 인지 검사 (호환성)
+    // 조건 2: DB의 title 또는 subtitle 에 "hero", "slider" 가 포함되어 있는지 검사
+    const isHero = (s: Selection) => {
+      const sAny = s as any
+      const matchCategory = sAny.category === 'hero' || sAny.type === 'slider'
+      const t = (s.title || '').toLowerCase()
+      const sub = (s.subtitle || '').toLowerCase()
+      const matchName = t.includes('hero') || t.includes('slider') || sub.includes('hero') || sub.includes('slider')
+      return matchCategory || matchName
+    }
+
+    heroSelections.value = allSelections.filter(isHero)
+    productSelections.value = allSelections.filter(s => !isHero(s))
+    
+    // 제품 정보들을 저장
+    selections.value = productSelections.value
+
+    const apiImages = heroSelections.value.flatMap(s => s.images ?? [])
     if (apiImages.length > 0) {
       heroSlides.value = apiImages.map(img => ({ type: 'single' as const, src: img.image_url }))
     }
   } catch {
     selections.value = []
+    heroSelections.value = []
+    productSelections.value = []
   }
 }
 
