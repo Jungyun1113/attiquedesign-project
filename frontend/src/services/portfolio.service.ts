@@ -22,6 +22,13 @@ export interface PortfolioCategory {
   portfolios: Portfolio[]
 }
 
+const CATEGORY_NAMES: Record<string, string> = {
+  residential: '주거',
+  commercial: '상업',
+  drama: '드라마',
+  magazine: '매거진',
+}
+
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   residential: '클래식과 모던, 색과 소재의 균형 속에서 완성한 주거 공간.',
   commercial: '브랜드의 성격을 공간으로 풀어낸 아띠끄의 상업 프로젝트.',
@@ -49,11 +56,14 @@ export const portfolioService = {
       if (!map.has(p.category)) map.set(p.category, [])
       map.get(p.category)!.push(p)
     }
-    return Array.from(map.entries()).map(([cat, items]) => ({
-      id: cat.toLowerCase().replace(/\s+/g, '-'),
-      name: cat,
-      description: CATEGORY_DESCRIPTIONS[cat.toLowerCase().replace(/\s+/g, '-')] ?? '',
-      portfolios: items,
-    }))
+    return Array.from(map.entries()).map(([cat, items]) => {
+      const key = cat.toLowerCase().replace(/\s+/g, '-')
+      return {
+        id: key,
+        name: CATEGORY_NAMES[key] ?? cat,
+        description: CATEGORY_DESCRIPTIONS[key] ?? '',
+        portfolios: items,
+      }
+    })
   },
 }

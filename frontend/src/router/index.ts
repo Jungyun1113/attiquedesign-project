@@ -52,6 +52,13 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
+  // ---- 관리자 로그인 (레이아웃 없음) ----
+  {
+    path: '/admin/login',
+    name: 'AdminLogin',
+    component: () => import('@/views/admin/AdminLoginView.vue'),
+  },
+
   // ---- 관리자 페이지 (AdminLayout) ----
   {
     path: '/admin',
@@ -59,6 +66,8 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAdmin: true },
     children: [
       { path: '', name: 'AdminDashboard', component: () => import('@/views/admin/DashboardView.vue') },
+      { path: 'portfolio', name: 'AdminPortfolio', component: () => import('@/views/admin/PortfolioAdminView.vue') },
+      { path: 'selection', name: 'AdminSelection', component: () => import('@/views/admin/SelectionAdminView.vue') },
     ],
   },
 ]
@@ -77,7 +86,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const auth = useAuthStore()
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'Login' }
+    return { name: 'AdminLogin' }
   }
 })
 

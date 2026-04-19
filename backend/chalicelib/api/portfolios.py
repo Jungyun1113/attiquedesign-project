@@ -124,6 +124,19 @@ def delete_portfolio(portfolio_id):
         return handle_app_error(e)
 
 
+@portfolios_bp.route("/portfolios/{portfolio_id}/images/{image_id}", methods=["DELETE"], cors=True)
+@require_admin
+def delete_portfolio_image(portfolio_id, image_id):
+    try:
+        with get_session() as session:
+            fetch(session, Portfolio, raise_not_found=True, id=portfolio_id)
+            image = fetch(session, PortfolioImage, raise_not_found=True, id=image_id)
+            delete(session, image)
+        return success_response({"message": "삭제되었습니다."})
+    except AppError as e:
+        return handle_app_error(e)
+
+
 @portfolios_bp.route("/portfolios/{portfolio_id}/images", methods=["POST"], cors=True)
 @require_admin
 def add_portfolio_image(portfolio_id):

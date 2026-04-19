@@ -214,6 +214,19 @@ def add_selection_product(selection_id):
         return handle_app_error(e)
 
 
+@selections_bp.route("/selections/{selection_id}/images/{image_id}", methods=["DELETE"], cors=True)
+@require_admin
+def delete_selection_image(selection_id, image_id):
+    try:
+        with get_session() as session:
+            fetch(session, Selection, raise_not_found=True, id=selection_id)
+            image = fetch(session, SelectionImage, raise_not_found=True, id=image_id)
+            delete(session, image)
+        return success_response({"message": "삭제되었습니다."})
+    except AppError as e:
+        return handle_app_error(e)
+
+
 @selections_bp.route("/selections/{selection_id}/images", methods=["POST"], cors=True)
 @require_admin
 def add_selection_image(selection_id):

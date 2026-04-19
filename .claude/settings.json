@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(PGPASSWORD=axHQ2KTOi6oANghBWhLV psql -h attiquedesign-db.cw9iic2c8iu9.us-east-1.rds.amazonaws.com -U postgres -d attiquedesign -c \"SELECT id, email, role FROM \\\\\"user\\\\\" WHERE email = 'demo@attique.co.kr';\")"
+    ]
+  }
+}

@@ -19,30 +19,10 @@
       </div>
     </form>
 
-    <!-- 데모 안내 -->
-    <div class="mt-8 p-4 bg-surface text-center">
-      <p class="text-xs text-secondary mb-2">🔑 데모 계정</p>
-      <p class="text-xs text-primary">demo@attique.co.kr / 아무 비밀번호</p>
-    </div>
-
     <!-- 회원가입 유도 -->
     <div class="mt-6 text-center">
       <p class="text-xs text-secondary mb-1">아직 회원이 아니신가요?</p>
-      <p class="text-xs text-accent mb-3">회원가입 시 더 원활한 혜택을 제공합니다.</p>
       <router-link to="/register" class="btn-outline text-xs">회원가입</router-link>
-    </div>
-
-    <!-- 소셜 로그인 (UI만) -->
-    <div class="mt-8 space-y-3">
-      <button class="w-full py-3 border border-surface text-sm text-secondary hover:border-accent transition-colors">
-        카카오로 시작하기
-      </button>
-      <button class="w-full py-3 border border-surface text-sm text-secondary hover:border-accent transition-colors">
-        네이버로 시작하기
-      </button>
-      <button class="w-full py-3 border border-surface text-sm text-secondary hover:border-accent transition-colors">
-        Apple로 시작하기
-      </button>
     </div>
   </div>
 </template>
