@@ -150,9 +150,9 @@ type DualSlide   = { type: 'dual';   src1: string; src2: string }
 type HeroSlide   = SingleSlide | DualSlide
 
 const fallbackSlides: HeroSlide[] = [
-  { type: 'single', src: '/images/hero/hero-01.png' },
-  { type: 'single', src: '/images/hero/hero-02.png' },
-  { type: 'single', src: '/images/hero/hero-03.png' },
+  { type: 'single', src: '/images/hero/hero-01.jpg' },
+  { type: 'single', src: '/images/hero/hero-02.jpg' },
+  { type: 'single', src: '/images/hero/hero-03.jpg' },
 ]
 
 const heroSlides = ref<HeroSlide[]>([])
@@ -219,10 +219,10 @@ async function loadData() {
 
     // 로컬 이미지 기반 슬라이더 구성 (S3 이슈 대응 및 사용자 요청 반영)
     heroSlides.value = [
-      { type: 'single', src: '/images/hero/hero-01.png' },
-      { type: 'single', src: '/images/hero/hero-02.png' },
-      { type: 'single', src: '/images/hero/hero-03.png' },
-      { type: 'dual',   src1: '/images/hero/hero-04.png', src2: '/images/hero/hero-05.png' }
+      { type: 'single', src: '/images/hero/hero-01.jpg' },
+      { type: 'single', src: '/images/hero/hero-02.jpg' },
+      { type: 'single', src: '/images/hero/hero-03.jpg' },
+      { type: 'dual',   src1: '/images/hero/hero-04.jpg', src2: '/images/hero/hero-05.jpg' }
     ]
 
     // 슬라이더가 아닌 셀렉션만 제품 영역에 표시
