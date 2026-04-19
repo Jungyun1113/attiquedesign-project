@@ -21,13 +21,16 @@ export interface Selection {
   title: string
   subtitle?: string
   description?: string
+  category?: string
   images: SelectionImage[]
   products: SelectionProduct[]
 }
 
 export const selectionService = {
-  async getSelections(params?: { page?: number; limit?: number }): Promise<Selection[]> {
-    const { data } = await api.get('/selections', { params: { page: params?.page ?? 1, limit: params?.limit ?? 50 } })
+  async getSelections(params?: { page?: number; limit?: number; category?: string }): Promise<Selection[]> {
+    const query: Record<string, unknown> = { page: params?.page ?? 1, limit: params?.limit ?? 50 }
+    if (params?.category) query.category = params.category
+    const { data } = await api.get('/selections', { params: query })
     return data.data as Selection[]
   },
 

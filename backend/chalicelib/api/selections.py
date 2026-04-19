@@ -71,6 +71,7 @@ def _serialize_selection(session, s: Selection) -> dict:
         "title": s.title,
         "subtitle": s.subtitle,
         "description": s.description,
+        "category": s.category,
         "images": _serialize_selection_images(session, s.id),
         "products": _serialize_selection_products(session, s.id),
     }
@@ -82,9 +83,11 @@ def list_selections():
         params = selections_bp.current_request.query_params or {}
         page = int(params.get("page", 1))
         size = min(int(params.get("limit", 20)), 100)
+        category_filter = params.get("category")
 
         with get_session() as session:
-            items, total = bulk_fetch(session, Selection, page=page, size=size)
+            cat_filters = {"category": category_filter} if category_filter else None
+            items, total = bulk_fetch(session, Selection, filters=cat_filters, page=page, size=size)
 
             # Batch fetch images and products in 2 queries instead of N*2
             selection_ids = [s.id for s in items]
@@ -138,6 +141,7 @@ def list_selections():
                     "title": s.title,
                     "subtitle": s.subtitle,
                     "description": s.description,
+                    "category": s.category,
                     "images": images_by_selection.get(str(s.id), []),
                     "products": products_by_selection.get(str(s.id), []),
                 }
@@ -208,6 +212,7 @@ def create_selection():
                 "title": body["title"],
                 "subtitle": body.get("subtitle"),
                 "description": body.get("description"),
+                "category": body.get("category"),
             })
             result = _serialize_selection(session, selection)
         return success_response(result, status_code=201)
@@ -220,7 +225,7 @@ def create_selection():
 def patch_selection(selection_id):
     try:
         body = selections_bp.current_request.json_body or {}
-        allowed = {"title", "subtitle", "description"}
+        allowed = {"title", "subtitle", "description", "category"}
         data = {k: v for k, v in body.items() if k in allowed}
 
         with get_session() as session:

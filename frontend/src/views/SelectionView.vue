@@ -6,54 +6,43 @@
     <!-- ═══════════════════════════════════════════ -->
     <template v-if="viewMode === 'hero'">
 
-      <!-- ── 섹션 1: 히어로 슬라이더 (Full-Width Overlay) ── -->
+      <!-- ── 섹션 1: 히어로 슬라이더 (이미지만, 텍스트 없음) ── -->
       <section class="sec-hero" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
-        <template v-if="!isMobile">
-          <div
-            v-for="(slide, idx) in pcSlides"
-            :key="'pc-' + idx"
-            class="hero-slide"
-            :class="{ 'is-active': activeSlide === idx }"
-          >
-            <template v-if="slide.type === 'single'">
-              <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" :loading="idx === 0 ? 'eager' : 'lazy'" />
-            </template>
-            <template v-else>
-              <div class="hero-dual">
-                <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
-                <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
-              </div>
-            </template>
-            <!-- 이미지 위 은은한 그라데이션 오버레이 -->
-            <div class="hero-overlay-mask"></div>
-          </div>
-        </template>
-        <template v-else>
-          <div
-            v-for="(slide, idx) in pcSlides"
-            :key="'mo-' + idx"
-            class="hero-slide"
-            :class="{ 'is-active': activeSlide === idx }"
-          >
-            <template v-if="slide.type === 'single'">
-              <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" :loading="idx === 0 ? 'eager' : 'lazy'" />
-            </template>
-            <template v-else>
-              <div class="hero-dual hero-dual--mobile">
-                <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
-                <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
-              </div>
-            </template>
-          </div>
-        </template>
+        <div
+          v-for="(slide, idx) in heroSlides"
+          :key="'slide-' + idx"
+          class="hero-slide"
+          :class="{ 'is-active': activeSlide === idx }"
+        >
+          <template v-if="slide.type === 'single'">
+            <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" :loading="idx === 0 ? 'eager' : 'lazy'" />
+          </template>
+          <template v-else>
+            <div class="hero-dual">
+              <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
+              <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
+            </div>
+          </template>
+        </div>
 
-        <!-- ── 히어로 텍스트 컨텐츠 (중앙 정렬) ── -->
-        <div class="hero-content">
-          <p class="brand-title">Living Edit · Space Creation</p>
-          <div class="brand-desc-wrap">
-            <p class="brand-desc1">하이엔드 수입 가구 큐레이션부터 맞춤형 공간 스타일링과 인테리어 시공까지.</p>
-            <p class="brand-desc2">아띠끄 디자인 한남동 쇼룸에서 품격 있는 토탈 리빙을 경험해 보십시오.</p>
-          </div>
+        <!-- 슬라이드 인디케이터 -->
+        <div class="hero-indicators" v-if="heroSlides.length > 1">
+          <button
+            v-for="(_, idx) in heroSlides"
+            :key="'dot-' + idx"
+            class="indicator-dot"
+            :class="{ 'is-active': activeSlide === idx }"
+            @click="goToSlide(idx)"
+          />
+        </div>
+      </section>
+
+      <!-- ── 섹션 2: 히어로 텍스트 (사진 아래, 좌측 정렬) ── -->
+      <section class="sec-hero-text">
+        <p class="brand-title">Living Edit · Space Creation</p>
+        <div class="brand-desc-wrap">
+          <p class="brand-desc1">하이엔드 수입 가구 큐레이션부터 맞춤형 공간 스타일링과 인테리어 시공까지.</p>
+          <p class="brand-desc2">아띠끄 디자인 한남동 쇼룸에서 품격 있는 토탈 리빙을 경험해 보십시오.</p>
         </div>
       </section>
 
@@ -144,20 +133,20 @@ const fallbackSlides: HeroSlide[] = [
 ]
 
 const heroSlides = ref<HeroSlide[]>(fallbackSlides)
-
-const pcSlides = computed(() => heroSlides.value)
-
-const isMobile = ref(window.innerWidth <= 768)
 const activeSlide = ref(0)
 let autoplayTimer: ReturnType<typeof setInterval> | null = null
 
-const currentLength = computed(() => pcSlides.value.length)
+const currentLength = computed(() => heroSlides.value.length)
+
+function goToSlide(idx: number) {
+  activeSlide.value = idx
+}
 
 function startAutoplay() {
   stopAutoplay()
   autoplayTimer = setInterval(() => {
     activeSlide.value = (activeSlide.value + 1) % currentLength.value
-  }, 2000)
+  }, 4000)
 }
 
 function stopAutoplay() {
@@ -166,6 +155,8 @@ function stopAutoplay() {
     autoplayTimer = null
   }
 }
+
+const isMobile = ref(window.innerWidth <= 768)
 
 function handleResize() {
   const wasMobile = isMobile.value
@@ -182,47 +173,33 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
   updateWrapWidth()
   startAutoplay()
-  loadSelections()
+  loadData()
 })
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   stopAutoplay()
 })
 
-// ── Selection 데이터 ──────────────────────────
+// ── 데이터 로딩 ──────────────────────────
 const selections = ref<Selection[]>([])
-const heroSelections = ref<Selection[]>([])
-const productSelections = ref<Selection[]>([])
 
-async function loadSelections() {
+async function loadData() {
   try {
-    const allSelections = await selectionService.getSelections()
-    
-    // 조건 1: 백엔드 필드에 명시적 category나 type이 "hero", "slider" 인지 검사 (호환성)
-    // 조건 2: DB의 title 또는 subtitle 에 "hero", "slider" 가 포함되어 있는지 검사
-    const isHero = (s: Selection) => {
-      const sAny = s as any
-      const matchCategory = sAny.category === 'hero' || sAny.type === 'slider'
-      const t = (s.title || '').toLowerCase()
-      const sub = (s.subtitle || '').toLowerCase()
-      const matchName = t.includes('hero') || t.includes('slider') || sub.includes('hero') || sub.includes('slider')
-      return matchCategory || matchName
+    // 슬라이더 전용: category=slider
+    const [sliderData, selectionData] = await Promise.all([
+      selectionService.getSelections({ category: 'slider', limit: 50 }),
+      selectionService.getSelections({ limit: 100 }),
+    ])
+
+    const sliderImages = sliderData.flatMap((s: Selection) => s.images ?? [])
+    if (sliderImages.length > 0) {
+      heroSlides.value = sliderImages.map(img => ({ type: 'single' as const, src: img.image_url }))
     }
 
-    heroSelections.value = allSelections.filter(isHero)
-    productSelections.value = allSelections.filter(s => !isHero(s))
-    
-    // 제품 정보들을 저장
-    selections.value = productSelections.value
-
-    const apiImages = heroSelections.value.flatMap(s => s.images ?? [])
-    if (apiImages.length > 0) {
-      heroSlides.value = apiImages.map(img => ({ type: 'single' as const, src: img.image_url }))
-    }
+    // 슬라이더가 아닌 셀렉션만 제품 영역에 표시
+    selections.value = selectionData.filter((s: Selection) => (s as any).category !== 'slider')
   } catch {
     selections.value = []
-    heroSelections.value = []
-    productSelections.value = []
   }
 }
 
@@ -273,38 +250,15 @@ function updateWrapWidth() {
   background-color: #F5F0E8;
 }
 
+/* ── PC 히어로 섹션: 와이드 비율 ── */
 .sec-hero {
   position: relative;
   width: 100%;
-  height: 80vh;
+  aspect-ratio: 16 / 7;
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-color: #F5F0E8;
-}
-
-.hero-overlay-mask {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(245, 240, 232, 0.4) 0%, transparent 40%, transparent 60%, rgba(245, 240, 232, 0.4) 100%);
-  pointer-events: none;
-}
-
-.hero-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 2rem;
-  pointer-events: none;
+  background-color: #1a1a18;
 }
 
 .hero-slide {
@@ -335,10 +289,6 @@ function updateWrapWidth() {
   gap: 4px;
 }
 
-.hero-dual--mobile {
-  gap: 2px;
-}
-
 .hero-img-half {
   flex: 1;
   min-width: 0;
@@ -348,44 +298,81 @@ function updateWrapWidth() {
   display: block;
 }
 
+/* 슬라이드 인디케이터 */
+.hero-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+.indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.indicator-dot.is-active {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.3);
+}
+
+/* ── 히어로 텍스트: 사진 아래, 좌측 정렬 ── */
+.sec-hero-text {
+  padding: 2.4rem 5rem 2rem;
+  background-color: #F5F0E8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
 .brand-title {
   font-family: 'Playfair Display', serif;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 400;
   font-style: italic;
   line-height: 1.4;
   color: #111111;
   margin: 0;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
+  text-align: left;
 }
 
 .brand-desc-wrap {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 1.8rem;
+  gap: 0.4rem;
+  margin-top: 1.2rem;
+  text-align: left;
 }
 
 .brand-desc1 {
   font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  color: #111111;
-  line-height: 1.6;
+  font-size: 15px;
+  font-weight: 400;
+  color: #444;
+  line-height: 1.7;
   margin: 0;
   word-break: keep-all;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
 }
 
 .brand-desc2 {
   font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 300;
-  color: #111111;
-  line-height: 1.6;
+  color: #666;
+  line-height: 1.7;
   margin: 0;
   word-break: keep-all;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
 }
 
 .sec-selection {
@@ -558,42 +545,40 @@ function updateWrapWidth() {
   gap: 2rem 1.5rem;
 }
 
+/* ── 모바일: 세로로 긴 비율, 텍스트 여백 축소 ── */
 @media (max-width: 768px) {
   .sec-hero {
-    height: auto;
-    aspect-ratio: 4 / 5; /* 모바일은 세로로 좀 더 길게 */
+    aspect-ratio: 3 / 4;
   }
 
-  .hero-content {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
-    padding: 2.5rem 1.5rem;
-    background-color: #F5F0E8; /* 모바일은 텍스트 가독성을 위해 배경 분리 */
+  .hero-indicators {
+    bottom: 14px;
+  }
+
+  .indicator-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .sec-hero-text {
+    padding: 1.8rem 1.4rem 1.2rem;
   }
 
   .brand-title {
-    font-size: 1.5rem;
-    text-shadow: none;
-  }
-
-  .brand-desc1 {
-    font-size: 14px;
-    text-shadow: none;
+    font-size: 1.35rem;
   }
 
   .brand-desc-wrap {
-    margin-top: 1rem;
-    gap: 0.4rem;
-  }
-
-  .brand-title {
-    font-size: 1.2rem;
+    margin-top: 0.8rem;
+    gap: 0.3rem;
   }
 
   .brand-desc1 {
     font-size: 13px;
+  }
+
+  .brand-desc2 {
+    font-size: 12px;
   }
 
   .sec-selection {

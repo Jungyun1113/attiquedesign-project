@@ -68,6 +68,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', name: 'AdminDashboard', component: () => import('@/views/admin/DashboardView.vue') },
       { path: 'portfolio', name: 'AdminPortfolio', component: () => import('@/views/admin/PortfolioAdminView.vue') },
       { path: 'selection', name: 'AdminSelection', component: () => import('@/views/admin/SelectionAdminView.vue') },
+      { path: 'slider', name: 'AdminSlider', component: () => import('@/views/admin/SliderAdminView.vue') },
     ],
   },
 ]
