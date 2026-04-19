@@ -231,15 +231,21 @@ async function uploadImages() {
   try {
     for (let i = 0; i < pendingFiles.value.length; i++) {
       const { file } = pendingFiles.value[i]
+      const uploadFileType = file.type || 'image/png'
 
       const { data: presignData } = await api.post('/uploads/presign', {
         filename: file.name,
-        content_type: file.type,
+        content_type: uploadFileType,
         target: 'selections',
       })
       const { upload_url, object_key } = presignData.data
 
-      await axios.put(upload_url, file, { headers: { 'Content-Type': file.type } })
+      // S3 PUT 시 Content-Type 헤더가 Presigned URL 생성 시와 정확히 일치해야 함
+      await axios.put(upload_url, file, { 
+        headers: { 
+          'Content-Type': uploadFileType 
+        } 
+      })
 
       await api.post(`/selections/${selected.value!.id}/images`, {
         image_url: object_key,

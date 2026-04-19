@@ -249,14 +249,15 @@ async function uploadImages() {
     for (let i = 0; i < pendingFiles.value.length; i++) {
       const { file } = pendingFiles.value[i]
 
+      const uploadFileType = file.type || 'image/png'
       const { data: presignData } = await api.post('/uploads/presign', {
         filename: file.name,
-        content_type: file.type,
+        content_type: uploadFileType,
         target: 'selections',
       })
       const { upload_url, object_key } = presignData.data
 
-      await axios.put(upload_url, file, { headers: { 'Content-Type': file.type } })
+      await axios.put(upload_url, file, { headers: { 'Content-Type': uploadFileType } })
 
       // object_key를 저장하면 백엔드가 올바른 public URL로 변환
       await api.post(`/selections/${selected.value!.id}/images`, {

@@ -1,6 +1,12 @@
 <template>
   <div class="contact-page">
     <div class="contact-wrapper">
+      <!-- 1. 상단 타이틀 -->
+      <div class="contact-header">
+        <h2 class="contact-title">Private Consultation.</h2>
+      </div>
+
+      <!-- 2. 하단 콘텐츠 섹션 -->
       <div class="contact-layout-split">
         <!-- 좌측: 쇼룸 빌딩 사진 -->
         <div class="contact-image-wrap">
@@ -9,10 +15,6 @@
 
         <!-- 우측: 컨택 정보 -->
         <div class="contact-inner">
-          <!-- 메인 타이틀: "Private Consultation." 딥 버건디 -->
-          <h2 class="contact-title">Private Consultation.</h2>
-
-          <!-- 주소 및 연락처 정보 (2줄 배치) -->
           <div class="contact-info">
             <p class="contact-address">Showroom. 서울시 용산구 한남대로 21길 27 아띠끄 디자인</p>
             <div class="contact-phone-row">
@@ -57,9 +59,7 @@
               </div>
             </div>
           </div>
-
           <div class="contact-actions">
-            <!-- 방문상담 예약하기 버튼 (네이버 예약 연결) -->
             <a
               href="https://m.booking.naver.com/booking/6/bizes/1563733/items/7301622?area=plt&lang=ko&theme=place"
               target="_blank"
@@ -82,49 +82,67 @@
 <style scoped>
 .contact-page {
   background-color: #F5F0E8;
-  min-height: calc(100vh - 160px);
-  padding: 1.5rem 2rem;
+  height: calc(100vh - 150px);
+  width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-start; /* 상단 정렬로 변경 */
   justify-content: center;
+  overflow: hidden;
+  padding: 4rem 2rem 0; /* 상단에 적절한 여백 부여 */
 }
 
 .contact-wrapper {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px; /* 너무 퍼지지 않게 너비 축소 */
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.contact-header {
+  width: 100%;
+}
+
+.contact-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(32px, 4.5vw, 56px);
+  line-height: 1;
+  color: #953735;
+  margin: 0;
+  text-align: left;
 }
 
 .contact-layout-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 4rem;
+  gap: 4rem; /* 간격 축소 (기존 6rem -> 4rem) */
+  width: 100%;
 }
 
 .contact-image-wrap {
-  aspect-ratio: 3/4;
+  width: 100%;
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  background-color: #eee;
 }
 
 .contact-building-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: left;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.05));
 }
 
 .contact-inner {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-}
-
-.contact-title {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: clamp(32px, 5vw, 56px);
-  color: #953735;
-  margin: 0;
+  gap: 2rem;
+  text-align: left;
 }
 
 .contact-info {
@@ -135,9 +153,9 @@
 
 .contact-address {
   font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #000;
+  font-size: clamp(14px, 1.1vw, 16px);
+  line-height: 1.6;
+  color: #312E2D;
   margin: 0;
 }
 
@@ -145,29 +163,33 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .contact-phone {
   font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  color: #000;
+  font-size: clamp(14px, 1.1vw, 16px);
+  font-weight: 500;
+  color: #312E2D;
 }
 
 .contact-social-group {
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .contact-social-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   color: #312E2D;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  opacity: 0.7;
 }
 
 .contact-social-icon:hover {
   color: #953735;
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
 .social-svg {
@@ -176,37 +198,61 @@
 }
 
 .contact-actions {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .btn-booking {
   display: inline-block;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  padding: 1.2rem 2.8rem;
+  padding: 1.2rem 2.5rem;
   background-color: #312E2D;
   color: #fff;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.btn-booking:hover,
-.btn-booking:active {
+.btn-booking:hover {
   background-color: #953735;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  padding-right: 3.5rem;
 }
 
 @media (max-width: 900px) {
-  .contact-layout-split {
-    grid-template-columns: 1fr;
-    gap: 3rem;
+  .contact-page {
+    height: auto;
+    min-height: calc(100vh - 120px);
+    padding: 2.5rem 1.5rem 5rem; /* 상단 여백 조절 및 스크롤 허용 */
+    overflow: visible;
   }
+
+  .contact-wrapper {
+    gap: 1.5rem;
+  }
+
+  .contact-layout-split {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem; /* 모바일 간격 대폭 축소 */
+  }
+
   .contact-image-wrap {
-    aspect-ratio: 16/9;
+    height: 35vh;
+  }
+
+  .contact-title {
+    font-size: 24px;
+  }
+
+  .contact-address, .contact-phone {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .btn-booking {
+    font-size: 9px;
+    padding: 1rem 1.4rem;
   }
 }
 </style>

@@ -34,7 +34,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const scrolled = ref(false)
 const menuItems = [
-  { label: 'Philosophy', path: '/philosophy' },
+  { label: 'About', path: '/philosophy' },
   { label: 'Interior', path: '/interior' },
   { label: 'Selection', path: '/selection?view=grid' },
   { label: 'Portfolio', path: '/portfolio' },
