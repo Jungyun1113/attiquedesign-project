@@ -81,7 +81,7 @@
               @click="viewSelection(sel.id)"
             >
               <div class="archive-img-wrap">
-                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" />
+                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" @error="(e) => (e.target as HTMLElement).classList.add('loaded')" />
               </div>
               <div class="archive-info">
                 <h3 class="archive-name">{{ sel.title }}</h3>
@@ -121,7 +121,7 @@
           @click="viewSelection(sel.id)"
         >
           <div class="archive-img-wrap">
-            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" />
+            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" @error="(e) => (e.target as HTMLElement).classList.add('loaded')" />
           </div>
           <div class="archive-info">
             <h3 class="archive-name">{{ sel.title }}</h3>
