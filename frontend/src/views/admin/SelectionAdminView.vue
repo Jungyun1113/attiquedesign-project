@@ -257,7 +257,11 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      await axios.put(upload_url, file)
+      const uploadRes = await fetch(upload_url, {
+        method: 'PUT',
+        body: file,
+      })
+      if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 
       // object_key를 저장하면 백엔드가 올바른 public URL로 변환
       await api.post(`/selections/${selected.value!.id}/images`, {

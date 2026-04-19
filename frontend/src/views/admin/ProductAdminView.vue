@@ -221,8 +221,12 @@ async function uploadThumbnail(e: Event) {
     })
     const { upload_url, object_key } = presignData.data
 
-    // 2) S3 PUT (Remove header to match existing server signature)
-    await axios.put(upload_url, file)
+    // 2) S3 PUT (fetch를 사용하여 자동 헤더 추가를 방지)
+    const uploadRes = await fetch(upload_url, {
+      method: 'PUT',
+      body: file,
+    })
+    if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 
     // 3) 상품 thumbnail_url 업데이트
     await api.patch(`/products/${selected.value.id}`, { thumbnail_url: object_key })

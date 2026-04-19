@@ -240,8 +240,12 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      // S3 PUT 시 서버의 서명(SignedHeaders=host)과 일치시키기 위해 헤더를 제외합니다.
-      await axios.put(upload_url, file)
+      // S3 PUT 시 서버의 서명(SignedHeaders=host)과 일치시키기 위해 fetch를 사용하여 헤더를 제외합니다.
+      const uploadRes = await fetch(upload_url, {
+        method: 'PUT',
+        body: file,
+      })
+      if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 
       await api.post(`/selections/${selected.value!.id}/images`, {
         image_url: object_key,
