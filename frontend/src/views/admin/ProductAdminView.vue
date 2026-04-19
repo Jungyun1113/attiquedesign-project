@@ -212,16 +212,17 @@ async function uploadThumbnail(e: Event) {
   if (!file || !selected.value) return
 
   try {
+    const uploadFileType = file.type || 'image/png'
     // 1) presign
     const { data: presignData } = await api.post('/uploads/presign', {
       filename: file.name,
-      content_type: file.type,
+      content_type: uploadFileType,
       target: 'products',
     })
     const { upload_url, object_key } = presignData.data
 
-    // 2) S3 PUT
-    await axios.put(upload_url, file, { headers: { 'Content-Type': file.type } })
+    // 2) S3 PUT (Remove header to match existing server signature)
+    await axios.put(upload_url, file)
 
     // 3) 상품 thumbnail_url 업데이트
     await api.patch(`/products/${selected.value.id}`, { thumbnail_url: object_key })

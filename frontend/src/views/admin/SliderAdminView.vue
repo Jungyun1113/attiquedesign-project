@@ -240,12 +240,8 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      // S3 PUT 시 Content-Type 헤더가 Presigned URL 생성 시와 정확히 일치해야 함
-      await axios.put(upload_url, file, { 
-        headers: { 
-          'Content-Type': uploadFileType 
-        } 
-      })
+      // S3 PUT 시 서버의 서명(SignedHeaders=host)과 일치시키기 위해 헤더를 제외합니다.
+      await axios.put(upload_url, file)
 
       await api.post(`/selections/${selected.value!.id}/images`, {
         image_url: object_key,

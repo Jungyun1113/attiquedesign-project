@@ -257,7 +257,7 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      await axios.put(upload_url, file, { headers: { 'Content-Type': uploadFileType } })
+      await axios.put(upload_url, file)
 
       // object_key를 저장하면 백엔드가 올바른 public URL로 변환
       await api.post(`/selections/${selected.value!.id}/images`, {

@@ -15,7 +15,10 @@ def _get_s3_client():
         _s3_client = boto3.client(
             "s3",
             region_name=settings.AWS_REGION,
-            config=Config(s3={"addressing_style": "path"}),
+            config=Config(
+                s3={"addressing_style": "path"},
+                signature_version="s3v4"
+            ),
         )
     return _s3_client
 
