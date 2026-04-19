@@ -226,6 +226,9 @@ async function uploadThumbnail(e: Event) {
     const uploadRes = await fetch(upload_url, {
       method: 'PUT',
       body: fileBuffer,
+      headers: {
+        'Content-Type': uploadFileType,
+      },
     })
     if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 

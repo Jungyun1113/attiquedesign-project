@@ -56,12 +56,13 @@ def generate_presigned_put_url(filename: str, content_type: str, target: str) ->
     ext = filename.rsplit(".", 1)[-1] if "." in filename else "bin"
     object_key = f"{target}/{uuid.uuid4()}.{ext}"
 
-    # ContentType을 Params에서 제외하면 SignedHeaders에 포함되지 않아 헤더 불일치로 인한 403 오류를 방지할 수 있습니다.
+    # ContentType을 Params에 포함하여 서명함으로써 브라우저의 자동 헤더 추가와 일치시킵니다.
     upload_url = _get_s3_client().generate_presigned_url(
         "put_object",
         Params={
             "Bucket": settings.S3_BUCKET,
             "Key": object_key,
+            "ContentType": content_type,
         },
         ExpiresIn=settings.PRESIGN_EXPIRY_SECONDS,
     )
