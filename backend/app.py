@@ -25,3 +25,11 @@ app.register_blueprint(webhooks_bp)
 @app.route("/health", methods=["GET"], cors=True)
 def health():
     return {"status": "ok"}
+
+
+@app.route("/debug/aws-account", methods=["GET"], cors=True)
+def debug_aws_account():
+    import boto3
+    sts = boto3.client("sts")
+    identity = sts.get_caller_identity()
+    return {"account": identity["Account"], "arn": identity["Arn"]}
