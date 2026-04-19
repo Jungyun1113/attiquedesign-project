@@ -50,7 +50,6 @@ jobs:
                   "ACCESS_TOKEN_EXPIRE_MINUTES": "60",
                   "REFRESH_TOKEN_EXPIRE_DAYS": "30",
                   "S3_BUCKET": "${{ secrets.AWS_S3_BUCKET }}",
-                  "AWS_REGION": "ap-northeast-2",
                   "PRESIGN_EXPIRY_SECONDS": "300",
                   "PORTONE_API_SECRET": "${{ secrets.PORTONE_API_SECRET }}",
                   "PORTONE_WEBHOOK_SECRET": "${{ secrets.PORTONE_WEBHOOK_SECRET }}",
