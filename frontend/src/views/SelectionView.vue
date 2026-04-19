@@ -6,7 +6,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <template v-if="viewMode === 'hero'">
 
-      <!-- ── 섹션 1: 히어로 슬라이더 ── -->
+      <!-- ── 섹션 1: 히어로 슬라이더 (Full-Width Overlay) ── -->
       <section class="sec-hero" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
         <template v-if="!isMobile">
           <div
@@ -24,6 +24,8 @@
                 <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
               </div>
             </template>
+            <!-- 이미지 위 은은한 그라데이션 오버레이 -->
+            <div class="hero-overlay-mask"></div>
           </div>
         </template>
         <template v-else>
@@ -44,16 +46,14 @@
             </template>
           </div>
         </template>
-      </section>
 
-      <!-- ── 섹션 2: 브랜드 텍스트 ── -->
-      <section class="sec-brand">
-        <div class="sec-brand-left">
+        <!-- ── 히어로 텍스트 컨텐츠 (중앙 정렬) ── -->
+        <div class="hero-content">
           <p class="brand-title">Living Edit · Space Creation</p>
-        </div>
-        <div class="sec-brand-right">
-          <p class="brand-desc1">인테리어 시공부터 가구, 조명, 러그, 오브제까지.</p>
-          <p class="brand-desc2">한남동 쇼룸에서 만나보실 수 있습니다.</p>
+          <div class="brand-desc-wrap">
+            <p class="brand-desc1">하이엔드 수입 가구 큐레이션부터 맞춤형 공간 스타일링과 인테리어 시공까지.</p>
+            <p class="brand-desc2">아띠끄 디자인 한남동 쇼룸에서 품격 있는 토탈 리빙을 경험해 보십시오.</p>
+          </div>
         </div>
       </section>
 
@@ -70,17 +70,18 @@
         <div class="prod-slider-wrap" ref="sliderWrapRef">
           <div class="prod-track" :style="trackStyle">
             <div
-              v-for="item in allProducts"
-              :key="item.id"
+              v-for="sel in selections"
+              :key="sel.id"
               class="archive-item"
               :style="itemStyle"
+              @click="viewSelection(sel.id)"
             >
               <div class="archive-img-wrap">
-                <img :src="item.thumbnail_url ?? ''" :alt="item.name ?? ''" loading="lazy" />
+                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" loading="lazy" />
               </div>
               <div class="archive-info">
-                <h3 class="archive-name">{{ item.name }}</h3>
-                <button class="archive-btn" @click="viewSelection(item.selectionId)">VIEW DETAILS</button>
+                <h3 class="archive-name">{{ sel.title }}</h3>
+                <button class="archive-btn">VIEW DETAILS</button>
               </div>
             </div>
           </div>
@@ -101,16 +102,17 @@
 
       <div class="grid-container">
         <div
-          v-for="item in allProducts"
-          :key="item.id"
+          v-for="sel in selections"
+          :key="sel.id"
           class="archive-item"
+          @click="viewSelection(sel.id)"
         >
           <div class="archive-img-wrap">
-            <img :src="item.thumbnail_url ?? ''" :alt="item.name ?? ''" loading="lazy" />
+            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" loading="lazy" />
           </div>
           <div class="archive-info">
-            <h3 class="archive-name">{{ item.name }}</h3>
-            <button class="archive-btn" @click="viewSelection(item.selectionId)">VIEW DETAILS</button>
+            <h3 class="archive-name">{{ sel.title }}</h3>
+            <button class="archive-btn">VIEW DETAILS</button>
           </div>
         </div>
       </div>
@@ -134,18 +136,22 @@ type SingleSlide = { type: 'single'; src: string }
 type DualSlide   = { type: 'dual';   src1: string; src2: string }
 type HeroSlide   = SingleSlide | DualSlide
 
-const pcSlides: HeroSlide[] = [
+const fallbackSlides: HeroSlide[] = [
   { type: 'single', src: '/images/hero/hero-01.png' },
   { type: 'single', src: '/images/hero/hero-02.png' },
   { type: 'single', src: '/images/hero/hero-03.png' },
   { type: 'dual',   src1: '/images/hero/hero-05.png', src2: '/images/hero/hero-04.png' },
 ]
 
+const heroSlides = ref<HeroSlide[]>(fallbackSlides)
+
+const pcSlides = computed(() => heroSlides.value)
+
 const isMobile = ref(window.innerWidth <= 768)
 const activeSlide = ref(0)
 let autoplayTimer: ReturnType<typeof setInterval> | null = null
 
-const currentLength = computed(() => pcSlides.length)
+const currentLength = computed(() => pcSlides.value.length)
 
 function startAutoplay() {
   stopAutoplay()
@@ -184,29 +190,15 @@ onUnmounted(() => {
 })
 
 // ── Selection 데이터 ──────────────────────────
-interface FlatProduct {
-  id: string
-  selectionId: string
-  name?: string
-  thumbnail_url?: string
-}
-
 const selections = ref<Selection[]>([])
-
-const allProducts = computed<FlatProduct[]>(() =>
-  selections.value.flatMap(sel =>
-    sel.products.map(p => ({
-      id: p.id,
-      selectionId: sel.id,
-      name: p.name,
-      thumbnail_url: p.thumbnail_url,
-    }))
-  )
-)
 
 async function loadSelections() {
   try {
     selections.value = await selectionService.getSelections()
+    const apiImages = selections.value.flatMap(s => s.images ?? [])
+    if (apiImages.length > 0) {
+      heroSlides.value = apiImages.map(img => ({ type: 'single' as const, src: img.image_url }))
+    }
   } catch {
     selections.value = []
   }
@@ -222,7 +214,7 @@ const wrapWidth = ref(0)
 const prodOffset = ref(0)
 
 const itemsPerView = computed(() => isMobile.value ? 2 : 3)
-const maxOffset = computed(() => Math.max(0, allProducts.value.length - itemsPerView.value))
+const maxOffset = computed(() => Math.max(0, selections.value.length - itemsPerView.value))
 
 const GAP = 16
 
@@ -262,11 +254,35 @@ function updateWrapWidth() {
 .sec-hero {
   position: relative;
   width: 100%;
-  height: 60vh;
+  height: 80vh;
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-color: #e8e6e2;
+  background-color: #F5F0E8;
+}
+
+.hero-overlay-mask {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(245, 240, 232, 0.4) 0%, transparent 40%, transparent 60%, rgba(245, 240, 232, 0.4) 100%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 2rem;
+  pointer-events: none;
 }
 
 .hero-slide {
@@ -310,53 +326,44 @@ function updateWrapWidth() {
   display: block;
 }
 
-.sec-brand {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-height: 120px;
-  padding: 2rem 4rem;
-  background-color: #F5F0E8;
-  gap: 2rem;
-  overflow: visible;
-}
-
-.sec-brand-left {
-  flex: 0 0 40%;
-}
-
 .brand-title {
   font-family: 'Playfair Display', serif;
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   font-weight: 400;
   font-style: italic;
   line-height: 1.4;
-  color: #2C2C2A;
+  color: #111111;
   margin: 0;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.4);
 }
 
-.sec-brand-right {
-  flex: 0 0 60%;
+.brand-desc-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.8rem;
 }
 
 .brand-desc1 {
   font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #5F5E5A;
+  font-size: 16px;
+  font-weight: 500;
+  color: #111111;
   line-height: 1.6;
   margin: 0;
   word-break: keep-all;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
 }
 
 .brand-desc2 {
   font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
-  color: #888780;
+  color: #111111;
   line-height: 1.6;
-  margin-top: 0.3rem;
+  margin: 0;
   word-break: keep-all;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
 }
 
 .sec-selection {
@@ -532,29 +539,31 @@ function updateWrapWidth() {
 @media (max-width: 768px) {
   .sec-hero {
     height: auto;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 4 / 5; /* 모바일은 세로로 좀 더 길게 */
   }
 
-  .hero-slide {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+  .hero-content {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    padding: 2.5rem 1.5rem;
+    background-color: #F5F0E8; /* 모바일은 텍스트 가독성을 위해 배경 분리 */
   }
 
-  .sec-brand {
-    flex-direction: column;
-    height: auto;
-    min-height: unset;
-    padding: 1.5rem;
+  .brand-title {
+    font-size: 1.5rem;
+    text-shadow: none;
+  }
+
+  .brand-desc1 {
+    font-size: 14px;
+    text-shadow: none;
+  }
+
+  .brand-desc-wrap {
+    margin-top: 1rem;
     gap: 0.4rem;
-    align-items: flex-start;
-  }
-
-  .sec-brand-left,
-  .sec-brand-right {
-    flex: none;
-    width: 100%;
   }
 
   .brand-title {

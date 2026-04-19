@@ -96,6 +96,29 @@
               </div>
             </div>
           </div>
+
+          <!-- 연결된 상품 관리 -->
+          <div class="registered-products">
+            <div class="section-header">
+              <h3 class="section-label">연결된 상품 ({{ selected.products?.length ?? 0 }}개)</h3>
+              <button class="btn-add-product" @click="showProductSearch = true">+ 상품 추가</button>
+            </div>
+            <div v-if="!selected.products || selected.products.length === 0" class="no-images">연결된 상품이 없습니다.</div>
+            <div v-else class="product-list">
+              <div v-for="prod in selected.products" :key="prod.id" class="product-row">
+                <div class="product-thumb">
+                  <img v-if="prod.thumbnail_url" :src="prod.thumbnail_url" :alt="prod.name ?? ''" />
+                  <span v-else class="no-thumb">📷</span>
+                </div>
+                <div class="product-meta">
+                  <span class="product-name-text">{{ prod.name ?? '이름 없음' }}</span>
+                  <span v-if="prod.price" class="product-price-text">{{ prod.price.toLocaleString() }}원</span>
+                  <span v-else class="product-price-text inquiry">가격 문의</span>
+                </div>
+                <button class="btn-remove-product" @click="removeProduct(prod.id)" title="연결 해제">✕</button>
+              </div>
+            </div>
+          </div>
         </template>
 
         <div v-else class="panel-empty">
@@ -155,6 +178,44 @@
         </div>
       </div>
     </div>
+    <!-- 상품 검색 모달 -->
+    <div v-if="showProductSearch" class="modal-overlay" @click.self="showProductSearch = false">
+      <div class="modal modal-wide">
+        <h2 class="modal-title">상품 추가</h2>
+        <div class="field">
+          <label>상품 검색</label>
+          <input v-model="productSearchQuery" type="text" placeholder="상품명으로 검색..." @input="searchProducts" />
+        </div>
+        <div class="product-search-results">
+          <div v-if="searchLoading" class="search-loading">검색 중...</div>
+          <div v-else-if="searchResults.length === 0" class="search-empty">검색 결과가 없습니다.</div>
+          <div v-else>
+            <div
+              v-for="p in searchResults"
+              :key="p.id"
+              class="search-result-item"
+              :class="{ 'already-added': isAlreadyAdded(p.id) }"
+              @click="addProduct(p.id)"
+            >
+              <div class="product-thumb">
+                <img v-if="p.thumbnail_url" :src="p.thumbnail_url" :alt="p.name" />
+                <span v-else class="no-thumb">📷</span>
+              </div>
+              <div class="product-meta">
+                <span class="product-name-text">{{ p.name }}</span>
+                <span v-if="p.price" class="product-price-text">{{ p.price.toLocaleString() }}원</span>
+                <span v-else class="product-price-text inquiry">가격 문의</span>
+              </div>
+              <span v-if="isAlreadyAdded(p.id)" class="added-badge">추가됨</span>
+              <span v-else class="add-badge">+ 추가</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showProductSearch = false">닫기</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -164,7 +225,9 @@ import axios from 'axios'
 import api from '@/services/api'
 
 interface SelectionImage { id: string; image_url: string; display_order: number }
-interface Selection { id: string; title: string; subtitle?: string; description?: string; images: SelectionImage[] }
+interface SelectionProduct { id: string; product_id: string; display_order: number; name?: string; thumbnail_url?: string; price?: number | null; status?: string }
+interface Selection { id: string; title: string; subtitle?: string; description?: string; images: SelectionImage[]; products: SelectionProduct[] }
+interface ProductSearchItem { id: string; name: string; thumbnail_url?: string; price?: number | null }
 
 const selections = ref<Selection[]>([])
 const selected = ref<Selection | null>(null)
@@ -250,13 +313,13 @@ async function uploadImages() {
         content_type: file.type,
         target: 'selections',
       })
-      const { upload_url } = presignData.data
+      const { upload_url, object_key } = presignData.data
 
       await axios.put(upload_url, file, { headers: { 'Content-Type': file.type } })
 
-      const imageUrl = upload_url.split('?')[0]
+      // object_key를 저장하면 백엔드가 올바른 public URL로 변환
       await api.post(`/selections/${selected.value!.id}/images`, {
-        image_url: imageUrl,
+        image_url: object_key,
         display_order: startOrder + i,
       })
 
@@ -359,6 +422,63 @@ async function confirmDeleteSelection(s: Selection) {
   }
 }
 
+// 상품 검색/추가/삭제
+const showProductSearch = ref(false)
+const productSearchQuery = ref('')
+const searchResults = ref<ProductSearchItem[]>([])
+const searchLoading = ref(false)
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+function searchProducts() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(async () => {
+    const q = productSearchQuery.value.trim()
+    if (!q) { searchResults.value = []; return }
+    searchLoading.value = true
+    try {
+      const { data } = await api.get('/products', { params: { limit: 20 } })
+      const all = (data.data ?? []) as ProductSearchItem[]
+      searchResults.value = all.filter((p: ProductSearchItem) =>
+        p.name?.toLowerCase().includes(q.toLowerCase())
+      )
+    } catch {
+      searchResults.value = []
+    } finally {
+      searchLoading.value = false
+    }
+  }, 300)
+}
+
+function isAlreadyAdded(productId: string): boolean {
+  return selected.value?.products?.some(p => p.product_id === productId) ?? false
+}
+
+async function addProduct(productId: string) {
+  if (!selected.value || isAlreadyAdded(productId)) return
+  try {
+    await api.post(`/selections/${selected.value.id}/products`, {
+      product_id: productId,
+      display_order: selected.value.products?.length ?? 0,
+    })
+    await selectSelection(selected.value!)
+    await loadSelections()
+  } catch {
+    alert('상품 추가 실패')
+  }
+}
+
+async function removeProduct(selectionProductId: string) {
+  if (!selected.value) return
+  if (!confirm('이 상품의 연결을 해제하시겠습니까?')) return
+  try {
+    await api.delete(`/selections/${selected.value.id}/products/${selectionProductId}`)
+    await selectSelection(selected.value!)
+    await loadSelections()
+  } catch {
+    alert('상품 연결 해제 실패')
+  }
+}
+
 onMounted(loadSelections)
 </script>
 
@@ -445,4 +565,33 @@ onMounted(loadSelections)
 
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* 상품 관리 */
+.registered-products { margin-top: 32px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.btn-add-product { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 12px; cursor: pointer; border-radius: 4px; }
+.btn-add-product:hover { background: #f5f5f5; }
+
+.product-list { display: flex; flex-direction: column; gap: 6px; }
+.product-row { display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #fafafa; border: 1px solid #eee; border-radius: 4px; }
+.product-thumb { width: 44px; height: 44px; flex-shrink: 0; border-radius: 3px; overflow: hidden; background: #eee; display: flex; align-items: center; justify-content: center; }
+.product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.no-thumb { font-size: 18px; color: #ccc; }
+.product-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.product-name-text { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-price-text { font-size: 11px; color: #888; }
+.product-price-text.inquiry { color: #953735; }
+.btn-remove-product { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 12px; padding: 4px 6px; border-radius: 3px; opacity: 0.5; transition: opacity 0.15s; }
+.btn-remove-product:hover { opacity: 1; background: #fce8e6; }
+
+/* 상품 검색 모달 */
+.modal-wide { width: 500px; max-height: 80vh; display: flex; flex-direction: column; }
+.product-search-results { flex: 1; overflow-y: auto; max-height: 400px; margin-bottom: 16px; border: 1px solid #eee; border-radius: 4px; }
+.search-loading, .search-empty { padding: 24px; text-align: center; font-size: 13px; color: #aaa; }
+.search-result-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: #f8f8f8; }
+.search-result-item.already-added { opacity: 0.5; cursor: default; }
+.added-badge { font-size: 10px; color: #aaa; background: #eee; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
+.add-badge { font-size: 10px; color: #27ae60; background: #e8f5e9; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
 </style>

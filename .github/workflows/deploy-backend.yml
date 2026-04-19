@@ -96,15 +96,38 @@ jobs:
           }
           ENDOFPOLICY
 
-      - name: Configure S3 CORS
+      - name: Configure S3 Public Access (disable block)
+        run: |
+          aws s3api put-public-access-block \
+            --bucket "${{ secrets.AWS_S3_BUCKET }}" \
+            --public-access-block-configuration \
+              "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+
+      - name: Configure S3 Bucket Policy (public read)
+        run: |
+          aws s3api put-bucket-policy \
+            --bucket "${{ secrets.AWS_S3_BUCKET }}" \
+            --policy "{
+              \"Version\": \"2012-10-17\",
+              \"Statement\": [{
+                \"Sid\": \"PublicReadGetObject\",
+                \"Effect\": \"Allow\",
+                \"Principal\": \"*\",
+                \"Action\": \"s3:GetObject\",
+                \"Resource\": \"arn:aws:s3:::${{ secrets.AWS_S3_BUCKET }}/*\"
+              }]
+            }"
+
+      - name: Configure S3 CORS (Safari compatible)
         run: |
           aws s3api put-bucket-cors \
             --bucket "${{ secrets.AWS_S3_BUCKET }}" \
             --cors-configuration '{
               "CORSRules": [{
                 "AllowedHeaders": ["*"],
-                "AllowedMethods": ["GET","PUT","POST","DELETE","HEAD"],
+                "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
                 "AllowedOrigins": ["*"],
+                "ExposeHeaders": ["ETag", "Content-Length", "Content-Type"],
                 "MaxAgeSeconds": 3000
               }]
             }'

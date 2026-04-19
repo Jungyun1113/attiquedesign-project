@@ -14,7 +14,7 @@ class Settings:
         self.REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
 
         self.S3_BUCKET: str = os.getenv("S3_BUCKET", "")
-        self.AWS_REGION: str = os.getenv("AWS_REGION", "ap-northeast-2")
+        self.AWS_REGION: str = os.getenv("APP_AWS_REGION", os.getenv("AWS_REGION", "ap-northeast-2"))
         self.PRESIGN_EXPIRY_SECONDS: int = int(os.getenv("PRESIGN_EXPIRY_SECONDS", "300"))
 
         self.PORTONE_API_SECRET: str = os.getenv("PORTONE_API_SECRET", "")

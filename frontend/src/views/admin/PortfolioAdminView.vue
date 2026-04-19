@@ -341,17 +341,16 @@ async function uploadImages() {
         content_type: file.type,
         target: 'portfolios',
       })
-      const { upload_url } = presignData.data
+      const { upload_url, object_key } = presignData.data
 
       // 2) S3 PUT (presigned URL — no auth header)
       await axios.put(upload_url, file, {
         headers: { 'Content-Type': file.type },
       })
 
-      // 3) DB 등록
-      const imageUrl = `${upload_url.split('?')[0]}`
+      // 3) DB 등록 — object_key를 저장하면 백엔드가 올바른 public URL로 변환
       await api.post(`/portfolios/${selectedPortfolio.value!.id}/images`, {
-        image_url: imageUrl,
+        image_url: object_key,
         display_order: startOrder + i,
       })
 

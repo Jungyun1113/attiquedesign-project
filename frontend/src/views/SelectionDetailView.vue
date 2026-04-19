@@ -14,21 +14,14 @@
           <p v-if="selection.description" class="detail-desc">{{ selection.description }}</p>
         </header>
 
-        <div v-if="selection.products.length" class="products-grid">
+        <div v-if="selection.images && selection.images.length" class="selection-images-grid">
           <div
-            v-for="product in selection.products"
-            :key="product.id"
-            class="product-item"
-            @click="goToProduct(product.product_id)"
+            v-for="(img, idx) in selection.images"
+            :key="img.id"
+            class="selection-image-item"
+            @click="openLightbox(idx)"
           >
-            <div class="product-img-wrap">
-              <img :src="product.thumbnail_url ?? ''" :alt="product.name ?? ''" loading="lazy" />
-            </div>
-            <div class="product-info">
-              <p class="product-name">{{ product.name }}</p>
-              <p v-if="product.price" class="product-price">{{ product.price.toLocaleString() }}원</p>
-              <p v-else class="product-price-inquiry">가격 문의</p>
-            </div>
+            <img :src="img.image_url" alt="selection image" loading="lazy" />
           </div>
         </div>
 
@@ -47,6 +40,14 @@
       </div>
 
     </div>
+
+    <!-- Lightbox Overlay -->
+    <div v-if="lightboxOpen" class="lightbox-overlay" @click.self="closeLightbox">
+      <button class="lightbox-close" @click="closeLightbox">✕</button>
+      <button class="lightbox-prev" @click.stop="prevImage" v-if="(selection?.images?.length ?? 0) > 1">‹</button>
+      <button class="lightbox-next" @click.stop="nextImage" v-if="(selection?.images?.length ?? 0) > 1">›</button>
+      <img v-if="selection?.images?.length" :src="selection.images[lightboxIndex]?.image_url" class="lightbox-img" />
+    </div>
   </div>
 </template>
 
@@ -61,6 +62,10 @@ const isAnimated = ref(false)
 const loading = ref(true)
 const selection = ref<Selection | null>(null)
 
+// Lightbox 상태
+const lightboxOpen = ref(false)
+const lightboxIndex = ref(0)
+
 onMounted(async () => {
   try {
     selection.value = await selectionService.getSelectionById(route.params.id as string)
@@ -72,8 +77,25 @@ onMounted(async () => {
   setTimeout(() => { isAnimated.value = true }, 100)
 })
 
-function goToProduct(productId: string) {
-  router.push(`/products/${productId}`)
+function openLightbox(index: number) {
+  lightboxIndex.value = index
+  lightboxOpen.value = true
+  document.body.style.overflow = 'hidden' // 스크롤 방지
+}
+
+function closeLightbox() {
+  lightboxOpen.value = false
+  document.body.style.overflow = ''
+}
+
+function prevImage() {
+  if (!selection.value) return
+  lightboxIndex.value = (lightboxIndex.value - 1 + selection.value.images.length) % selection.value.images.length
+}
+
+function nextImage() {
+  if (!selection.value) return
+  lightboxIndex.value = (lightboxIndex.value + 1) % selection.value.images.length
 }
 
 function goBack() {
@@ -152,59 +174,30 @@ function goBack() {
   word-break: keep-all;
 }
 
-.products-grid {
+.selection-images-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem 1.5rem;
+  gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
-.product-item {
+.selection-image-item {
+  width: 100%;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background-color: #E8E2D7;
   cursor: pointer;
 }
 
-.product-img-wrap {
-  width: 100%;
-  aspect-ratio: 4/5;
-  background-color: #E8E2D7;
-  overflow: hidden;
-  margin-bottom: 0.75rem;
-}
-
-.product-img-wrap img {
+.selection-image-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
 }
 
-.product-item:hover .product-img-wrap img {
-  transform: scale(1.04);
-}
-
-.product-info {
-  text-align: center;
-}
-
-.product-name {
-  font-family: 'Raleway', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: #2C2C2A;
-  margin: 0 0 0.3rem;
-}
-
-.product-price {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
-  color: #444;
-}
-
-.product-price-inquiry {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 12px;
-  color: #953735;
-  letter-spacing: 0.05em;
+.selection-image-item:hover img {
+  transform: scale(1.03);
 }
 
 .fade-in-delay {
@@ -235,8 +228,73 @@ function goBack() {
   border-color: #111;
 }
 
+/* Lightbox Styles */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  z-index: 10000;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-prev, .lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 4rem;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  padding: 1rem;
+  z-index: 10000;
+}
+
+.lightbox-prev { left: 2rem; }
+.lightbox-next { right: 2rem; }
+
+.lightbox-prev:hover, .lightbox-next:hover {
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @media (max-width: 1024px) {
-  .products-grid {
+  .selection-images-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .selection-detail-page {
@@ -245,8 +303,15 @@ function goBack() {
 }
 
 @media (max-width: 640px) {
-  .products-grid {
+  .selection-images-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
+  .lightbox-prev, .lightbox-next {
+    font-size: 3rem;
+  }
+  .lightbox-prev { left: 0.5rem; }
+  .lightbox-next { right: 0.5rem; }
+  .lightbox-close { top: 1rem; right: 1rem; }
 }
 </style>
