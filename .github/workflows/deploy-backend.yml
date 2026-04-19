@@ -35,7 +35,37 @@ jobs:
         working-directory: backend
         run: |
           mkdir -p .chalice
-          echo '${{ secrets.CHALICE_CONFIG_JSON }}' > .chalice/config.json
+          cat > .chalice/config.json << 'ENDOFCONFIG'
+          {
+            "version": "2.0",
+            "app_name": "attique-project",
+            "stages": {
+              "prod": {
+                "api_gateway_stage": "api",
+                "environment_variables": {
+                  "CHALICE_ENV": "prod",
+                  "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
+                  "JWT_SECRET": "${{ secrets.JWT_SECRET }}",
+                  "JWT_ALGORITHM": "HS256",
+                  "ACCESS_TOKEN_EXPIRE_MINUTES": "60",
+                  "REFRESH_TOKEN_EXPIRE_DAYS": "30",
+                  "S3_BUCKET": "${{ secrets.AWS_S3_BUCKET }}",
+                  "AWS_REGION": "ap-northeast-2",
+                  "PRESIGN_EXPIRY_SECONDS": "300",
+                  "PORTONE_API_SECRET": "${{ secrets.PORTONE_API_SECRET }}",
+                  "PORTONE_WEBHOOK_SECRET": "${{ secrets.PORTONE_WEBHOOK_SECRET }}",
+                  "ALLOWED_ORIGINS": "${{ secrets.ALLOWED_ORIGINS }}"
+                },
+                "lambda_functions": {
+                  "api_handler": {
+                    "lambda_memory_size": 1024,
+                    "lambda_timeout": 30
+                  }
+                }
+              }
+            }
+          }
+          ENDOFCONFIG
 
       - name: Deploy with Chalice
         working-directory: backend
