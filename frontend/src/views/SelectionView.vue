@@ -16,12 +16,12 @@
             :class="{ 'is-active': activeSlide === idx }"
           >
             <template v-if="slide.type === 'single'">
-              <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" :loading="idx === 0 ? 'eager' : 'lazy'" />
+              <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" loading="eager" />
             </template>
             <template v-else>
               <div class="hero-dual">
-                <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
-                <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" loading="lazy" />
+                <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" />
+                <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" />
               </div>
             </template>
           </div>
@@ -64,6 +64,15 @@
         </div>
         <div class="prod-slider-wrap" ref="sliderWrapRef">
           <div class="prod-track" :style="trackStyle">
+            <!-- 로딩 중 스켈레톤 -->
+            <template v-if="isDataLoading && !selections.length">
+              <div v-for="n in 3" :key="'skeleton-'+n" class="archive-item skeleton" :style="itemStyle">
+                <div class="archive-img-wrap skeleton-img"></div>
+                <div class="skeleton-info"></div>
+              </div>
+            </template>
+            
+            <!-- 실제 데이터 -->
             <div
               v-for="sel in selections"
               :key="sel.id"
@@ -72,7 +81,7 @@
               @click="viewSelection(sel.id)"
             >
               <div class="archive-img-wrap">
-                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" loading="lazy" />
+                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" />
               </div>
               <div class="archive-info">
                 <h3 class="archive-name">{{ sel.title }}</h3>
@@ -96,6 +105,15 @@
       </header>
 
       <div class="grid-container">
+        <!-- 로딩 중 스켈레톤 -->
+        <template v-if="isDataLoading && !selections.length">
+          <div v-for="n in 8" :key="'grid-skeleton-'+n" class="archive-item skeleton">
+            <div class="archive-img-wrap skeleton-img"></div>
+            <div class="skeleton-info"></div>
+          </div>
+        </template>
+
+        <!-- 실제 데이터 -->
         <div
           v-for="sel in selections"
           :key="sel.id"
@@ -103,7 +121,7 @@
           @click="viewSelection(sel.id)"
         >
           <div class="archive-img-wrap">
-            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" loading="lazy" />
+            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" />
           </div>
           <div class="archive-info">
             <h3 class="archive-name">{{ sel.title }}</h3>
@@ -137,7 +155,7 @@ const fallbackSlides: HeroSlide[] = [
   { type: 'single', src: '/images/hero/hero-03.png' },
 ]
 
-const heroSlides = ref<HeroSlide[]>(fallbackSlides)
+const heroSlides = ref<HeroSlide[]>([])
 const activeSlide = ref(0)
 let autoplayTimer: ReturnType<typeof setInterval> | null = null
 
@@ -152,7 +170,7 @@ function startAutoplay() {
   if (currentLength.value <= 1) return
   autoplayTimer = setInterval(() => {
     activeSlide.value = (activeSlide.value + 1) % currentLength.value
-  }, 4500)
+  }, 2000)
 }
 
 function stopAutoplay() {
@@ -188,21 +206,23 @@ onUnmounted(() => {
 
 // ── 데이터 로딩 ──────────────────────────
 const selections = ref<Selection[]>([])
+const isDataLoading = ref(true)
 
 async function loadData() {
   try {
+    isDataLoading.value = true
     // 1. 슬라이더 전용 데이터 (category: 'slider')
-    const sliderData = await selectionService.getSelections({ category: 'slider', limit: 20 })
+    await selectionService.getSelections({ category: 'slider', limit: 20 })
     
-    // 2. 전체 셀렉션 데이터
-    const allData = await selectionService.getSelections({ limit: 100 })
+    // 2. 전체 셀렉션 데이터 (초기 로딩량 최적화: 100 -> 24)
+    const allData = await selectionService.getSelections({ limit: 24 })
 
     // 로컬 이미지 기반 슬라이더 구성 (S3 이슈 대응 및 사용자 요청 반영)
     heroSlides.value = [
       { type: 'single', src: '/images/hero/hero-01.png' },
       { type: 'single', src: '/images/hero/hero-02.png' },
       { type: 'single', src: '/images/hero/hero-03.png' },
-      { type: 'dual',   src1: '/images/hero/hero-04.png', src2: '/images/hero/hero-05.png' } // 마지막 듀얼 슬라이드
+      { type: 'dual',   src1: '/images/hero/hero-04.png', src2: '/images/hero/hero-05.png' }
     ]
 
     // 슬라이더가 아닌 셀렉션만 제품 영역에 표시
@@ -210,6 +230,8 @@ async function loadData() {
   } catch (error) {
     console.error('Data loading failed:', error)
     selections.value = []
+  } finally {
+    isDataLoading.value = false
   }
 }
 
@@ -353,8 +375,8 @@ function updateWrapWidth() {
 }
 
 .indicator-dot {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   border: none;
@@ -365,7 +387,7 @@ function updateWrapWidth() {
 
 .indicator-dot.is-active {
   background: #fff;
-  transform: scale(1.4);
+  transform: scale(1.25);
 }
 
 /* ── 섹션 2: 텍스트 영역 ── */
@@ -523,7 +545,7 @@ function updateWrapWidth() {
 .archive-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.8s ease;
 }
 
@@ -654,11 +676,55 @@ function updateWrapWidth() {
 }
 
 @media (max-width: 640px) {
+  .sel-grid-view {
+    padding: 2rem 1.5rem 6rem;
+  }
+  .grid-header {
+    margin-bottom: 2.5rem;
+  }
   .grid-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1rem;
   }
   .grid-title {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
   }
+  .grid-subtitle {
+    font-size: 14px;
+    margin-bottom: 0.5rem;
+  }
+  .grid-desc {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+}
+
+/* ── 스켈레톤 & 애니메이션 ── */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+.fade-in.loaded {
+  opacity: 1;
+}
+
+.skeleton-img {
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+.skeleton-info {
+  width: 60%;
+  height: 14px;
+  background: #eee;
+  margin-top: 10px;
+  border-radius: 2px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

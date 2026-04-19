@@ -33,6 +33,9 @@ def _virtual_hosted_prefix() -> str:
 
 def _extract_object_key(stored_url: str) -> str | None:
     """Extract S3 object key from any stored URL format."""
+    if not stored_url or stored_url.startswith("blob:"):
+        return None
+
     path_prefix = _path_style_prefix()
     virtual_prefix = _virtual_hosted_prefix()
 
@@ -47,7 +50,8 @@ def _extract_object_key(stored_url: str) -> str | None:
         bucket_prefix = settings.S3_BUCKET + "/"
         if path.startswith(bucket_prefix):
             return path[len(bucket_prefix):]
-        return path
+        # If it's a full URL but not from our bucket, we can't get a key
+        return None
     # Already a bare object key
     return stored_url.lstrip("/")
 

@@ -176,23 +176,23 @@ function goBack() {
 
 .selection-images-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
 .selection-image-item {
   width: 100%;
-  aspect-ratio: 3/4;
+  aspect-ratio: 4/5;
   overflow: hidden;
-  background-color: #E8E2D7;
+  background-color: #fff;
   cursor: pointer;
 }
 
 .selection-image-item img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.6s ease;
 }
 

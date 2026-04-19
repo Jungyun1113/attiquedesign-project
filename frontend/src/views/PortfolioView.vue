@@ -44,10 +44,10 @@
                 :key="idx"
                 class="gallery-item"
               >
-                <img :src="img.image_url" :alt="portfolio.title + ' ' + (idx + 1)" loading="lazy" />
+                <img :src="img.image_url" :alt="portfolio.title + ' ' + (idx + 1)" />
               </div>
               <div v-if="portfolio.images.length === 0 && portfolio.cover_image_url" class="gallery-item">
-                <img :src="portfolio.cover_image_url" :alt="portfolio.title" loading="lazy" />
+                <img :src="portfolio.cover_image_url" :alt="portfolio.title" />
               </div>
             </div>
 

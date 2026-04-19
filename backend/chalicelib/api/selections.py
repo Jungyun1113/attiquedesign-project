@@ -318,6 +318,7 @@ def add_selection_image(selection_id):
                 "image_url": body["image_url"],
                 "display_order": body.get("display_order", 0),
             })
+            print(f"DEBUG: Saved Selection Image - ID: {image.id}, URL stored: {image.image_url}")
             result = {
                 "id": str(image.id),
                 "selection_id": str(image.selection_id),

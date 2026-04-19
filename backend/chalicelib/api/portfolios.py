@@ -199,6 +199,7 @@ def add_portfolio_image(portfolio_id):
                 "image_url": body["image_url"],
                 "display_order": body.get("display_order", 0),
             })
+            print(f"DEBUG: Saved Portfolio Image - ID: {image.id}, URL stored: {image.image_url}")
             result = {
                 "id": str(image.id),
                 "portfolio_id": str(image.portfolio_id),
