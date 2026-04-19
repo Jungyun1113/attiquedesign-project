@@ -151,8 +151,8 @@ def delete_portfolio(portfolio_id):
         return handle_app_error(e)
 
 
-# Reorder path moved away from /images/ to avoid routing ambiguity with /images/{image_id}
-@portfolios_bp.route("/portfolios/{portfolio_id}/reorder", methods=["PATCH"], cors=True)
+# POST to avoid CORS preflight issues with PATCH in Chalice 1.x
+@portfolios_bp.route("/portfolios/{portfolio_id}/reorder", methods=["POST"], cors=True)
 @require_admin
 def reorder_portfolio_images(portfolio_id):
     try:

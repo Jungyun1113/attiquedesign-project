@@ -250,7 +250,7 @@ async function saveOrder() {
   orderSaveMsg.value = ''
   try {
     const orders = orderedImages.value.map((img, i) => ({ id: img.id, display_order: i }))
-    await api.patch(`/portfolios/${selectedPortfolio.value.id}/reorder`, { orders })
+    await api.post(`/portfolios/${selectedPortfolio.value.id}/reorder`, { orders })
     orderSaveMsg.value = '순서 저장 완료!'
     orderSaveMsgType.value = 'success'
     orderChanged.value = false

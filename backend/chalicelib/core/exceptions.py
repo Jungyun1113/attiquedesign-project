@@ -1,6 +1,12 @@
 from chalice import Response
 import json
 
+_CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+    "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+}
+
 
 class AppError(Exception):
     def __init__(self, code: str, message: str, status_code: int = 400):
@@ -40,7 +46,7 @@ def error_response(code: str, message: str, status_code: int = 400) -> Response:
     return Response(
         body=body,
         status_code=status_code,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", **_CORS_HEADERS},
     )
 
 
@@ -51,7 +57,7 @@ def success_response(data=None, meta: dict = None, status_code: int = 200) -> Re
     return Response(
         body=json.dumps(payload, default=str),
         status_code=status_code,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", **_CORS_HEADERS},
     )
 
 

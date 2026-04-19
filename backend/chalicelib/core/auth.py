@@ -64,11 +64,17 @@ def try_extract_user(request) -> Optional[str]:
         return None
 
 
+def _is_options_preflight(request) -> bool:
+    return request.method == "OPTIONS"
+
+
 def require_auth(func):
     """Require valid JWT. Sets user context via ContextVar."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         request = _get_app_request()
+        if _is_options_preflight(request):
+            return func(*args, **kwargs)
         try:
             token = _extract_token_from_request(request)
             if not token:
@@ -86,6 +92,8 @@ def require_admin(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         request = _get_app_request()
+        if _is_options_preflight(request):
+            return func(*args, **kwargs)
         try:
             token = _extract_token_from_request(request)
             if not token:
