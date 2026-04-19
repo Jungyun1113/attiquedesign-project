@@ -8,6 +8,7 @@ from chalicelib.core.exceptions import success_response, handle_app_error, AppEr
 from chalicelib.helpers.db import fetch, bulk_fetch, insert, update, delete
 from chalicelib.models.selection import Selection, SelectionImage, SelectionProduct
 from chalicelib.models.product import Product
+from chalicelib.services.storage_service import get_image_display_url
 
 selections_bp = Blueprint(__name__)
 
@@ -57,7 +58,7 @@ def _serialize_selection_images(session, selection_id) -> list:
     return [
         {
             "id": str(img.id),
-            "image_url": img.image_url,
+            "image_url": get_image_display_url(img.image_url),
             "display_order": img.display_order,
         }
         for img in images
@@ -84,7 +85,64 @@ def list_selections():
 
         with get_session() as session:
             items, total = bulk_fetch(session, Selection, page=page, size=size)
-            result = [_serialize_selection(session, s) for s in items]
+
+            # Batch fetch images and products in 2 queries instead of N*2
+            selection_ids = [s.id for s in items]
+            images_by_selection: dict = {}
+            products_by_selection: dict = {}
+
+            if selection_ids:
+                imgs_stmt = (
+                    select(SelectionImage)
+                    .where(SelectionImage.selection_id.in_(selection_ids))
+                    .where(SelectionImage.is_deleted == False)
+                    .order_by(SelectionImage.display_order)
+                )
+                for img in session.exec(imgs_stmt).all():
+                    sid = str(img.selection_id)
+                    images_by_selection.setdefault(sid, []).append(
+                        {"id": str(img.id), "image_url": get_image_display_url(img.image_url), "display_order": img.display_order}
+                    )
+
+                sp_stmt = (
+                    select(SelectionProduct)
+                    .where(SelectionProduct.selection_id.in_(selection_ids))
+                    .where(SelectionProduct.is_deleted == False)
+                    .order_by(SelectionProduct.display_order)
+                )
+                sps = session.exec(sp_stmt).all()
+                if sps:
+                    product_ids = [sp.product_id for sp in sps]
+                    prods_stmt = (
+                        select(Product)
+                        .where(Product.id.in_(product_ids))
+                        .where(Product.is_deleted == False)
+                    )
+                    products_map = {p.id: p for p in session.exec(prods_stmt).all()}
+                    for sp in sps:
+                        sid = str(sp.selection_id)
+                        prod = products_map.get(sp.product_id)
+                        products_by_selection.setdefault(sid, []).append({
+                            "id": str(sp.id),
+                            "product_id": str(sp.product_id),
+                            "display_order": sp.display_order,
+                            "name": prod.name if prod else None,
+                            "thumbnail_url": prod.thumbnail_url if prod else None,
+                            "price": float(prod.price) if prod and prod.price else None,
+                            "status": prod.status.value if prod else None,
+                        })
+
+            result = [
+                {
+                    "id": str(s.id),
+                    "title": s.title,
+                    "subtitle": s.subtitle,
+                    "description": s.description,
+                    "images": images_by_selection.get(str(s.id), []),
+                    "products": products_by_selection.get(str(s.id), []),
+                }
+                for s in items
+            ]
 
         total_pages = math.ceil(total / size) if size else 1
         return success_response(
@@ -245,7 +303,7 @@ def add_selection_image(selection_id):
             result = {
                 "id": str(image.id),
                 "selection_id": str(image.selection_id),
-                "image_url": image.image_url,
+                "image_url": get_image_display_url(image.image_url),
                 "display_order": image.display_order,
             }
         return success_response(result, status_code=201)

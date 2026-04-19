@@ -83,10 +83,22 @@ const router = createRouter({
 })
 
 // Navigation Guard
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore()
-  if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return { name: 'AdminLogin' }
+  if (to.meta.requiresAdmin) {
+    if (!auth.isLoggedIn) {
+      return { name: 'AdminLogin' }
+    }
+    if (!auth.user) {
+      try {
+        await auth.init()
+      } catch {
+        return { name: 'AdminLogin' }
+      }
+    }
+    if (!auth.isAdmin) {
+      return { name: 'AdminLogin' }
+    }
   }
 })
 

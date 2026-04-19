@@ -22,7 +22,11 @@
               <span class="project-name">{{ s.title }}</span>
               <span v-if="s.subtitle" class="project-sub">{{ s.subtitle }}</span>
             </div>
-            <span class="image-count">{{ s.images.length }}장</span>
+            <div class="item-actions">
+              <span class="image-count">{{ s.images.length }}장</span>
+              <button class="btn-icon" title="수정" @click.stop="openEditModal(s)">✏</button>
+              <button class="btn-icon btn-icon-del" title="삭제" @click.stop="confirmDeleteSelection(s)">✕</button>
+            </div>
           </li>
           <li v-if="selections.length === 0" class="empty-item">셀렉션 없음</li>
         </ul>
@@ -125,6 +129,32 @@
         </div>
       </div>
     </div>
+
+    <!-- 셀렉션 수정 모달 -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
+      <div class="modal">
+        <h2 class="modal-title">셀렉션 수정</h2>
+        <div class="field">
+          <label>제목 <span class="required">*</span></label>
+          <input v-model="editTitle" type="text" />
+        </div>
+        <div class="field">
+          <label>부제목 (선택)</label>
+          <input v-model="editSubtitle" type="text" />
+        </div>
+        <div class="field">
+          <label>설명 (선택)</label>
+          <textarea v-model="editDescription" rows="3"></textarea>
+        </div>
+        <p v-if="editError" class="error-msg">{{ editError }}</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showEditModal = false">취소</button>
+          <button class="btn-confirm" :disabled="editing" @click="patchSelection">
+            {{ editing ? '저장 중...' : '저장' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -149,12 +179,22 @@ const uploadProgress = ref(0)
 const uploadMsg = ref('')
 const uploadMsgType = ref<'success' | 'error'>('success')
 
+// 생성 모달
 const showCreateModal = ref(false)
 const newTitle = ref('')
 const newSubtitle = ref('')
 const newDescription = ref('')
 const creating = ref(false)
 const createError = ref('')
+
+// 수정 모달
+const showEditModal = ref(false)
+const editingSelection = ref<Selection | null>(null)
+const editTitle = ref('')
+const editSubtitle = ref('')
+const editDescription = ref('')
+const editing = ref(false)
+const editError = ref('')
 
 async function loadSelections() {
   loadingList.value = true
@@ -275,6 +315,50 @@ async function createSelection() {
   }
 }
 
+function openEditModal(s: Selection) {
+  editingSelection.value = s
+  editTitle.value = s.title
+  editSubtitle.value = s.subtitle ?? ''
+  editDescription.value = s.description ?? ''
+  editError.value = ''
+  showEditModal.value = true
+}
+
+async function patchSelection() {
+  if (!editingSelection.value) return
+  if (!editTitle.value.trim()) { editError.value = '제목을 입력해주세요.'; return }
+  editing.value = true
+  editError.value = ''
+  try {
+    await api.patch(`/selections/${editingSelection.value.id}`, {
+      title: editTitle.value.trim(),
+      subtitle: editSubtitle.value.trim() || null,
+      description: editDescription.value.trim() || null,
+    })
+    showEditModal.value = false
+    await loadSelections()
+    if (selected.value?.id === editingSelection.value.id) {
+      const updated = selections.value.find(s => s.id === editingSelection.value!.id)
+      if (updated) await selectSelection(updated)
+    }
+  } catch {
+    editError.value = '수정 실패'
+  } finally {
+    editing.value = false
+  }
+}
+
+async function confirmDeleteSelection(s: Selection) {
+  if (!confirm(`"${s.title}" 셀렉션을 삭제하시겠습니까?\n이미지도 모두 삭제됩니다.`)) return
+  try {
+    await api.delete(`/selections/${s.id}`)
+    if (selected.value?.id === s.id) selected.value = null
+    await loadSelections()
+  } catch {
+    alert('삭제 실패')
+  }
+}
+
 onMounted(loadSelections)
 </script>
 
@@ -292,14 +376,20 @@ onMounted(loadSelections)
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
-.project-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
+.project-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
 .project-item:last-child { border-bottom: none; }
 .project-item:hover { background: #f8f8f8; }
 .project-item.active { background: #f0f0f0; }
-.item-info { display: flex; flex-direction: column; gap: 2px; }
-.project-name { font-size: 13px; color: #222; }
-.project-sub { font-size: 11px; color: #aaa; }
-.image-count { font-size: 11px; color: #aaa; flex-shrink: 0; }
+.item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
+.project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-sub { font-size: 11px; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 8px; }
+.image-count { font-size: 11px; color: #aaa; margin-right: 2px; }
+.btn-icon { background: none; border: none; cursor: pointer; font-size: 11px; color: #888; padding: 2px 4px; border-radius: 3px; opacity: 0; transition: opacity 0.15s, background 0.12s; }
+.btn-icon-del { color: #c0392b; }
+.project-item:hover .btn-icon { opacity: 1; }
+.btn-icon:hover { background: #eee; }
+.btn-icon-del:hover { background: #fce8e6; }
 .empty-item { padding: 16px; font-size: 13px; color: #bbb; text-align: center; }
 
 .image-panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 6px; padding: 24px; }
@@ -345,7 +435,7 @@ onMounted(loadSelections)
 .modal-title { font-size: 16px; font-weight: 600; margin: 0 0 24px; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .field label { font-size: 12px; font-weight: 500; color: #444; }
-.field input, .field textarea { padding: 10px 12px; border: 1px solid #ddd; font-size: 14px; outline: none; resize: vertical; font-family: inherit; }
+.field input, .field textarea { padding: 10px 12px; border: 1px solid #ddd; font-size: 14px; outline: none; resize: vertical; font-family: inherit; border-radius: 3px; }
 .field input:focus, .field textarea:focus { border-color: #333; }
 .error-msg { font-size: 12px; color: #c0392b; margin: 0 0 12px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }

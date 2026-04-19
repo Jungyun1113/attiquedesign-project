@@ -7,8 +7,17 @@ from chalicelib.core.auth import require_admin
 from chalicelib.core.exceptions import success_response, handle_app_error, AppError, ValidationError
 from chalicelib.helpers.db import fetch, bulk_fetch, insert, update, delete
 from chalicelib.models.portfolio import Portfolio, PortfolioImage
+from chalicelib.services.storage_service import get_image_display_url
 
 portfolios_bp = Blueprint(__name__)
+
+
+def _img_dict(img: PortfolioImage) -> dict:
+    return {
+        "id": str(img.id),
+        "image_url": get_image_display_url(img.image_url),
+        "display_order": img.display_order,
+    }
 
 
 def _serialize_portfolio(session, p: Portfolio) -> dict:
@@ -24,15 +33,8 @@ def _serialize_portfolio(session, p: Portfolio) -> dict:
         "category": p.category,
         "title": p.title,
         "description": p.description,
-        "cover_image_url": p.cover_image_url,
-        "images": [
-            {
-                "id": str(img.id),
-                "image_url": img.image_url,
-                "display_order": img.display_order,
-            }
-            for img in images
-        ],
+        "cover_image_url": get_image_display_url(p.cover_image_url) if p.cover_image_url else None,
+        "images": [_img_dict(img) for img in images],
     }
 
 
@@ -50,7 +52,32 @@ def list_portfolios():
 
         with get_session() as session:
             items, total = bulk_fetch(session, Portfolio, filters=filters, page=page, size=size)
-            result = [_serialize_portfolio(session, p) for p in items]
+
+            # Batch fetch all images in one query instead of N+1
+            portfolio_ids = [p.id for p in items]
+            images_by_portfolio: dict = {}
+            if portfolio_ids:
+                imgs_stmt = (
+                    select(PortfolioImage)
+                    .where(PortfolioImage.portfolio_id.in_(portfolio_ids))
+                    .where(PortfolioImage.is_deleted == False)
+                    .order_by(PortfolioImage.display_order)
+                )
+                for img in session.exec(imgs_stmt).all():
+                    pid = str(img.portfolio_id)
+                    images_by_portfolio.setdefault(pid, []).append(img)
+
+            result = [
+                {
+                    "id": str(p.id),
+                    "category": p.category,
+                    "title": p.title,
+                    "description": p.description,
+                    "cover_image_url": get_image_display_url(p.cover_image_url) if p.cover_image_url else None,
+                    "images": [_img_dict(img) for img in images_by_portfolio.get(str(p.id), [])],
+                }
+                for p in items
+            ]
 
         total_pages = math.ceil(total / size) if size else 1
         return success_response(
@@ -124,7 +151,8 @@ def delete_portfolio(portfolio_id):
         return handle_app_error(e)
 
 
-@portfolios_bp.route("/portfolios/{portfolio_id}/images/reorder", methods=["PATCH"], cors=True)
+# Reorder path moved away from /images/ to avoid routing ambiguity with /images/{image_id}
+@portfolios_bp.route("/portfolios/{portfolio_id}/reorder", methods=["PATCH"], cors=True)
 @require_admin
 def reorder_portfolio_images(portfolio_id):
     try:
@@ -174,7 +202,7 @@ def add_portfolio_image(portfolio_id):
             result = {
                 "id": str(image.id),
                 "portfolio_id": str(image.portfolio_id),
-                "image_url": image.image_url,
+                "image_url": get_image_display_url(image.image_url),
                 "display_order": image.display_order,
             }
         return success_response(result, status_code=201)

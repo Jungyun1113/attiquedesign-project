@@ -7,6 +7,7 @@ from chalicelib.core.auth import require_admin
 from chalicelib.core.exceptions import success_response, handle_app_error, AppError, ValidationError
 from chalicelib.helpers.db import fetch, bulk_fetch, insert, update, delete
 from chalicelib.models.product import Product, ProductImage, ProductStatus
+from chalicelib.services.storage_service import get_image_display_url
 
 products_bp = Blueprint(__name__)
 
@@ -33,11 +34,11 @@ def _serialize_product(session, p: Product) -> dict:
         "price": float(p.price) if p.price is not None else None,
         "stock_quantity": p.stock_quantity,
         "status": p.status.value,
-        "thumbnail_url": p.thumbnail_url,
+        "thumbnail_url": get_image_display_url(p.thumbnail_url) if p.thumbnail_url else None,
         "images": [
             {
                 "id": str(img.id),
-                "image_url": img.image_url,
+                "image_url": get_image_display_url(img.image_url),
                 "display_order": img.display_order,
                 "is_primary": img.is_primary,
             }

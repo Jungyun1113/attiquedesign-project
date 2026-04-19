@@ -28,5 +28,15 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('refresh_token')
   }
 
-  return { user, accessToken, isLoggedIn, isAdmin, login, logout }
+  async function init() {
+    if (accessToken.value && !user.value) {
+      try {
+        user.value = await authService.getMe()
+      } catch {
+        logout()
+      }
+    }
+  }
+
+  return { user, accessToken, isLoggedIn, isAdmin, login, logout, init }
 })

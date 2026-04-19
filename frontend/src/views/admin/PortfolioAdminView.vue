@@ -32,7 +32,11 @@
             @click="selectPortfolio(p)"
           >
             <span class="project-name">{{ p.title }}</span>
-            <span class="image-count">{{ p.images.length }}장</span>
+            <div class="item-actions">
+              <span class="image-count">{{ p.images.length }}장</span>
+              <button class="btn-icon" title="수정" @click.stop="openEditModal(p)">✏</button>
+              <button class="btn-icon btn-icon-del" title="삭제" @click.stop="confirmDeletePortfolio(p)">✕</button>
+            </div>
           </li>
           <li v-if="portfolios.length === 0" class="empty-item">프로젝트 없음</li>
         </ul>
@@ -148,11 +152,39 @@
         </div>
       </div>
     </div>
+
+    <!-- 프로젝트 수정 모달 -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
+      <div class="modal">
+        <h2 class="modal-title">프로젝트 수정</h2>
+        <div class="field">
+          <label>카테고리</label>
+          <select v-model="editCategory">
+            <option v-for="cat in CATEGORIES" :key="cat.value" :value="cat.value">{{ cat.label }}</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>프로젝트 이름</label>
+          <input v-model="editTitle" type="text" />
+        </div>
+        <div class="field">
+          <label>설명 (선택)</label>
+          <textarea v-model="editDescription" rows="3"></textarea>
+        </div>
+        <p v-if="editError" class="error-msg">{{ editError }}</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showEditModal = false">취소</button>
+          <button class="btn-confirm" :disabled="editing" @click="patchPortfolio">
+            {{ editing ? '저장 중...' : '저장' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 import api from '@/services/api'
 
@@ -218,7 +250,7 @@ async function saveOrder() {
   orderSaveMsg.value = ''
   try {
     const orders = orderedImages.value.map((img, i) => ({ id: img.id, display_order: i }))
-    await api.patch(`/portfolios/${selectedPortfolio.value.id}/images/reorder`, { orders })
+    await api.patch(`/portfolios/${selectedPortfolio.value.id}/reorder`, { orders })
     orderSaveMsg.value = '순서 저장 완료!'
     orderSaveMsgType.value = 'success'
     orderChanged.value = false
@@ -231,11 +263,21 @@ async function saveOrder() {
   }
 }
 
+// 생성 모달
 const showCreateModal = ref(false)
 const newTitle = ref('')
 const newDescription = ref('')
 const creating = ref(false)
 const createError = ref('')
+
+// 수정 모달
+const showEditModal = ref(false)
+const editingPortfolio = ref<Portfolio | null>(null)
+const editTitle = ref('')
+const editDescription = ref('')
+const editCategory = ref('')
+const editing = ref(false)
+const editError = ref('')
 
 async function loadPortfolios(category: string) {
   loadingProjects.value = true
@@ -299,7 +341,7 @@ async function uploadImages() {
         content_type: file.type,
         target: 'portfolios',
       })
-      const { upload_url, object_key } = presignData.data
+      const { upload_url } = presignData.data
 
       // 2) S3 PUT (presigned URL — no auth header)
       await axios.put(upload_url, file, {
@@ -321,7 +363,6 @@ async function uploadImages() {
     pendingFiles.value.forEach(f => URL.revokeObjectURL(f.preview))
     pendingFiles.value = []
 
-    // 새로고침
     await selectPortfolio(selectedPortfolio.value!)
   } catch {
     uploadMsg.value = '업로드 중 오류가 발생했습니다.'
@@ -368,6 +409,51 @@ async function createPortfolio() {
   }
 }
 
+function openEditModal(p: Portfolio) {
+  editingPortfolio.value = p
+  editTitle.value = p.title
+  editDescription.value = p.description ?? ''
+  editCategory.value = p.category
+  editError.value = ''
+  showEditModal.value = true
+}
+
+async function patchPortfolio() {
+  if (!editingPortfolio.value) return
+  if (!editTitle.value.trim()) { editError.value = '이름을 입력해주세요.'; return }
+  editing.value = true
+  editError.value = ''
+  try {
+    await api.patch(`/portfolios/${editingPortfolio.value.id}`, {
+      title: editTitle.value.trim(),
+      description: editDescription.value.trim() || null,
+      category: editCategory.value,
+    })
+    showEditModal.value = false
+    await loadPortfolios(selectedCategory.value)
+    // 현재 선택된 포트폴리오였으면 다시 로드
+    if (selectedPortfolio.value?.id === editingPortfolio.value.id) {
+      const updated = portfolios.value.find(p => p.id === editingPortfolio.value!.id)
+      if (updated) await selectPortfolio(updated)
+    }
+  } catch {
+    editError.value = '수정 실패'
+  } finally {
+    editing.value = false
+  }
+}
+
+async function confirmDeletePortfolio(p: Portfolio) {
+  if (!confirm(`"${p.title}" 프로젝트를 삭제하시겠습니까?\n이미지도 모두 삭제됩니다.`)) return
+  try {
+    await api.delete(`/portfolios/${p.id}`)
+    if (selectedPortfolio.value?.id === p.id) selectedPortfolio.value = null
+    await loadPortfolios(selectedCategory.value)
+  } catch {
+    alert('삭제 실패')
+  }
+}
+
 onMounted(() => loadPortfolios('residential'))
 </script>
 
@@ -390,12 +476,18 @@ onMounted(() => loadPortfolios('residential'))
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
-.project-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
+.project-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
 .project-item:last-child { border-bottom: none; }
 .project-item:hover { background: #f8f8f8; }
 .project-item.active { background: #f0f0f0; }
-.project-name { font-size: 13px; color: #222; }
-.image-count { font-size: 11px; color: #aaa; }
+.project-name { font-size: 13px; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.image-count { font-size: 11px; color: #aaa; margin-right: 4px; }
+.btn-icon { background: none; border: none; cursor: pointer; font-size: 11px; color: #888; padding: 2px 4px; border-radius: 3px; opacity: 0; transition: opacity 0.15s, background 0.12s; }
+.btn-icon-del { color: #c0392b; }
+.project-item:hover .btn-icon { opacity: 1; }
+.btn-icon:hover { background: #eee; }
+.btn-icon-del:hover { background: #fce8e6; }
 .empty-item { padding: 16px; font-size: 13px; color: #bbb; text-align: center; }
 
 .image-panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 6px; padding: 24px; }
@@ -448,8 +540,8 @@ onMounted(() => loadPortfolios('residential'))
 .modal-title { font-size: 16px; font-weight: 600; margin: 0 0 24px; }
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 .field label { font-size: 12px; font-weight: 500; color: #444; }
-.field input, .field textarea { padding: 10px 12px; border: 1px solid #ddd; font-size: 14px; outline: none; resize: vertical; font-family: inherit; }
-.field input:focus, .field textarea:focus { border-color: #333; }
+.field input, .field textarea, .field select { padding: 10px 12px; border: 1px solid #ddd; font-size: 14px; outline: none; resize: vertical; font-family: inherit; border-radius: 3px; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: #333; }
 .error-msg { font-size: 12px; color: #c0392b; margin: 0 0 12px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 .btn-cancel { padding: 9px 20px; border: 1px solid #ddd; background: #fff; font-size: 13px; cursor: pointer; border-radius: 4px; }
