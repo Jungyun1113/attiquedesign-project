@@ -124,6 +124,25 @@ def delete_portfolio(portfolio_id):
         return handle_app_error(e)
 
 
+@portfolios_bp.route("/portfolios/{portfolio_id}/images/reorder", methods=["PATCH"], cors=True)
+@require_admin
+def reorder_portfolio_images(portfolio_id):
+    try:
+        body = portfolios_bp.current_request.json_body or {}
+        orders = body.get("orders", [])  # [{id, display_order}, ...]
+        if not orders:
+            raise ValidationError("orders는 필수입니다.")
+
+        with get_session() as session:
+            fetch(session, Portfolio, raise_not_found=True, id=portfolio_id)
+            for item in orders:
+                image = fetch(session, PortfolioImage, raise_not_found=True, id=item["id"])
+                update(session, image, {"display_order": item["display_order"]})
+        return success_response({"message": "순서가 저장되었습니다."})
+    except AppError as e:
+        return handle_app_error(e)
+
+
 @portfolios_bp.route("/portfolios/{portfolio_id}/images/{image_id}", methods=["DELETE"], cors=True)
 @require_admin
 def delete_portfolio_image(portfolio_id, image_id):

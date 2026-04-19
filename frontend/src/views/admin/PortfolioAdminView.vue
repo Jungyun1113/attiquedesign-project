@@ -83,17 +83,37 @@
             <p v-if="uploadMsg" :class="['upload-msg', uploadMsgType]">{{ uploadMsg }}</p>
           </div>
 
-          <!-- 등록된 이미지 목록 -->
+          <!-- 등록된 이미지 목록 (드래그앤드롭 순서 변경) -->
           <div class="registered-images">
-            <h3 class="section-label">등록된 이미지 ({{ selectedPortfolio.images.length }}장)</h3>
-            <div v-if="selectedPortfolio.images.length === 0" class="no-images">등록된 이미지가 없습니다.</div>
+            <div class="section-header">
+              <h3 class="section-label">등록된 이미지 ({{ orderedImages.length }}장)</h3>
+              <div class="order-actions">
+                <span class="drag-hint">드래그해서 순서 변경</span>
+                <button
+                  v-if="orderChanged"
+                  class="btn-save-order"
+                  :disabled="savingOrder"
+                  @click="saveOrder"
+                >
+                  {{ savingOrder ? '저장 중...' : '순서 저장' }}
+                </button>
+                <span v-if="orderSaveMsg" :class="['order-msg', orderSaveMsgType]">{{ orderSaveMsg }}</span>
+              </div>
+            </div>
+            <div v-if="orderedImages.length === 0" class="no-images">등록된 이미지가 없습니다.</div>
             <div v-else class="image-grid">
               <div
-                v-for="(img, idx) in selectedPortfolio.images"
+                v-for="(img, idx) in orderedImages"
                 :key="img.id"
                 class="image-card"
+                :class="{ dragging: dragIdx === idx }"
+                draggable="true"
+                @dragstart="onDragStart(idx)"
+                @dragover.prevent="onDragOver(idx)"
+                @dragend="onDragEnd"
               >
                 <span v-if="idx === 0" class="main-badge">메인</span>
+                <span class="order-badge">{{ idx + 1 }}</span>
                 <img :src="img.image_url" :alt="`이미지 ${idx + 1}`" />
                 <button class="btn-delete-img" @click="deleteImage(img.id)" title="삭제">✕</button>
               </div>
@@ -132,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import axios from 'axios'
 import api from '@/services/api'
 
@@ -159,6 +179,57 @@ const uploading = ref(false)
 const uploadProgress = ref(0)
 const uploadMsg = ref('')
 const uploadMsgType = ref<'success' | 'error'>('success')
+
+// 드래그앤드롭 순서 변경
+const orderedImages = ref<PortfolioImage[]>([])
+const dragIdx = ref<number | null>(null)
+const orderChanged = ref(false)
+const savingOrder = ref(false)
+const orderSaveMsg = ref('')
+const orderSaveMsgType = ref<'success' | 'error'>('success')
+
+watch(() => selectedPortfolio.value?.images, (imgs) => {
+  orderedImages.value = imgs ? [...imgs] : []
+  orderChanged.value = false
+  orderSaveMsg.value = ''
+}, { immediate: true })
+
+function onDragStart(idx: number) {
+  dragIdx.value = idx
+}
+
+function onDragOver(idx: number) {
+  if (dragIdx.value === null || dragIdx.value === idx) return
+  const imgs = [...orderedImages.value]
+  const [moved] = imgs.splice(dragIdx.value, 1)
+  imgs.splice(idx, 0, moved)
+  orderedImages.value = imgs
+  dragIdx.value = idx
+  orderChanged.value = true
+}
+
+function onDragEnd() {
+  dragIdx.value = null
+}
+
+async function saveOrder() {
+  if (!selectedPortfolio.value) return
+  savingOrder.value = true
+  orderSaveMsg.value = ''
+  try {
+    const orders = orderedImages.value.map((img, i) => ({ id: img.id, display_order: i }))
+    await api.patch(`/portfolios/${selectedPortfolio.value.id}/images/reorder`, { orders })
+    orderSaveMsg.value = '순서 저장 완료!'
+    orderSaveMsgType.value = 'success'
+    orderChanged.value = false
+    await selectPortfolio(selectedPortfolio.value!)
+  } catch {
+    orderSaveMsg.value = '저장 실패'
+    orderSaveMsgType.value = 'error'
+  } finally {
+    savingOrder.value = false
+  }
+}
 
 const showCreateModal = ref(false)
 const newTitle = ref('')
@@ -353,12 +424,22 @@ onMounted(() => loadPortfolios('residential'))
 .upload-msg.error { color: #c0392b; }
 
 .registered-images { margin-top: 32px; }
-.section-label { font-size: 13px; font-weight: 600; color: #555; margin: 0 0 12px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.section-label { font-size: 13px; font-weight: 600; color: #555; margin: 0; }
+.order-actions { display: flex; align-items: center; gap: 10px; }
+.drag-hint { font-size: 11px; color: #bbb; }
+.btn-save-order { padding: 6px 16px; background: #1a1a1a; color: #fff; border: none; font-size: 12px; cursor: pointer; border-radius: 4px; }
+.btn-save-order:disabled { opacity: 0.6; cursor: not-allowed; }
+.order-msg { font-size: 12px; }
+.order-msg.success { color: #27ae60; }
+.order-msg.error { color: #c0392b; }
 .no-images { font-size: 13px; color: #bbb; padding: 20px 0; }
 .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-.image-card { position: relative; aspect-ratio: 4/3; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
-.image-card img { width: 100%; height: 100%; object-fit: cover; }
-.main-badge { position: absolute; top: 6px; left: 6px; background: #1a1a1a; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 1; }
+.image-card { position: relative; aspect-ratio: 4/3; background: #f0f0f0; border-radius: 4px; overflow: hidden; cursor: grab; }
+.image-card.dragging { opacity: 0.4; outline: 2px dashed #888; }
+.image-card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.main-badge { position: absolute; top: 6px; left: 6px; background: #953735; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 1; }
+.order-badge { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.55); color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1; }
 .btn-delete-img { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
 .image-card:hover .btn-delete-img { opacity: 1; }
 
