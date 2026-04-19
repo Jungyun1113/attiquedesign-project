@@ -12,6 +12,7 @@ class Portfolio(BaseModel, table=True):
     title: str
     description: Optional[str] = Field(default=None)
     cover_image_url: Optional[str] = Field(default=None)
+    sort_order: int = Field(default=0)
 
     images: List["PortfolioImage"] = Relationship(back_populates="portfolio")
 

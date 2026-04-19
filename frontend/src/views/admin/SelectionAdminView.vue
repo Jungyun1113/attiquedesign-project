@@ -43,6 +43,15 @@
             <p v-if="selected.subtitle" class="panel-sub">{{ selected.subtitle }}</p>
           </div>
 
+          <!-- 업로드 결과 메시지 (최상단 배치) -->
+          <Transition name="fade">
+            <div v-if="uploadResultMessage" :class="['upload-result-box', uploadResultType]">
+              <span class="result-icon">{{ uploadResultType === 'success' ? '✓' : '✕' }}</span>
+              <span class="result-text">{{ uploadResultMessage }}</span>
+              <button class="btn-msg-close" @click="uploadResultMessage = ''">✕</button>
+            </div>
+          </Transition>
+
           <!-- 업로드 영역 -->
           <div
             class="drop-zone"
@@ -80,7 +89,6 @@
               </span>
               <span v-else>{{ pendingFiles.length }}장 업로드</span>
             </button>
-            <p v-if="uploadMsg" :class="['upload-msg', uploadMsgType]">{{ uploadMsg }}</p>
           </div>
 
           <!-- 등록된 이미지 -->
@@ -180,8 +188,8 @@ const isDragging = ref(false)
 
 const uploading = ref(false)
 const uploadProgress = ref(0)
-const uploadMsg = ref('')
-const uploadMsgType = ref<'success' | 'error'>('success')
+const uploadResultMessage = ref('')
+const uploadResultType = ref<'success' | 'error'>('success')
 
 // 생성 모달
 const showCreateModal = ref(false)
@@ -241,15 +249,19 @@ async function uploadImages() {
   if (!selected.value || pendingFiles.value.length === 0) return
   uploading.value = true
   uploadProgress.value = 0
-  uploadMsg.value = ''
+  uploadResultMessage.value = ''
 
   const startOrder = selected.value.images.length
+  let totalOriginal = 0
+  let totalOptimized = 0
 
   try {
     for (let i = 0; i < pendingFiles.value.length; i++) {
       const { file } = pendingFiles.value[i]
 
-      const uploadFileType = file.type || 'image/png'
+      const uploadFileType = file.type || 'image/jpeg'
+
+      // 1) presign
       const { data: presignData } = await api.post('/uploads/presign', {
         filename: file.name,
         content_type: uploadFileType,
@@ -257,34 +269,54 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
+      // 2) S3 PUT — upload raw file directly to S3
       const fileBuffer = await file.arrayBuffer()
       const uploadRes = await fetch(upload_url, {
         method: 'PUT',
         body: fileBuffer,
-        headers: {
-          'Content-Type': uploadFileType,
-        },
+        headers: { 'Content-Type': uploadFileType },
       })
-      if (!uploadRes.ok) throw new Error('S3 업로드 실패')
+      if (!uploadRes.ok) throw new Error(`S3 업로드 실패 (${uploadRes.status})`)
 
-      // object_key를 저장하면 백엔드가 올바른 public URL로 변환
+      // 3) Server-side WebP optimization
+      const { data: optData } = await api.post('/uploads/optimize', { object_key })
+      const finalKey: string = optData.data.optimized_key
+      totalOriginal += optData.data.original_bytes ?? 0
+      totalOptimized += optData.data.optimized_bytes ?? 0
+
+      // 4) DB registration — store final (optimized) key
       await api.post(`/selections/${selected.value!.id}/images`, {
-        image_url: object_key,
+        image_url: finalKey,
         display_order: startOrder + i,
       })
 
       uploadProgress.value = i + 1
     }
 
-    uploadMsg.value = `${pendingFiles.value.length}장 업로드 완료!`
-    uploadMsgType.value = 'success'
+    const count = pendingFiles.value.length
+    const originalKB = Math.round(totalOriginal / 1024)
+    const savedKB = Math.round((totalOriginal - totalOptimized) / 1024)
+    const pct = totalOriginal > 0 ? Math.round((1 - totalOptimized / totalOriginal) * 100) : 0
+    
+    if (totalOriginal > 0) {
+      uploadResultMessage.value = `${count}장 업로드 완료! (${pct}% 압축, ${savedKB}KB 절약)`
+    } else {
+      uploadResultMessage.value = `${count}장 업로드 완료!`
+    }
+    
+    uploadResultType.value = 'success'
+    console.log('Upload Result:', uploadResultMessage.value)
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
+
     pendingFiles.value.forEach(f => URL.revokeObjectURL(f.preview))
     pendingFiles.value = []
 
     await selectSelection(selected.value!)
-  } catch {
-    uploadMsg.value = '업로드 중 오류가 발생했습니다.'
-    uploadMsgType.value = 'error'
+  } catch (err) {
+    console.error('Upload Error:', err)
+    uploadResultMessage.value = '업로드 중 오류가 발생했습니다.'
+    uploadResultType.value = 'error'
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
   } finally {
     uploading.value = false
   }
@@ -429,9 +461,16 @@ onMounted(loadSelections)
 .btn-upload { padding: 10px 24px; background: #1a1a1a; color: #fff; border: none; font-size: 13px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
 .btn-upload:hover:not(:disabled) { background: #333; }
 .btn-upload:disabled { opacity: 0.6; cursor: not-allowed; }
-.upload-msg { font-size: 13px; margin: 0; }
-.upload-msg.success { color: #27ae60; }
-.upload-msg.error { color: #c0392b; }
+.upload-result-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; font-weight: 600; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.upload-result-box.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-left: 5px solid #22c55e; }
+.upload-result-box.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-left: 5px solid #ef4444; }
+.result-icon { font-size: 16px; }
+.result-text { flex: 1; }
+.btn-msg-close { background: none; border: none; font-size: 16px; color: currentColor; cursor: pointer; opacity: 0.5; }
+.btn-msg-close:hover { opacity: 1; }
+
+.fade-enter-active, .fade-leave-active { transition: all 0.4s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
 
 .registered-images { margin-top: 32px; }
 .section-label { font-size: 13px; font-weight: 600; color: #555; margin: 0 0 12px; }

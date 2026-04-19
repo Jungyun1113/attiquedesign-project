@@ -20,20 +20,40 @@
       <aside class="project-list">
         <div class="list-header">
           <span class="list-title">프로젝트</span>
-          <button class="btn-new" @click="openCreateModal">+ 새 프로젝트</button>
+          <div class="header-actions">
+            <button
+              class="btn-save-project-order"
+              :class="{ active: projectOrderChanged }"
+              :disabled="!projectOrderChanged || savingProjectOrder"
+              @click="savePortfolioOrder"
+            >
+              {{ savingProjectOrder ? '...' : '순서저장' }}
+            </button>
+            <button class="btn-new" @click="openCreateModal">+ 새 프로젝트</button>
+          </div>
         </div>
         <div v-if="loadingProjects" class="list-loading">불러오는 중...</div>
         <ul v-else class="project-items">
           <li
-            v-for="p in portfolios"
+            v-for="(p, idx) in portfolios"
             :key="p.id"
             class="project-item"
-            :class="{ active: selectedPortfolio?.id === p.id }"
+            :class="{
+              active: selectedPortfolio?.id === p.id,
+              'is-dragging': dragProjectIdx === idx
+            }"
+            draggable="true"
+            @dragstart="onProjectDragStart(idx)"
+            @dragover.prevent="onProjectDragOver(idx)"
+            @dragend="onProjectDragEnd"
             @click="selectPortfolio(p)"
           >
-            <span class="project-name">{{ p.title }}</span>
+            <div class="project-info">
+              <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
+              <span class="project-name">{{ p.title }}</span>
+            </div>
             <div class="item-actions">
-              <span class="image-count">{{ p.images.length }}장</span>
+              <span class="image-count">{{ p.images?.length || 0 }}장</span>
               <button class="btn-icon" title="수정" @click.stop="openEditModal(p)">✏</button>
               <button class="btn-icon btn-icon-del" title="삭제" @click.stop="confirmDeletePortfolio(p)">✕</button>
             </div>
@@ -46,6 +66,15 @@
       <section class="image-panel">
         <template v-if="selectedPortfolio">
           <h2 class="panel-title">{{ selectedPortfolio.title }}</h2>
+
+          <!-- 업로드 결과 메시지 (최상단 배치) -->
+          <Transition name="fade">
+            <div v-if="uploadResultMessage" :class="['upload-result-box', uploadResultType]">
+              <span class="result-icon">{{ uploadResultType === 'success' ? '✓' : '✕' }}</span>
+              <span class="result-text">{{ uploadResultMessage }}</span>
+              <button class="btn-msg-close" @click="uploadResultMessage = ''">✕</button>
+            </div>
+          </Transition>
 
           <!-- 업로드 영역 -->
           <div
@@ -84,7 +113,6 @@
               </span>
               <span v-else>{{ pendingFiles.length }}장 업로드</span>
             </button>
-            <p v-if="uploadMsg" :class="['upload-msg', uploadMsgType]">{{ uploadMsg }}</p>
           </div>
 
           <!-- 등록된 이미지 목록 (드래그앤드롭 순서 변경) -->
@@ -209,8 +237,8 @@ const isDragging = ref(false)
 
 const uploading = ref(false)
 const uploadProgress = ref(0)
-const uploadMsg = ref('')
-const uploadMsgType = ref<'success' | 'error'>('success')
+const uploadResultMessage = ref('')
+const uploadResultType = ref<'success' | 'error'>('success')
 
 // 드래그앤드롭 순서 변경
 const orderedImages = ref<PortfolioImage[]>([])
@@ -225,6 +253,44 @@ watch(() => selectedPortfolio.value?.images, (imgs) => {
   orderChanged.value = false
   orderSaveMsg.value = ''
 }, { immediate: true })
+
+// 프로젝트 리스트 순서 변경
+const dragProjectIdx = ref<number | null>(null)
+const projectOrderChanged = ref(false)
+const savingProjectOrder = ref(false)
+
+function onProjectDragStart(idx: number) {
+  dragProjectIdx.value = idx
+}
+
+function onProjectDragOver(idx: number) {
+  if (dragProjectIdx.value === null || dragProjectIdx.value === idx) return
+  const items = [...portfolios.value]
+  const [moved] = items.splice(dragProjectIdx.value, 1)
+  items.splice(idx, 0, moved)
+  portfolios.value = items
+  dragProjectIdx.value = idx
+  projectOrderChanged.value = true
+}
+
+function onProjectDragEnd() {
+  dragProjectIdx.value = null
+}
+
+async function savePortfolioOrder() {
+  savingProjectOrder.value = true
+  try {
+    const orders = portfolios.value.map((p, i) => ({ id: p.id, sort_order: i }))
+    await api.post('/admin/portfolios/reorder', { orders })
+    projectOrderChanged.value = false
+    alert('프로젝트 순서가 저장되었습니다.')
+  } catch (err) {
+    console.error('Failed to save project order:', err)
+    alert('순서 저장 실패')
+  } finally {
+    savingProjectOrder.value = false
+  }
+}
 
 function onDragStart(idx: number) {
   dragIdx.value = idx
@@ -285,6 +351,7 @@ async function loadPortfolios(category: string) {
   try {
     const { data } = await api.get('/portfolios', { params: { category, limit: 100 } })
     portfolios.value = data.data as Portfolio[]
+    projectOrderChanged.value = false
   } finally {
     loadingProjects.value = false
   }
@@ -327,16 +394,19 @@ async function uploadImages() {
   if (!selectedPortfolio.value || pendingFiles.value.length === 0) return
   uploading.value = true
   uploadProgress.value = 0
-  uploadMsg.value = ''
+  uploadResultMessage.value = ''
 
   const startOrder = selectedPortfolio.value.images.length
+  let totalOriginal = 0
+  let totalOptimized = 0
 
   try {
     for (let i = 0; i < pendingFiles.value.length; i++) {
       const { file } = pendingFiles.value[i]
 
-      const uploadFileType = file.type || 'image/png'
-      // 1) presign
+      const uploadFileType = file.type || 'image/jpeg'
+
+      // 1) presign — get temporary upload URL and object key
       const { data: presignData } = await api.post('/uploads/presign', {
         filename: file.name,
         content_type: uploadFileType,
@@ -344,35 +414,53 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      // 2) S3 PUT (file을 buffer로 변환하여 브라우저의 자동 Content-Type 삽입을 방지합니다.)
+      // 2) S3 PUT — upload raw file directly to S3
       const fileBuffer = await file.arrayBuffer()
       const uploadRes = await fetch(upload_url, {
         method: 'PUT',
         body: fileBuffer,
-        headers: {
-          'Content-Type': uploadFileType,
-        },
+        headers: { 'Content-Type': uploadFileType },
       })
-      if (!uploadRes.ok) throw new Error('S3 업로드 실패')
+      if (!uploadRes.ok) throw new Error(`S3 업로드 실패 (${uploadRes.status})`)
 
-      // 3) DB 등록 — object_key를 저장하면 백엔드가 올바른 public URL로 변환
+      // 3) Server-side WebP optimization — backend converts and replaces in S3
+      const { data: optData } = await api.post('/uploads/optimize', { object_key })
+      const finalKey: string = optData.data.optimized_key
+      totalOriginal += optData.data.original_bytes ?? 0
+      totalOptimized += optData.data.optimized_bytes ?? 0
+
+      // 4) DB registration — store final (optimized) key
       await api.post(`/portfolios/${selectedPortfolio.value!.id}/images`, {
-        image_url: object_key,
+        image_url: finalKey,
         display_order: startOrder + i,
       })
 
       uploadProgress.value = i + 1
     }
 
-    uploadMsg.value = `${pendingFiles.value.length}장 업로드 완료!`
-    uploadMsgType.value = 'success'
+    const count = pendingFiles.value.length
+    const savedKB = Math.round((totalOriginal - totalOptimized) / 1024)
+    const pct = totalOriginal > 0 ? Math.round((1 - totalOptimized / totalOriginal) * 100) : 0
+    
+    if (totalOriginal > 0) {
+      uploadResultMessage.value = `${count}장 업로드 완료! (${pct}% 압축, ${savedKB}KB 절약)`
+    } else {
+      uploadResultMessage.value = `${count}장 업로드 완료!`
+    }
+
+    uploadResultType.value = 'success'
+    console.log('Upload Result:', uploadResultMessage.value)
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
+
     pendingFiles.value.forEach(f => URL.revokeObjectURL(f.preview))
     pendingFiles.value = []
 
     await selectPortfolio(selectedPortfolio.value!)
-  } catch {
-    uploadMsg.value = '업로드 중 오류가 발생했습니다.'
-    uploadMsgType.value = 'error'
+  } catch (err) {
+    console.error('Upload Error:', err)
+    uploadResultMessage.value = '업로드 중 오류가 발생했습니다.'
+    uploadResultType.value = 'error'
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
   } finally {
     uploading.value = false
   }
@@ -479,13 +567,41 @@ onMounted(() => loadPortfolios('residential'))
 .list-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }
 .btn-new { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
 .btn-new:hover { background: #f5f5f5; }
+.btn-save-project-order { font-size: 11px; background: #eee; color: #999; border: 1px solid #ddd; padding: 4px 10px; cursor: not-allowed; border-radius: 4px; margin-right: 4px; transition: all 0.2s; }
+.btn-save-project-order.active { background: #953735; color: #fff; border-color: #953735; cursor: pointer; }
+.btn-save-project-order.active:hover { background: #7a2d2b; box-shadow: 0 2px 4px rgba(149, 55, 53, 0.2); }
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
-.project-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
-.project-item:last-child { border-bottom: none; }
-.project-item:hover { background: #f8f8f8; }
+.project-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: grab; border-bottom: 1px solid #f0f0f0; transition: all 0.15s; user-select: none; }
+.project-item:hover { background: #fafafa; }
+.project-item:active { cursor: grabbing; }
 .project-item.active { background: #f0f0f0; }
+
+/* 드래그 상태 피드백 강화 */
+.project-item.is-dragging { 
+  opacity: 0.9; 
+  background-color: #F5F0E8 !important; /* 연한 베이지색 */
+  border: 1px dashed #953735;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.project-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.drag-handle { 
+  font-size: 16px; 
+  color: #ccc; 
+  cursor: grab; 
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+.project-item:hover .drag-handle { color: #888; }
+.drag-handle:active { cursor: grabbing; }
+
 .project-name { font-size: 13px; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .image-count { font-size: 11px; color: #aaa; margin-right: 4px; }
@@ -517,9 +633,16 @@ onMounted(() => loadPortfolios('residential'))
 .btn-upload { padding: 10px 24px; background: #1a1a1a; color: #fff; border: none; font-size: 13px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
 .btn-upload:hover:not(:disabled) { background: #333; }
 .btn-upload:disabled { opacity: 0.6; cursor: not-allowed; }
-.upload-msg { font-size: 13px; margin: 0; }
-.upload-msg.success { color: #27ae60; }
-.upload-msg.error { color: #c0392b; }
+.upload-result-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13.5px; font-weight: 600; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.upload-result-box.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-left: 5px solid #22c55e; }
+.upload-result-box.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-left: 5px solid #ef4444; }
+.result-icon { font-size: 16px; }
+.result-text { flex: 1; }
+.btn-msg-close { background: none; border: none; font-size: 16px; color: currentColor; cursor: pointer; opacity: 0.5; }
+.btn-msg-close:hover { opacity: 1; }
+
+.fade-enter-active, .fade-leave-active { transition: all 0.4s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
 
 .registered-images { margin-top: 32px; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }

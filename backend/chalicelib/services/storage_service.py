@@ -1,3 +1,4 @@
+import io
 import uuid
 import boto3
 from botocore.config import Config
@@ -92,3 +93,80 @@ def get_image_display_url(stored_url: str) -> str:
 
 def get_public_url(object_key: str) -> str:
     return f"{_path_style_prefix()}{object_key}"
+
+
+def optimize_image_in_s3(source_key: str) -> dict:
+    """Download raw image from S3, convert to WebP (max 2400px, q=82), re-upload.
+
+    Returns {optimized_key, original_bytes, optimized_bytes}.
+    Falls back to the original key if Pillow is unavailable or processing fails.
+    """
+    try:
+        from PIL import Image
+    except ImportError:
+        return {"optimized_key": source_key, "original_bytes": 0, "optimized_bytes": 0}
+
+    s3 = _get_s3_client()
+
+    # Download original
+    obj = s3.get_object(Bucket=settings.S3_BUCKET, Key=source_key)
+    original_bytes_data = obj["Body"].read()
+    original_size = len(original_bytes_data)
+
+    try:
+        img = Image.open(io.BytesIO(original_bytes_data))
+
+        # Preserve EXIF orientation before any transform
+        try:
+            from PIL import ImageOps
+            img = ImageOps.exif_transpose(img)
+        except Exception:
+            pass
+
+        # Convert RGBA/P → RGB for WebP compatibility
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGBA")
+        else:
+            img = img.convert("RGB")
+
+        # Downscale if either dimension exceeds 2400px
+        max_dim = 2400
+        if img.width > max_dim or img.height > max_dim:
+            img.thumbnail((max_dim, max_dim), Image.LANCZOS)
+
+        buf = io.BytesIO()
+        img.save(buf, format="WEBP", quality=82, method=4)
+        optimized_data = buf.getvalue()
+        optimized_size = len(optimized_data)
+
+        # Build new key with .webp extension
+        base = source_key.rsplit(".", 1)[0] if "." in source_key else source_key
+        optimized_key = f"{base}.webp"
+
+        s3.put_object(
+            Bucket=settings.S3_BUCKET,
+            Key=optimized_key,
+            Body=optimized_data,
+            ContentType="image/webp",
+        )
+
+        # Delete the original only if it differs from the optimized key
+        if optimized_key != source_key:
+            try:
+                s3.delete_object(Bucket=settings.S3_BUCKET, Key=source_key)
+            except Exception:
+                pass
+
+        return {
+            "optimized_key": optimized_key,
+            "original_bytes": original_size,
+            "optimized_bytes": optimized_size,
+        }
+
+    except Exception:
+        # If anything goes wrong, return the original untouched
+        return {
+            "optimized_key": source_key,
+            "original_bytes": original_size,
+            "optimized_bytes": original_size,
+        }

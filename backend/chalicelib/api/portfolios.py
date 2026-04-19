@@ -51,7 +51,17 @@ def list_portfolios():
             filters["category"] = category
 
         with get_session() as session:
-            items, total = bulk_fetch(session, Portfolio, filters=filters, page=page, size=size)
+            # Modify bulk_fetch behavior or just order manually here
+            stmt = select(Portfolio)
+            if category:
+                stmt = stmt.where(Portfolio.category == category)
+            stmt = stmt.order_by(Portfolio.sort_order)
+            
+            # Since bulk_fetch is a helper, let's see if we can use it with order_by
+            # or just re-implement pagination here if needed.
+            # Looking at portfolios.py:54, it uses bulk_fetch.
+            # Let's try to pass order_by if supported, else manual query.
+            items, total = bulk_fetch(session, Portfolio, filters=filters, page=page, size=size, order_by=Portfolio.sort_order)
 
             # Batch fetch all images in one query instead of N+1
             portfolio_ids = [p.id for p in items]
@@ -135,6 +145,24 @@ def patch_portfolio(portfolio_id):
             portfolio = update(session, portfolio, data)
             result = _serialize_portfolio(session, portfolio)
         return success_response(result)
+    except AppError as e:
+        return handle_app_error(e)
+
+
+@portfolios_bp.route("/admin/portfolios/reorder", methods=["POST"], cors=True)
+@require_admin
+def reorder_portfolios():
+    try:
+        body = portfolios_bp.current_request.json_body or {}
+        orders = body.get("orders", [])  # [{id, sort_order}, ...]
+        if not orders:
+            raise ValidationError("orders는 필수입니다.")
+
+        with get_session() as session:
+            for item in orders:
+                p = fetch(session, Portfolio, raise_not_found=True, id=item["id"])
+                update(session, p, {"sort_order": item["sort_order"]})
+        return success_response({"message": "포트폴리오 순서가 저장되었습니다."})
     except AppError as e:
         return handle_app_error(e)
 

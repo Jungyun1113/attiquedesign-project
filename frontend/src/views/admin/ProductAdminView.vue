@@ -42,6 +42,15 @@
             <button class="btn-edit" @click="openEditModal">수정</button>
           </div>
 
+          <!-- 업로드 결과 메시지 (최상단 배치) -->
+          <Transition name="fade">
+            <div v-if="uploadResultMessage" :class="['upload-result-box', uploadResultType]">
+              <span class="result-icon">{{ uploadResultType === 'success' ? '✓' : '✕' }}</span>
+              <span class="result-text">{{ uploadResultMessage }}</span>
+              <button class="btn-msg-close" @click="uploadResultMessage = ''">✕</button>
+            </div>
+          </Transition>
+
           <div class="detail-meta">
             <div class="meta-item"><span class="meta-label">SKU</span><span>{{ selected.sku }}</span></div>
             <div class="meta-item"><span class="meta-label">카테고리</span><span>{{ selected.category }}</span></div>
@@ -59,8 +68,9 @@
             </div>
             <div class="thumb-upload">
               <input type="file" ref="thumbInput" accept="image/*" @change="uploadThumbnail" style="display:none" />
-              <button class="btn-upload-thumb" @click="($refs.thumbInput as HTMLInputElement)?.click()">
-                {{ selected.thumbnail_url ? '썸네일 변경' : '썸네일 업로드' }}
+              <button class="btn-upload-thumb" :disabled="uploadingThumb" @click="($refs.thumbInput as HTMLInputElement)?.click()">
+                <span v-if="uploadingThumb" class="spinner"></span>
+                {{ uploadingThumb ? '업로드 중...' : (selected.thumbnail_url ? '썸네일 변경' : '썸네일 업로드') }}
               </button>
             </div>
           </div>
@@ -122,6 +132,10 @@ const modalMode = ref<'create' | 'edit'>('create')
 const saving = ref(false)
 const formError = ref('')
 const form = ref({ sku: '', name: '', category: '', price: null as number | null, stock_quantity: 0, status: 'ACTIVE' })
+
+const uploadingThumb = ref(false)
+const uploadResultMessage = ref('')
+const uploadResultType = ref<'success' | 'error'>('success')
 
 function statusLabel(status: string) {
   return { ACTIVE: '활성', HIDDEN: '숨김', SOLDOUT: '품절' }[status] ?? status
@@ -211,6 +225,8 @@ async function uploadThumbnail(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file || !selected.value) return
 
+  uploadingThumb.value = true
+  uploadResultMessage.value = ''
   try {
     const uploadFileType = file.type || 'image/png'
     // 1) presign
@@ -221,23 +237,44 @@ async function uploadThumbnail(e: Event) {
     })
     const { upload_url, object_key } = presignData.data
 
-    // 2) S3 PUT (buffer로 변환하여 자동 헤더 추가 방지)
+    // 2) S3 PUT
     const fileBuffer = await file.arrayBuffer()
     const uploadRes = await fetch(upload_url, {
       method: 'PUT',
       body: fileBuffer,
-      headers: {
-        'Content-Type': uploadFileType,
-      },
+      headers: { 'Content-Type': uploadFileType },
     })
     if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 
-    // 3) 상품 thumbnail_url 업데이트
-    await api.patch(`/products/${selected.value.id}`, { thumbnail_url: object_key })
+    // 3) Optimization
+    const { data: optData } = await api.post('/uploads/optimize', { object_key })
+    const finalKey = optData.data.optimized_key
+    const totalOriginal = optData.data.original_bytes ?? 0
+    const totalOptimized = optData.data.optimized_bytes ?? 0
+    const pct = totalOriginal > 0 ? Math.round((1 - totalOptimized / totalOriginal) * 100) : 0
+
+    // 4) Update product
+    await api.patch(`/products/${selected.value.id}`, { thumbnail_url: finalKey })
+    
+    if (totalOriginal > 0) {
+      uploadResultMessage.value = `썸네일 업로드 완료! (${pct}% 압축)`
+    } else {
+      uploadResultMessage.value = `썸네일 업로드 완료!`
+    }
+    
+    uploadResultType.value = 'success'
+    console.log('Thumbnail Result:', uploadResultMessage.value)
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
+
     await selectProduct(selected.value)
     await loadProducts()
-  } catch {
-    alert('썸네일 업로드 실패')
+  } catch (err) {
+    console.error('Thumbnail error:', err)
+    uploadResultMessage.value = '업로드 중 오류가 발생했습니다.'
+    uploadResultType.value = 'error'
+    setTimeout(() => { uploadResultMessage.value = '' }, 6000)
+  } finally {
+    uploadingThumb.value = false
   }
 }
 
@@ -292,8 +329,20 @@ onMounted(loadProducts)
 .thumbnail-wrap { width: 200px; height: 200px; background: #f5f5f5; border: 1px solid #eee; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
 .thumb-preview { width: 100%; height: 100%; object-fit: cover; }
 .thumb-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 13px; color: #ccc; }
-.btn-upload-thumb { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 12px; cursor: pointer; border-radius: 4px; }
+.btn-upload-thumb { font-size: 11px; color: #555; background: #fff; border: 1px solid #ddd; padding: 4px 12px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
 .btn-upload-thumb:hover { background: #f5f5f5; }
+.btn-upload-thumb:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.upload-result-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.upload-result-box.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-left: 5px solid #22c55e; }
+.upload-result-box.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-left: 5px solid #ef4444; }
+.result-icon { font-size: 16px; }
+.result-text { flex: 1; }
+.btn-msg-close { background: none; border: none; font-size: 16px; color: currentColor; cursor: pointer; opacity: 0.5; }
+.btn-msg-close:hover { opacity: 1; }
+
+.fade-enter-active, .fade-leave-active { transition: all 0.4s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
 
 .panel-empty { display: flex; align-items: center; justify-content: center; height: 200px; font-size: 14px; color: #aaa; }
 

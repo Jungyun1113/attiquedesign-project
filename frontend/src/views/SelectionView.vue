@@ -16,12 +16,33 @@
             :class="{ 'is-active': activeSlide === idx }"
           >
             <template v-if="slide.type === 'single'">
-              <img :src="slide.src" alt="ATTIQUE interior" class="hero-img-full" loading="eager" />
+              <img 
+                :src="slide.src" 
+                alt="ATTIQUE interior" 
+                class="hero-img-full" 
+                :loading="idx === 0 ? 'eager' : 'lazy'"
+                :fetchpriority="idx === 0 ? 'high' : undefined"
+                :decoding="idx === 0 ? undefined : 'async'"
+              />
             </template>
             <template v-else>
               <div class="hero-dual">
-                <img :src="slide.src1" alt="ATTIQUE interior" class="hero-img-half" />
-                <img :src="slide.src2" alt="ATTIQUE interior" class="hero-img-half" />
+                <img 
+                  :src="slide.src1" 
+                  alt="ATTIQUE interior" 
+                  class="hero-img-half" 
+                  :loading="idx === 0 ? 'eager' : 'lazy'"
+                  :fetchpriority="idx === 0 ? 'high' : undefined"
+                  :decoding="idx === 0 ? undefined : 'async'"
+                />
+                <img 
+                  :src="slide.src2" 
+                  alt="ATTIQUE interior" 
+                  class="hero-img-half" 
+                  :loading="idx === 0 ? 'eager' : 'lazy'"
+                  :fetchpriority="idx === 0 ? 'high' : undefined"
+                  :decoding="idx === 0 ? undefined : 'async'"
+                />
               </div>
             </template>
           </div>
@@ -155,7 +176,12 @@ const fallbackSlides: HeroSlide[] = [
   { type: 'single', src: '/images/hero/hero-03.jpg' },
 ]
 
-const heroSlides = ref<HeroSlide[]>([])
+const heroSlides = ref<HeroSlide[]>([
+  { type: 'single', src: '/images/hero/hero-01.jpg' },
+  { type: 'single', src: '/images/hero/hero-02.jpg' },
+  { type: 'single', src: '/images/hero/hero-03.jpg' },
+  { type: 'dual',   src1: '/images/hero/hero-04.jpg', src2: '/images/hero/hero-05.jpg' }
+])
 const activeSlide = ref(0)
 let autoplayTimer: ReturnType<typeof setInterval> | null = null
 
@@ -216,14 +242,6 @@ async function loadData() {
     
     // 2. 전체 셀렉션 데이터 (초기 로딩량 최적화: 100 -> 24)
     const allData = await selectionService.getSelections({ limit: 24 })
-
-    // 로컬 이미지 기반 슬라이더 구성 (S3 이슈 대응 및 사용자 요청 반영)
-    heroSlides.value = [
-      { type: 'single', src: '/images/hero/hero-01.jpg' },
-      { type: 'single', src: '/images/hero/hero-02.jpg' },
-      { type: 'single', src: '/images/hero/hero-03.jpg' },
-      { type: 'dual',   src1: '/images/hero/hero-04.jpg', src2: '/images/hero/hero-05.jpg' }
-    ]
 
     // 슬라이더가 아닌 셀렉션만 제품 영역에 표시
     selections.value = allData.filter((s: Selection) => s.category !== 'slider')
