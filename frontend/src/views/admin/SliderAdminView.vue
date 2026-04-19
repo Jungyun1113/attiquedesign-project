@@ -240,10 +240,11 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      // S3 PUT 시 서버의 서명(SignedHeaders=host)과 일치시키기 위해 fetch를 사용하여 헤더를 제외합니다.
+      // S3 PUT 시 서버의 서명과 일치시키기 위해 buffer로 변환하여 전송합니다.
+      const fileBuffer = await file.arrayBuffer()
       const uploadRes = await fetch(upload_url, {
         method: 'PUT',
-        body: file,
+        body: fileBuffer,
       })
       if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 

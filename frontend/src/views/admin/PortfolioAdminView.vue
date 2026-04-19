@@ -344,10 +344,11 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
-      // 2) S3 PUT (fetch를 사용하여 axios의 자동 헤더 추가(Content-Type 등)를 방지합니다.)
+      // 2) S3 PUT (file을 buffer로 변환하여 브라우저의 자동 Content-Type 삽입을 방지합니다.)
+      const fileBuffer = await file.arrayBuffer()
       const uploadRes = await fetch(upload_url, {
         method: 'PUT',
-        body: file,
+        body: fileBuffer,
       })
       if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 

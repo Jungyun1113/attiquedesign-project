@@ -221,10 +221,11 @@ async function uploadThumbnail(e: Event) {
     })
     const { upload_url, object_key } = presignData.data
 
-    // 2) S3 PUT (fetch를 사용하여 자동 헤더 추가를 방지)
+    // 2) S3 PUT (buffer로 변환하여 자동 헤더 추가 방지)
+    const fileBuffer = await file.arrayBuffer()
     const uploadRes = await fetch(upload_url, {
       method: 'PUT',
-      body: file,
+      body: fileBuffer,
     })
     if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 

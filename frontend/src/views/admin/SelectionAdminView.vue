@@ -257,9 +257,10 @@ async function uploadImages() {
       })
       const { upload_url, object_key } = presignData.data
 
+      const fileBuffer = await file.arrayBuffer()
       const uploadRes = await fetch(upload_url, {
         method: 'PUT',
-        body: file,
+        body: fileBuffer,
       })
       if (!uploadRes.ok) throw new Error('S3 업로드 실패')
 
