@@ -478,9 +478,33 @@ onMounted(loadSelections)
 .list-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }
 .btn-new { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
 .btn-new:hover { background: #f5f5f5; }
-.btn-save-selection-order { font-size: 11px; background: #eee; color: #999; border: 1px solid #ddd; padding: 4px 10px; cursor: not-allowed; border-radius: 4px; margin-right: 4px; transition: all 0.2s; }
-.btn-save-selection-order.active { background: #953735; color: #fff; border-color: #953735; cursor: pointer; }
-.btn-save-selection-order.active:hover { background: #7a2d2b; box-shadow: 0 2px 4px rgba(149, 55, 53, 0.2); }
+.btn-save-selection-order { 
+  font-size: 11px; 
+  background: #f0f0f0; 
+  color: #bbb; 
+  border: 1px solid #ddd; 
+  padding: 4px 12px; 
+  cursor: not-allowed; 
+  border-radius: 4px; 
+  margin-right: 8px; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+}
+.btn-save-selection-order.active { 
+  background: #953735; 
+  color: #fff; 
+  border-color: #953735; 
+  cursor: pointer; 
+  box-shadow: 0 2px 6px rgba(149, 55, 53, 0.2);
+}
+.btn-save-selection-order.active:hover { 
+  background: #7a2d2b; 
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(149, 55, 53, 0.3);
+}
+.btn-save-selection-order.active:active {
+  transform: translateY(0);
+}
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
@@ -502,17 +526,22 @@ onMounted(loadSelections)
 
 .item-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; overflow: hidden; }
 .drag-handle { 
-  font-size: 16px; 
-  color: #ccc; 
+  font-size: 18px; 
+  color: #ddd; 
   cursor: grab; 
-  padding: 4px;
+  padding: 4px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  user-select: none;
 }
-.project-item:hover .drag-handle { color: #888; }
-.drag-handle:active { cursor: grabbing; }
+.project-item:hover .drag-handle { 
+  color: #953735; 
+}
+.drag-handle:active { 
+  cursor: grabbing; 
+}
 
 .project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; flex: 1; }
 .hero-badge { background: #333; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: normal; flex-shrink: 0; }

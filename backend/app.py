@@ -9,8 +9,13 @@ from chalicelib.api.selections import selections_bp
 from chalicelib.api.uploads import uploads_bp
 from chalicelib.api.webhooks import webhooks_bp
 
+from chalicelib.core.db import create_db_and_tables
+
 app = Chalice(app_name="attique-project")
 app.debug = True
+
+# Create tables if they don't exist
+create_db_and_tables()
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(products_bp)
