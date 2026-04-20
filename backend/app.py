@@ -9,16 +9,17 @@ from chalicelib.api.selections import selections_bp
 from chalicelib.api.uploads import uploads_bp
 from chalicelib.api.webhooks import webhooks_bp
 
-from chalicelib.core.db import create_db_and_tables
+from chalicelib.core.db import create_db_and_tables, seed_admin_if_missing
 # Import all models to ensure they are registered with SQLModel.metadata
 from chalicelib.models import user, product, order, reservation, portfolio, selection, waitlist # noqa
 
 app = Chalice(app_name="attique-project")
 app.debug = True
 
-# Create tables if they don't exist
+# Create tables and seed admin if they don't exist
 try:
     create_db_and_tables()
+    seed_admin_if_missing()
 except Exception as e:
     print(f"INFO: Database initialization deferred: {e}")
 

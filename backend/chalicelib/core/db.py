@@ -44,3 +44,39 @@ def get_session():
         except Exception:
             session.rollback()
             raise
+
+def seed_admin_if_missing():
+    """관리자 계정이 없으면 기본 관리자 정보를 생성합니다."""
+    from chalicelib.models.user import User, UserRole, AuthProvider
+    from chalicelib.core.auth import hash_password
+    from sqlmodel import select, Session
+    import os
+
+    engine = get_engine()
+    if not engine:
+        return
+
+    admin_email = os.getenv("ADMIN_EMAIL", "admin@attique.com")
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin1234!")
+
+    with Session(engine) as session:
+        try:
+            statement = select(User).where(User.role == UserRole.ADMIN)
+            existing_admin = session.exec(statement).first()
+            
+            if not existing_admin:
+                print(f"INFO: Seeding default admin account: {admin_email}")
+                new_admin = User(
+                    email=admin_email,
+                    password_hash=hash_password(admin_password),
+                    name="최고관리자",
+                    role=UserRole.ADMIN,
+                    auth_provider=AuthProvider.LOCAL,
+                )
+                session.add(new_admin)
+                session.commit()
+            else:
+                print("INFO: Admin account already exists.")
+        except Exception as e:
+            print(f"WARNING: Could not seed admin account: {e}")
+            session.rollback()
