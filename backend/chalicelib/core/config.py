@@ -14,7 +14,8 @@ class Settings:
         # 만약 환경 변수가 오염되어 있다면(잘못된 에러 메시지가 들어있다면) 정상 주소로 강제 복구
         if db_url.startswith("Failed to add secret") or not db_url.startswith("postgresql"):
             print("WARNING: Corrupted DATABASE_URL detected. Using hardcoded fallback.")
-            db_url = "postgresql+psycopg2://postgres:axHQ2KTOi6oANghBWhLV@attiquedesign-db.cw9iic2c8iu9.us-east-1.rds.amazonaws.com:5432/attiquedesign"
+            # SSL 설정을 위해 ?sslmode=require 추가
+            db_url = "postgresql+psycopg2://postgres:axHQ2KTOi6oANghBWhLV@attiquedesign-db.cw9iic2c8iu9.us-east-1.rds.amazonaws.com:5432/attiquedesign?sslmode=require"
         
         self.DATABASE_URL: str = db_url
         self.JWT_SECRET: str = os.getenv("JWT_SECRET", "change-me-in-production")
