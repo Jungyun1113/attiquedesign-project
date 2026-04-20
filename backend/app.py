@@ -44,3 +44,34 @@ def debug_aws_account():
     sts = boto3.client("sts")
     identity = sts.get_caller_identity()
     return {"account": identity["Account"], "arn": identity["Arn"]}
+@app.route("/debug/db-status", methods=["GET"], cors=True)
+def db_status():
+    import os
+    from sqlmodel import text, Session
+    from chalicelib.core.db import get_engine
+    
+    db_url = os.getenv("DATABASE_URL", "NOT_FOUND")
+    masked_url = db_url[:20] + "..." + db_url[-10:] if db_url != "NOT_FOUND" else "NOT_FOUND"
+    
+    status = {
+        "database_url_present": db_url != "NOT_FOUND",
+        "database_url_masked": masked_url,
+        "engine_created": False,
+        "connection_test": "pending",
+        "error": None
+    }
+    
+    try:
+        engine = get_engine()
+        if engine:
+            status["engine_created"] = True
+            with Session(engine) as session:
+                session.exec(text("SELECT 1"))
+                status["connection_test"] = "success"
+        else:
+            status["error"] = "Engine is None"
+    except Exception as e:
+        status["connection_test"] = "failed"
+        status["error"] = str(e)
+        
+    return status
