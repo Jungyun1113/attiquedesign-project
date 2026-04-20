@@ -58,9 +58,26 @@ def health():
     except Exception as e:
         db_status["error"] = str(e)
         
+    from chalicelib.models.user import User, UserRole
+    admin_status = "unknown"
+    try:
+        if engine:
+            with Session(engine) as session:
+                from sqlmodel import select
+                admin_user = session.exec(select(User).where(User.role == UserRole.ADMIN)).first()
+                if admin_user:
+                    admin_status = f"exists ({admin_user.email})"
+                else:
+                    admin_status = "missing - re-seeding..."
+                    seed_admin_if_missing()
+                    admin_status = "seeded"
+    except Exception as e:
+        admin_status = f"error: {str(e)}"
+        
     return {
         "status": "ok",
         "db": db_status,
+        "admin": admin_status,
         "url_masked": masked_url
     }
 
