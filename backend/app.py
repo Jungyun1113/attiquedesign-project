@@ -35,7 +35,34 @@ app.register_blueprint(webhooks_bp)
 
 @app.route("/health", methods=["GET"], cors=True)
 def health():
-    return {"status": "ok"}
+    import os
+    from sqlmodel import text, Session
+    from chalicelib.core.db import get_engine
+    
+    db_url = os.getenv("DATABASE_URL", "NOT_FOUND")
+    masked_url = db_url[:20] + "..." + db_url[-10:] if db_url != "NOT_FOUND" else "NOT_FOUND"
+    
+    db_status = {
+        "connected": False,
+        "error": None
+    }
+    
+    try:
+        engine = get_engine()
+        if engine:
+            with Session(engine) as session:
+                session.exec(text("SELECT 1"))
+                db_status["connected"] = True
+        else:
+            db_status["error"] = "Engine is None"
+    except Exception as e:
+        db_status["error"] = str(e)
+        
+    return {
+        "status": "ok",
+        "db": db_status,
+        "url_masked": masked_url
+    }
 
 
 @app.route("/debug/aws-account", methods=["GET"], cors=True)
