@@ -11,7 +11,7 @@ load_dotenv(dotenv_path=env_path)
 class Settings:
     def __init__(self):
         # 현재 배포 시스템의 Secret 오염으로 인해 일시적으로 주소를 코드에 고정합니다.
-        self.DATABASE_URL: str = "postgresql+psycopg2://postgres:axHQ2KTOi6oANghBWhLV@attiquedesign-db.cw9iic2c8iu9.us-east-1.rds.amazonaws.com:5432/attiquedesign?sslmode=require"
+        self.DATABASE_URL: str = "postgresql+psycopg2://postgres:Nk840627%21@attiquedesign-db.cw9iic2c8iu9.us-east-1.rds.amazonaws.com:5432/attiquedesign?sslmode=require"
         
         self.JWT_SECRET: str = os.getenv("JWT_SECRET", "change-me-in-production")
         self.JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
