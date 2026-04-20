@@ -85,6 +85,9 @@ def login():
         })
     except AppError as e:
         return handle_app_error(e)
+    except Exception as e:
+        print(f"ERROR: Login failure: {e}")
+        return handle_app_error(AppError("서버 오류가 발생했습니다. DB 상태를 확인해주세요.", status_code=500))
 
 
 @auth_bp.route("/auth/refresh", methods=["POST"], cors=True)
