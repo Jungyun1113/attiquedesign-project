@@ -43,6 +43,7 @@ jobs:
               "prod": {
                 "api_gateway_stage": "api",
                 "autogen_policy": false,
+                "manage_iam_role": true,
                 "environment_variables": {
                   "CHALICE_ENV": "prod",
                   "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
@@ -131,6 +132,9 @@ jobs:
                 "MaxAgeSeconds": 3000
               }]
             }'
+
+      - name: Wait for IAM Consistency
+        run: sleep 10
 
       - name: Deploy with Chalice
         working-directory: backend
