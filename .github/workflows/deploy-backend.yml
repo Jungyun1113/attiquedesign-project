@@ -138,4 +138,9 @@ jobs:
 
       - name: Deploy with Chalice
         working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CHALICE_ENV: prod
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         run: chalice deploy --stage prod
