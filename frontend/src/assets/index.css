@@ -94,3 +94,82 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ── GLOBAL STANDARDS: Typography & Layout ── */
+
+/* 1. English Subheading Standard */
+.global-eng-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1.2;
+  color: #312E2D; /* Dark Charcoal */
+  margin: 0 0 3rem 0; /* 하단 여백 3rem 추가 */
+  word-break: keep-all;
+}
+
+.global-eng-subtitle em {
+  font-style: italic;
+  color: #953735; /* Brand Accent Red */
+  font-weight: inherit;
+}
+
+/* 2. Korean Body Text Standard */
+.global-kor-desc {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 16px;
+  line-height: 1.85;
+  color: #312E2D; /* Unified Dark Charcoal */
+  font-weight: 400;
+  word-break: keep-all;
+}
+
+/* 3. Common Page Layout Container */
+.global-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem 10rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Responsive Scaling */
+@media (max-width: 768px) {
+  .global-page-container {
+    padding: 2.5rem 1.5rem 6rem;
+  }
+  
+  .global-kor-desc {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  
+  .global-eng-subtitle {
+    font-size: clamp(24px, 7vw, 36px);
+  }
+}
+
+/* 4. Global Premium Button */
+.global-btn-main {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  padding: 1.2rem 2.8rem;
+  background-color: #312E2D;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.global-btn-main:hover {
+  background-color: #953735;
+  padding-right: 3.8rem;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}

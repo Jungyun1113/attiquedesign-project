@@ -7,18 +7,36 @@
       <aside class="project-list">
         <div class="list-header">
           <span class="list-title">셀렉션</span>
-          <button class="btn-new" @click="openCreateModal">+ 새 셀렉션</button>
+          <div class="header-actions">
+            <button
+              class="btn-save-selection-order"
+              :class="{ active: selectionOrderChanged }"
+              :disabled="!selectionOrderChanged || savingSelectionOrder"
+              @click="saveSelectionOrder"
+            >
+              {{ savingSelectionOrder ? '...' : '순서저장' }}
+            </button>
+            <button class="btn-new" @click="openCreateModal">+ 새 셀렉션</button>
+          </div>
         </div>
         <div v-if="loadingList" class="list-loading">불러오는 중...</div>
         <ul v-else class="project-items">
           <li
-            v-for="s in selections"
+            v-for="(s, idx) in selections"
             :key="s.id"
             class="project-item"
-            :class="{ active: selected?.id === s.id }"
+            :class="{ 
+              active: selected?.id === s.id,
+              'is-dragging': dragSelectionIdx === idx
+            }"
+            draggable="true"
+            @dragstart="onSelectionDragStart(idx)"
+            @dragover.prevent="onSelectionDragOver(idx)"
+            @dragend="onSelectionDragEnd"
             @click="selectSelection(s)"
           >
             <div class="item-info">
+              <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
               <span class="project-name">
                 {{ s.title }}
                 <span v-if="s.title.toLowerCase().includes('hero') || s.title.toLowerCase().includes('slider')" class="hero-badge">메인 슬라이더</span>
@@ -93,7 +111,10 @@
 
           <!-- 등록된 이미지 -->
           <div class="registered-images">
-            <h3 class="section-label">등록된 이미지 ({{ selected.images.length }}장)</h3>
+            <div class="section-header">
+              <h3 class="section-label">등록된 이미지 ({{ selected.images.length }}장)</h3>
+              <span class="drag-hint">이미지 정렬은 자동 저장됩니다 (업로드 순)</span>
+            </div>
             <div v-if="selected.images.length === 0" class="no-images">등록된 이미지가 없습니다.</div>
             <div v-else class="image-grid">
               <div
@@ -191,6 +212,44 @@ const uploadProgress = ref(0)
 const uploadResultMessage = ref('')
 const uploadResultType = ref<'success' | 'error'>('success')
 
+// 리스트 드래그앤드롭 및 순서 변경
+const dragSelectionIdx = ref<number | null>(null)
+const selectionOrderChanged = ref(false)
+const savingSelectionOrder = ref(false)
+
+function onSelectionDragStart(idx: number) {
+  dragSelectionIdx.value = idx
+}
+
+function onSelectionDragOver(idx: number) {
+  if (dragSelectionIdx.value === null || dragSelectionIdx.value === idx) return
+  const items = [...selections.value]
+  const [moved] = items.splice(dragSelectionIdx.value, 1)
+  items.splice(idx, 0, moved)
+  selections.value = items
+  dragSelectionIdx.value = idx
+  selectionOrderChanged.value = true
+}
+
+function onSelectionDragEnd() {
+  dragSelectionIdx.value = null
+}
+
+async function saveSelectionOrder() {
+  savingSelectionOrder.value = true
+  try {
+    const orders = selections.value.map((s, i) => ({ id: s.id, sort_order: i }))
+    await api.post('/admin/selections/reorder', { orders })
+    selectionOrderChanged.value = false
+    alert('셀렉션 순서가 저장되었습니다.')
+  } catch (err) {
+    console.error('Failed to save selection order:', err)
+    alert('순서 저장 실패')
+  } finally {
+    savingSelectionOrder.value = false
+  }
+}
+
 // 생성 모달
 const showCreateModal = ref(false)
 const newTitle = ref('')
@@ -213,6 +272,7 @@ async function loadSelections() {
   try {
     const { data } = await api.get('/selections', { params: { limit: 100 } })
     selections.value = data.data as Selection[]
+    selectionOrderChanged.value = false
   } finally {
     loadingList.value = false
   }
@@ -418,15 +478,43 @@ onMounted(loadSelections)
 .list-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }
 .btn-new { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
 .btn-new:hover { background: #f5f5f5; }
+.btn-save-selection-order { font-size: 11px; background: #eee; color: #999; border: 1px solid #ddd; padding: 4px 10px; cursor: not-allowed; border-radius: 4px; margin-right: 4px; transition: all 0.2s; }
+.btn-save-selection-order.active { background: #953735; color: #fff; border-color: #953735; cursor: pointer; }
+.btn-save-selection-order.active:hover { background: #7a2d2b; box-shadow: 0 2px 4px rgba(149, 55, 53, 0.2); }
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
-.project-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.12s; }
+.project-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; cursor: grab; border-bottom: 1px solid #f0f0f0; transition: all 0.15s; user-select: none; }
 .project-item:last-child { border-bottom: none; }
-.project-item:hover { background: #f8f8f8; }
+.project-item:hover { background: #fafafa; }
+.project-item:active { cursor: grabbing; }
 .project-item.active { background: #f0f0f0; }
-.item-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; overflow: hidden; }
-.project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+
+/* 드래그 상태 피드백 */
+.project-item.is-dragging { 
+  opacity: 0.9; 
+  background-color: #F5F0E8 !important; 
+  border: 1px dashed #953735;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.item-info { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; overflow: hidden; }
+.drag-handle { 
+  font-size: 16px; 
+  color: #ccc; 
+  cursor: grab; 
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+.project-item:hover .drag-handle { color: #888; }
+.drag-handle:active { cursor: grabbing; }
+
+.project-name { font-size: 13px; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; flex: 1; }
 .hero-badge { background: #333; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; font-weight: normal; flex-shrink: 0; }
 .project-sub { font-size: 11px; color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 8px; }
@@ -473,7 +561,9 @@ onMounted(loadSelections)
 .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
 
 .registered-images { margin-top: 32px; }
-.section-label { font-size: 13px; font-weight: 600; color: #555; margin: 0 0 12px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-label { font-size: 13px; font-weight: 600; color: #555; margin: 0; }
+.drag-hint { font-size: 11px; color: #bbb; }
 .no-images { font-size: 13px; color: #bbb; padding: 20px 0; }
 .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
 .image-card { position: relative; aspect-ratio: 4/3; background: #f0f0f0; border-radius: 4px; overflow: hidden; }

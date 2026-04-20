@@ -33,7 +33,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   residential: '클래식과 모던, 색과 소재의 균형 속에서 완성한 주거 공간.',
   commercial: '브랜드의 성격을 공간으로 풀어낸 아띠끄의 상업 프로젝트.',
   drama: '도깨비, 상속자들, 괜찮아 사랑이야.\n극 중 인물이 살아 숨쉬는 공간을 스타일링해온 아띠끄의 작업.',
-  magazine: '메종, 까사리빙, 리빙센스와 함께해온 아띠끄의 리빙 스타일링 아카이브.',
+  magazine: '행복이 가득한 집, 메종, 까사리빙, 노블레스와 함께해온 아띠끄의 리빙 스타일링 아카이브.',
 }
 
 export const portfolioService = {

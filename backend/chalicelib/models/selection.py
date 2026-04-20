@@ -12,6 +12,7 @@ class Selection(BaseModel, table=True):
     subtitle: Optional[str] = Field(default=None)
     description: Optional[str] = Field(default=None)
     category: Optional[str] = Field(default=None)
+    sort_order: int = Field(default=0)
 
     images: List["SelectionImage"] = Relationship(back_populates="selection")
     selection_products: List["SelectionProduct"] = Relationship(back_populates="selection")

@@ -1,15 +1,15 @@
 <template>
   <div class="philosophy-page">
-    <div class="philo-container" :class="{ 'is-visible': isLoaded }">
+    <div class="global-page-container philo-container" :class="{ 'is-visible': isLoaded }">
       
       <!-- Section 1: Brand Story -->
       <section class="philo-section story-section">
-        <h2 class="philo-title">
+        <h2 class="global-eng-subtitle philo-title">
           Where Curation Meets <em class="philo-accent">Living</em>.
         </h2>
         <div class="section-content">
           <div class="eyebrow">BRAND STORY</div>
-          <p class="description">
+          <p class="global-kor-desc description">
             미국과 유럽의 하이엔드 가구와 소품을 국내에 직접 소개하고자 아띠끄 디자인을 설립했습니다.<br>
             청담 쇼룸을 시작으로 인테리어와 리빙을 아우르는 브랜드로 자리잡았고,<br>
             단일 브랜드가 아닌 대표의 안목으로 엄선한 다양한 해외 가구와 소품을 조합해 고객만의 공간을 완성해왔습니다.<br>
@@ -24,19 +24,19 @@
         <div class="history-list">
           <div class="history-item">
             <span class="year">2012</span>
-            <span class="event">아띠끄 디자인 설립</span>
+            <span class="global-kor-desc event">아띠끄 디자인 설립</span>
           </div>
           <div class="history-item">
             <span class="year">2010s</span>
-            <span class="event">청담 쇼룸 운영 · 드라마·잡지 스타일링 · 주거/상업 프로젝트</span>
+            <span class="global-kor-desc event">청담 쇼룸 운영 · 드라마·잡지 스타일링 · 주거/상업 프로젝트</span>
           </div>
           <div class="history-item">
             <span class="year">2020</span>
-            <span class="event">한남동 아띠끄빌딩 건립 및 쇼룸 이전</span>
+            <span class="global-kor-desc event">한남동 아띠끄빌딩 건립 및 쇼룸 이전</span>
           </div>
           <div class="history-item">
             <span class="year highlight">2026.05</span>
-            <span class="event">한남 쇼룸 리뉴얼 오픈</span>
+            <span class="global-kor-desc event">한남 쇼룸 리뉴얼 오픈</span>
           </div>
         </div>
       </section>
@@ -45,7 +45,7 @@
       <section class="philo-section philosophy-section">
         <div class="eyebrow">PHILOSOPHY</div>
         <h3 class="philo-sub-title">Balance of Space & Life</h3>
-        <p class="description">
+        <p class="global-kor-desc description">
           머무는 사람의 일상과 공간이 자연스럽게 어우러지는 균형.<br>
           아띠끄 디자인의 고민은 여기서 시작합니다.<br><br>
           정제된 시선으로 엄선한 셀렉션과 세밀한 맞춤 설계로,<br>
@@ -73,21 +73,7 @@ onMounted(() => {
 .philosophy-page {
   background-color: #F5F0E8;
   min-height: calc(100vh - 160px);
-  color: #312E2D;
-}
-
-.philo-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 4rem 2rem 10rem;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
-}
-
-.philo-container.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+  color: #2C2C2C;
 }
 
 .philo-section {
@@ -121,15 +107,6 @@ onMounted(() => {
 }
 
 /* Section 1: Story */
-.philo-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(40px, 8vw, 72px);
-  font-weight: 400;
-  line-height: 1.1;
-  margin-bottom: 4rem;
-  word-break: keep-all;
-}
-
 .philo-accent {
   font-style: italic;
   color: #953735;
@@ -138,14 +115,6 @@ onMounted(() => {
 .story-section .section-content {
   max-width: 700px;
   margin-left: auto;
-}
-
-.description {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
-  line-height: 1.8;
-  color: #555250;
-  word-break: keep-all;
 }
 
 /* Section 2: History */
@@ -172,7 +141,7 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 600;
   min-width: 100px;
-  color: #312E2D;
+  color: #2C2C2C;
 }
 
 .year.highlight {
@@ -199,40 +168,8 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .philo-container {
-    padding: 3rem 1.5rem 6rem;
-  }
-  
   .philo-section {
     margin-bottom: 5rem;
-  }
-
-  .philo-title {
-    font-size: 40px;
-    margin-bottom: 3rem;
-  }
-
-  .story-section .section-content {
-    margin-left: 0;
-  }
-
-  .history-item {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding-bottom: 1rem;
-  }
-
-  .year {
-    font-size: 16px;
-    min-width: auto;
-  }
-
-  .event {
-    font-size: 14px;
-  }
-
-  .philo-sub-title {
-    font-size: 24px;
   }
 }
 </style>

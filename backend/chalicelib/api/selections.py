@@ -87,7 +87,14 @@ def list_selections():
 
         with get_session() as session:
             cat_filters = {"category": category_filter} if category_filter else None
-            items, total = bulk_fetch(session, Selection, filters=cat_filters, page=page, size=size)
+            items, total = bulk_fetch(
+                session, 
+                Selection, 
+                filters=cat_filters, 
+                page=page, 
+                size=size,
+                order_by=Selection.sort_order.asc()
+            )
 
             # Batch fetch images and products in 2 queries instead of N*2
             selection_ids = [s.id for s in items]
@@ -326,5 +333,26 @@ def add_selection_image(selection_id):
                 "display_order": image.display_order,
             }
         return success_response(result, status_code=201)
+    except AppError as e:
+        return handle_app_error(e)
+@selections_bp.route("/admin/selections/reorder", methods=["POST"], cors=True)
+@require_admin
+def reorder_selections():
+    try:
+        body = selections_bp.current_request.json_body or {}
+        orders = body.get("orders", [])
+        if not orders:
+            raise ValidationError("orders 목록이 비어있습니다.")
+
+        with get_session() as session:
+            for item in orders:
+                selection_id = item.get("id")
+                sort_order = item.get("sort_order")
+                if selection_id is not None and sort_order is not None:
+                    selection = fetch(session, Selection, id=selection_id)
+                    if selection:
+                        update(session, selection, {"sort_order": sort_order})
+            session.commit()
+        return success_response({"message": "순서가 저장되었습니다."})
     except AppError as e:
         return handle_app_error(e)

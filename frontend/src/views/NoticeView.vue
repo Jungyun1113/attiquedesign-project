@@ -1,62 +1,64 @@
 <template>
-  <div class="container-page section-gap max-w-3xl">
-    <p class="text-xs uppercase tracking-[0.2em] text-accent mb-2">Notice</p>
-    <h1 class="font-serif text-3xl md:text-4xl mb-8">공지사항</h1>
+  <div class="notice-page">
+    <div class="global-page-container">
+      <header class="notice-header">
+        <h1 class="global-eng-subtitle">Notice.</h1>
+        <p class="global-kor-desc">아띠끄 디자인의 새로운 소식과 안내사항을 확인하세요.</p>
+      </header>
 
-    <!-- 탭 -->
-    <div class="flex border-b border-surface mb-8">
-      <button
-        v-for="tab in tabs"
-        :key="tab.key"
-        :class="[
-          'px-5 py-3 text-xs uppercase tracking-wider transition-colors border-b-2 -mb-px',
-          activeTab === tab.key
-            ? 'border-primary text-primary'
-            : 'border-transparent text-secondary hover:text-primary',
-        ]"
-        @click="activeTab = tab.key"
-      >
-        {{ tab.label }}
-      </button>
-    </div>
-
-    <!-- 공지사항 -->
-    <div v-if="activeTab === 'notice'" class="divide-y divide-surface">
-      <div v-for="item in notices" :key="item.id" class="py-5 flex justify-between items-start cursor-pointer hover:bg-surface/50 transition-colors px-2 -mx-2">
-        <div>
-          <span class="text-[10px] uppercase tracking-wider text-accent mr-2">공지</span>
-          <h3 class="font-sans text-sm font-medium mt-1">{{ item.title }}</h3>
-        </div>
-        <span class="text-xs text-secondary whitespace-nowrap ml-4">{{ item.date }}</span>
+      <!-- 탭 -->
+      <div class="notice-nav">
+        <ul class="tab-list">
+          <li
+            v-for="tab in tabs"
+            :key="tab.key"
+            class="tab-item"
+            :class="{ 'is-active': activeTab === tab.key }"
+            @click="activeTab = tab.key"
+          >
+            <span class="tab-text">{{ tab.label }}</span>
+          </li>
+        </ul>
       </div>
-    </div>
 
-    <!-- FAQ -->
-    <div v-if="activeTab === 'faq'" class="space-y-4">
-      <div v-for="item in faqs" :key="item.id" class="border border-surface">
-        <button
-          class="w-full flex justify-between items-center px-5 py-4 text-left text-sm font-medium hover:bg-surface/50 transition-colors"
-          @click="item.open = !item.open"
-        >
-          <span>{{ item.question }}</span>
-          <svg :class="['w-4 h-4 transition-transform text-secondary', item.open ? 'rotate-180' : '']" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        <div v-if="item.open" class="px-5 pb-4 text-sm text-secondary leading-relaxed">
-          {{ item.answer }}
+      <!-- 콘텐츠 영역 -->
+      <div class="notice-content">
+        <!-- 공지사항 리스트 -->
+        <div v-if="activeTab === 'notice'" class="notice-list">
+          <div v-for="item in notices" :key="item.id" class="notice-item">
+            <div class="item-main">
+              <span class="item-tag">NOTICE</span>
+              <h3 class="item-title">{{ item.title }}</h3>
+            </div>
+            <span class="item-date">{{ item.date }}</span>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div v-if="activeTab === 'faq'" class="faq-list">
+          <div v-for="item in faqs" :key="item.id" class="faq-item">
+            <button class="faq-question" @click="item.open = !item.open">
+              <span>{{ item.question }}</span>
+              <svg :class="{ 'is-open': item.open }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="item.open" class="faq-answer">
+              <p class="global-kor-desc">{{ item.answer }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1:1 Q&A -->
+        <div v-if="activeTab === 'qna'" class="qna-section">
+          <p class="global-kor-desc text-center">궁금한 사항이 있으신가요? 내용을 남겨주시면 빠르게 답변드리겠습니다.</p>
+          <form @submit.prevent="submitQna" class="qna-form">
+            <input v-model="qnaForm.title" type="text" placeholder="제목" class="input-field" />
+            <textarea v-model="qnaForm.content" placeholder="문의 내용" rows="5" class="textarea-field" />
+            <button type="submit" class="btn-submit">문의 접수하기</button>
+          </form>
         </div>
       </div>
-    </div>
-
-    <!-- 1:1 Q&A -->
-    <div v-if="activeTab === 'qna'" class="text-center py-16">
-      <p class="text-sm text-secondary mb-6">궁금한 사항이 있으신가요?</p>
-      <form @submit.prevent="submitQna" class="max-w-md mx-auto space-y-4">
-        <input v-model="qnaForm.title" type="text" placeholder="제목을 입력해주세요" class="w-full px-4 py-3 bg-surface text-sm focus:outline-none focus:ring-1 focus:ring-accent" />
-        <textarea v-model="qnaForm.content" placeholder="문의 내용을 입력해주세요" rows="5" class="w-full px-4 py-3 bg-surface text-sm focus:outline-none focus:ring-1 focus:ring-accent resize-none" />
-        <button type="submit" class="btn-primary w-full">문의 접수하기</button>
-      </form>
     </div>
   </div>
 </template>
@@ -96,3 +98,165 @@ function submitQna() {
   qnaForm.content = ''
 }
 </script>
+
+<style scoped>
+.notice-page {
+  background-color: #F5F0E8;
+  min-height: calc(100vh - 160px);
+}
+
+.notice-nav {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 3rem;
+}
+
+.tab-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.tab-item {
+  padding: 1rem 2.5rem 1rem 0;
+  margin-right: 1.5rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.3s ease;
+}
+
+.tab-text {
+  font-family: 'Raleway', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: rgba(0,0,0,0.4);
+}
+
+.tab-item.is-active {
+  border-bottom-color: #953735;
+}
+
+.tab-item.is-active .tab-text {
+  color: #953735;
+  font-weight: 600;
+}
+
+.notice-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.notice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.item-main {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.item-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #953735;
+  letter-spacing: 0.1em;
+}
+
+.item-title {
+  font-size: 15px;
+  font-weight: 400;
+  color: #312E2D;
+}
+
+.item-date {
+  font-size: 13px;
+  color: #888;
+}
+
+.faq-item {
+  border: 1px solid rgba(0,0,0,0.08);
+  margin-bottom: 1rem;
+}
+
+.faq-question {
+  width: 100%;
+  text-align: left;
+  padding: 1.5rem;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 15px;
+  color: #312E2D;
+}
+
+.faq-question svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.faq-question svg.is-open {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid rgba(0,0,0,0.04);
+  padding-top: 1.5rem;
+}
+
+.qna-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.qna-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.input-field, .textarea-field {
+  width: 100%;
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+}
+
+.btn-submit {
+  padding: 1.2rem;
+  background-color: #312E2D;
+  color: #fff;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+  background-color: #953735;
+}
+
+.text-center { text-align: center; }
+
+@media (max-width: 768px) {
+  .item-main { gap: 1rem; }
+  .item-title { font-size: 13px; }
+  .item-date { font-size: 11px; }
+}
+</style>

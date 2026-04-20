@@ -115,14 +115,13 @@
 
     </template>
 
-    <!-- ═══════════════════════════════════════════ -->
     <!-- Grid Exhibition View (GNB Entry)            -->
     <!-- ═══════════════════════════════════════════ -->
-    <div v-else class="sel-grid-view container-page">
+    <div v-else class="global-page-container sel-grid-view">
       <header class="grid-header">
-        <h1 class="grid-title">Living Edit · Space Creation.</h1>
-        <p class="grid-subtitle">아띠끄의 안목으로 엄선한 가구와 오브제.</p>
-        <p class="grid-desc">미국과 유럽에서 직수입한 셀렉션을 한남동 쇼룸에서 만나보실 수 있습니다.</p>
+        <h1 class="global-eng-subtitle grid-title">Living Edit · <em>Space Creation.</em></h1>
+        <p class="global-kor-desc grid-subtitle">제품당 1~2점만 입고되는 희소성 있는 셀렉션.</p>
+        <p class="global-kor-desc grid-desc" style="opacity: 0.7; margin-top: 0.5rem;">한정 수량의 수입 오브제를 한남 쇼룸에서 직접 경험해 보세요.</p>
       </header>
 
       <div class="grid-container">
@@ -360,7 +359,7 @@ function updateWrapWidth() {
 
 @media (min-width: 1024px) {
   .hero-container {
-    height: calc(100vh - 190px) !important; /* 헤더 높이를 넉넉히 제외하여 문구까지 한 화면에 고정 */
+    height: 100vh !important; /* 엄격한 100vh 유지 */
   }
   .sec-hero {
     flex: 1;
@@ -368,12 +367,11 @@ function updateWrapWidth() {
     max-height: none;
   }
   .hero-img-full {
-    object-fit: contain; /* 단일 사진 전체 표시 */
+    object-fit: contain;
   }
   .hero-img-half {
-    object-fit: contain; /* 듀얼 사진도 자르지 않고 전체 표시 */
+    object-fit: contain;
   }
-  /* 두 사진이 가운데서 달라붙도록 각각 정렬 */
   .hero-img-half:first-child {
     object-position: right; 
   }
@@ -443,7 +441,7 @@ function updateWrapWidth() {
   font-weight: 400;
   font-style: italic;
   line-height: 1.2;
-  color: #000000;
+  color: #2C2C2C;
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -459,7 +457,7 @@ function updateWrapWidth() {
   font-family: 'Pretendard', sans-serif;
   font-size: 16px;
   font-weight: 400;
-  color: #000000;
+  color: #2C2C2C;
   line-height: 1.6;
   margin: 0;
   word-break: keep-all;
@@ -469,7 +467,7 @@ function updateWrapWidth() {
   font-family: 'Pretendard', sans-serif;
   font-size: 14px;
   font-weight: 300;
-  color: #000000;
+  color: #2C2C2C;
   line-height: 1.6;
   margin: 0;
   word-break: keep-all;
@@ -579,7 +577,7 @@ function updateWrapWidth() {
   font-family: 'Raleway', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #2C2C2A;
+  color: #2C2C2C;
   margin: 0 0 0.8rem;
 }
 
@@ -609,15 +607,15 @@ function updateWrapWidth() {
   }
 
   .hero-container {
-    height: calc(100vh - 120px); /* 헤더 높이 제외한 전체 화면 */
+    height: 65svh; /* 사진까지 빼꼼 보이도록 높이를 65svh로 추가 축소 */
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
   .sec-hero {
-    height: 48vh; /* 이미지 영역을 줄여서 문구가 보이도록 조정 */
-    max-height: 48vh;
+    height: 38svh; /* 전체 높이 축소에 맞춰 이미지 영역도 컴팩트하게 조정 */
+    max-height: 40svh;
   }
 
   .sec-hero-text {
@@ -651,8 +649,12 @@ function updateWrapWidth() {
     bottom: 12px;
   }
 
+  .selection-header {
+    margin-bottom: 1.2rem; /* 헤더와 사진 사이 간격을 줄여 사진이 더 많이 보이게 함 */
+  }
+
   .sec-selection {
-    padding: 0 1.5rem 4rem; /* 상단 여백을 완전히 제거하여 본문을 위로 밀착 */
+    padding: 0.5rem 1.5rem 4rem; 
   }
 
   .archive-img-wrap {
@@ -666,19 +668,22 @@ function updateWrapWidth() {
 
 /* GNB 그리드 뷰 */
 .sel-grid-view {
-  padding: 4rem 8% 8rem;
+  /* 글로벌 컨테이너가 기본 padding 제공 */
 }
 
 .grid-header {
-  margin-bottom: 5rem;
   text-align: left;
+  margin-bottom: 5rem; /* PC에서 사진과의 여백 확보 */
+}
+
+@media (max-width: 768px) {
+  .grid-header {
+    margin-bottom: 3rem; /* 모바일은 기존 여백 유지 */
+  }
 }
 
 .grid-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 3.2rem;
-  color: #111;
-  margin-bottom: 1.5rem;
+  white-space: nowrap; /* 타이틀만 줄바꿈 방지 */
 }
 
 .grid-container {
@@ -694,27 +699,12 @@ function updateWrapWidth() {
 }
 
 @media (max-width: 640px) {
-  .sel-grid-view {
-    padding: 2rem 1.5rem 6rem;
-  }
   .grid-header {
     margin-bottom: 2.5rem;
   }
   .grid-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem 1rem;
-  }
-  .grid-title {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  .grid-subtitle {
-    font-size: 14px;
-    margin-bottom: 0.5rem;
-  }
-  .grid-desc {
-    font-size: 13px;
-    opacity: 0.8;
   }
 }
 
