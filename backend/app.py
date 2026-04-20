@@ -15,7 +15,10 @@ app = Chalice(app_name="attique-project")
 app.debug = True
 
 # Create tables if they don't exist
-create_db_and_tables()
+try:
+    create_db_and_tables()
+except Exception as e:
+    print(f"INFO: Database initialization deferred: {e}")
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(products_bp)
