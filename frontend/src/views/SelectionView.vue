@@ -553,7 +553,7 @@ function updateWrapWidth() {
 .archive-img-wrap {
   width: 100%;
   aspect-ratio: 4 / 5;
-  background-color: #fff;
+  background-color: #F5F0E8;
   overflow: hidden;
   margin-bottom: 1rem;
 }

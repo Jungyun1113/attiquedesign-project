@@ -185,7 +185,7 @@ function goBack() {
   width: 100%;
   aspect-ratio: 4/5;
   overflow: hidden;
-  background-color: #fff;
+  background-color: #F5F0E8;
   cursor: pointer;
 }
 
