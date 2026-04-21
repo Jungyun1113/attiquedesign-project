@@ -6,8 +6,8 @@
         <p class="global-kor-desc portfolio-subtitle">아띠끄 디자인의 시선으로 완성한 공간들.</p>
       </div>
 
-      <div v-if="loading" class="portfolio-content">
-        <p class="global-kor-desc">불러오는 중...</p>
+      <div v-if="loading" class="loading-state">
+        <span class="loading-text">Loading.</span>
       </div>
 
       <template v-else-if="categories.length">
@@ -160,6 +160,28 @@ const activeCategory = computed(() =>
 
 .tab-item.is-active {
   border-bottom-color: #953735;
+}
+
+@keyframes quiet-pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+}
+
+.loading-text {
+  font-family: 'Raleway', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: #2C2C2C;
+  text-transform: uppercase;
+  animation: quiet-pulse 3s ease-in-out infinite;
 }
 
 .portfolio-content {
