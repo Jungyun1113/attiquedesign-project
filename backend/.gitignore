@@ -6,3 +6,7 @@
 .env
 .venv/
 __pycache__/
+
+out/
+out_dev/
+scratch/
