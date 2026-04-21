@@ -119,6 +119,39 @@ def refresh():
         return handle_app_error(e)
 
 
+@auth_bp.route("/auth/password", methods=["PATCH"], cors=True)
+def change_password():
+    """현재 비밀번호 확인 후 새 비밀번호로 변경."""
+    try:
+        request = auth_bp.current_request
+        auth_header = request.headers.get("authorization", "")
+        if not auth_header.startswith("Bearer "):
+            raise UnauthorizedError()
+
+        token = auth_header[len("Bearer "):]
+        payload = decode_token(token)
+
+        body = request.json_body or {}
+        current_password = body.get("current_password", "")
+        new_password = body.get("new_password", "")
+
+        if not current_password or not new_password:
+            raise ValidationError("current_password와 new_password는 필수입니다.")
+        if len(new_password) < 8:
+            raise ValidationError("새 비밀번호는 최소 8자 이상이어야 합니다.")
+
+        with get_session() as session:
+            user = fetch(session, User, raise_not_found=True, id=payload["sub"])
+            if not verify_password(current_password, user.password_hash):
+                raise UnauthorizedError("현재 비밀번호가 올바르지 않습니다.")
+            user.password_hash = hash_password(new_password)
+            session.add(user)
+
+        return success_response({"message": "비밀번호가 변경되었습니다."})
+    except AppError as e:
+        return handle_app_error(e)
+
+
 @auth_bp.route("/auth/me", methods=["GET"], cors=True)
 def me():
     """현재 로그인된 사용자 정보 조회."""
