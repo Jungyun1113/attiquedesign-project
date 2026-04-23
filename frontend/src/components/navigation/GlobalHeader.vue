@@ -130,10 +130,10 @@ onUnmounted(() => {
 
 .gnb-link {
   font-family: 'Raleway', sans-serif;
-  font-size: 11px;
+  font-size: 13px; /* 모바일과 비슷한 비율로 글씨를 더 키움 (기존 11px) */
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.15em; /* 글씨가 커진 만큼 자간을 살짝 좁힘 (기존 0.3em) */
   color: #222222;
   text-decoration: none;
   padding: 0.5rem 0 0;
@@ -168,22 +168,23 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .global-header {
-    padding: 0.8rem 0 0.8rem;
+    padding: 1.4rem 0 0.4rem; /* 상단 여백을 늘려 로고를 살짝 아래로 내림 */
   }
   .logo-wrap {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem; /* 로고가 내려온 만큼 메뉴와의 간격을 좁힘 */
   }
   .header-inner {
     padding: 0 1rem;
   }
   .gnb-list {
-    gap: 0.6rem 1rem;
-    flex-wrap: wrap;
+    gap: 0.6rem 0.7rem; /* 한 줄에 다 들어오도록 메뉴 간격 축소 */
+    flex-wrap: nowrap; /* 강제로 한 줄 유지 */
     justify-content: center;
+    overflow-x: auto; /* 너무 작은 화면에서는 가로 스크롤 허용 (하지만 기본적으로 맞도록 설정) */
   }
   .gnb-link {
-    font-size: 9px;
-    letter-spacing: 0.1em;
+    font-size: 10.5px; /* 한 줄에 들어올 수 있도록 12px에서 소폭 축소 */
+    letter-spacing: 0.05em; /* 글자 간격 축소 */
     white-space: nowrap;
   }
   .header-logo {

@@ -99,7 +99,7 @@ function nextImage() {
 }
 
 function goBack() {
-  router.push('/#selection')
+  router.push('/selection?view=grid')
 }
 </script>
 

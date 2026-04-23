@@ -7,7 +7,20 @@
     <template v-if="viewMode === 'hero'">
 
       <div class="hero-container">
-        <!-- ── 섹션 1: 히어로 슬라이더 (상단 이미지 영역) ── -->
+        <!-- ── 섹션 1: 히어로 텍스트 (상단 텍스트 전용 영역) ── -->
+        <section class="sec-hero-text">
+          <div class="hero-text-content">
+            <h2 class="brand-title">Living Edit · Space Creation</h2>
+            <div class="brand-desc-wrap">
+              <p class="brand-desc1">
+                가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
+                한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 섹션 2: 히어로 슬라이더 (하단 이미지 영역) ── -->
         <section class="sec-hero" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
           <div
             v-for="(slide, idx) in heroSlides"
@@ -59,18 +72,12 @@
           </div>
         </section>
 
-        <!-- ── 섹션 2: 히어로 텍스트 (하단 텍스트 전용 영역) ── -->
-        <section class="sec-hero-text">
-          <div class="hero-text-content">
-            <h2 class="brand-title">Living Edit · Space Creation</h2>
-            <div class="brand-desc-wrap">
-              <p class="brand-desc1">
-                가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
-                한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
-              </p>
-            </div>
-          </div>
-        </section>
+        <!-- 모바일 전용 스크롤 인디케이터 -->
+        <div class="scroll-indicator mobile-only">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
       </div>
 
       <!-- ── 섹션 3: 제품 슬라이더 (스크롤해야 보임) ── -->
@@ -308,6 +315,7 @@ function updateWrapWidth() {
   flex-direction: column;
   overflow: hidden;
   background-color: #F5F0E8;
+  position: relative;
 }
 
 /* ── 섹션 1: 이미지 영역 ── */
@@ -359,12 +367,13 @@ function updateWrapWidth() {
 
 @media (min-width: 1024px) {
   .hero-container {
-    height: 100vh !important; /* 엄격한 100vh 유지 */
+    height: calc(100vh - 90px) !important; /* 헤더 공간을 확보하여 스크롤 없이 한 페이지에 사진이 온전히 들어오게 함 */
   }
   .sec-hero {
     flex: 1;
     height: auto;
-    max-height: none;
+    max-height: 65vh; /* 무조건 한 화면에 들어오도록 사진 영역의 최대 높이를 65vh로 제한하여 크기 축소 */
+    min-height: 0;    /* Flex 속성으로 인해 원본 사진 크기만큼 강제로 늘어나는 현상 방지 */
   }
   .hero-img-full {
     object-fit: contain;
@@ -425,13 +434,14 @@ function updateWrapWidth() {
 @media (min-width: 1024px) {
   .sec-hero-text {
     height: auto; 
-    padding: 2rem 0 3rem; 
+    min-height: 0; /* 강제 최소 높이를 해제하여 위로 더 올라갈 수 있게 함 */
+    padding: 1rem 0 1rem; /* 상단 여백을 줄여 전체를 올리고, 하단 여백을 줄여 사진과의 간격을 타이트하게 조절 */
     justify-content: center;
   }
   .hero-text-content {
-    /* 사진의 일반적인 너비(3:2 비율 기준 약 100vh)를 고려하여 최대 너비 설정 */
-    max-width: 100vh; 
-    padding: 0 2rem;
+    /* 사진(비율 3:2)이 높이 65vh일 때의 가로 너비(97.5vh)와 완벽히 일치시켜 왼쪽 정렬 시작점을 맞춤 */
+    max-width: 97.5vh; 
+    padding: 0;
   }
 }
 
@@ -600,29 +610,50 @@ function updateWrapWidth() {
   color: #F5F0E8;
 }
 
+.scroll-indicator {
+  display: none;
+}
+
 /* ── 모바일 최적화 ── */
 @media (max-width: 768px) {
-  .hero-container {
-    height: 100vh;
+  .scroll-indicator.mobile-only {
+    display: flex;
+    position: absolute;
+    bottom: 18vh; /* 이전보다 더 위로 올려서 사진과 가까워지게 조절 */
+    left: 50%;
+    transform: translateX(-50%);
+    color: #888780; /* 부드러운 색상 적용 */
+    animation: bounce 2.5s infinite;
+    z-index: 10;
+    justify-content: center;
+  }
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+    40% { transform: translateY(-8px) translateX(-50%); }
+    60% { transform: translateY(-4px) translateX(-50%); }
   }
 
   .hero-container {
-    height: 65svh; /* 사진까지 빼꼼 보이도록 높이를 65svh로 추가 축소 */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-  }
-
-  .sec-hero {
-    height: 38svh; /* 전체 높이 축소에 맞춰 이미지 영역도 컴팩트하게 조정 */
-    max-height: 40svh;
+    position: relative;
   }
 
   .sec-hero-text {
-    flex: 1;
+    flex: none;
     height: auto;
-    padding: 1.5rem 1.5rem 0; /* 하단 여백을 0.5rem에서 0으로 완전히 제거 */
-    align-items: flex-start; /* 문구를 상단으로 밀착 */
+    min-height: 0;
+    padding: 2rem 1.5rem 1.5rem; /* 로고-메뉴 간격 확장으로 인해 문구를 메뉴쪽으로 더 당겨올림 */
+    align-items: flex-start;
+  }
+
+  .sec-hero {
+    flex: none; /* 이전 버전의 사진 비율을 그대로 유지하기 위해 flex: 1 해제 */
+    height: 38svh; /* 이전 버전과 동일한 높이로 강제 고정 (가로세로 안 잘림) */
+    max-height: 40svh;
+    position: relative;
   }
 
   .brand-title {
@@ -646,7 +677,7 @@ function updateWrapWidth() {
 
   /* 인디케이터 위치 조정 */
   .hero-indicators {
-    bottom: 12px;
+    bottom: 12px; /* 이미지가 38svh로 고정되었으므로 다시 하단 12px 위치로 복구 */
   }
 
   .selection-header {

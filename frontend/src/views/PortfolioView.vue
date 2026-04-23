@@ -102,18 +102,22 @@ const activeCategory = computed(() =>
 .portfolio-header {
   display: flex;
   flex-direction: column;
-  margin-bottom: 4rem; /* PC에서 탭 메뉴와의 여백 확보 */
+  margin-bottom: 1.5rem; /* PC 여백 추가 축소 */
+}
+
+.portfolio-title {
+  margin-bottom: 0.5rem; /* 기본 3rem에서 대폭 축소하여 설명과 밀착 */
 }
 
 @media (max-width: 768px) {
   .portfolio-header {
-    margin-bottom: 2.5rem; /* 모바일 기존 유지 */
+    margin-bottom: 1.5rem; /* 모바일 여백 축소 (기존 2.5rem) */
   }
 }
 
 .portfolio-nav {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem; /* 탭과 컨텐츠 사이 여백 최소화 (기존 2rem) */
   overflow-x: auto; /* 가로 스크롤 허용 */
   -webkit-overflow-scrolling: touch;
 }
@@ -141,7 +145,7 @@ const activeCategory = computed(() =>
 
 .tab-text {
   font-family: 'Raleway', sans-serif;
-  font-size: 12px;
+  font-size: 17px; /* PC화면: 위 설명(16px)보다 약간 큰 크기 */
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -185,12 +189,12 @@ const activeCategory = computed(() =>
 }
 
 .portfolio-content {
-  padding: 2rem 0 8rem;
+  padding: 0.5rem 0 8rem; /* 상단 패딩 축소 (기존 2rem) */
 }
 
 .category-desc {
   white-space: pre-line;
-  margin: 0 0 3rem 0;
+  margin: 0 0 1.5rem 0; /* 설명과 프로젝트 사이 여백 축소 (기존 3rem) */
   max-width: 600px;
 }
 
@@ -212,9 +216,9 @@ const activeCategory = computed(() =>
 }
 
 .project-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 22px;
-  font-weight: 400;
+  font-weight: 500;
   color: #2C2C2C;
   margin: 0;
 }
@@ -277,6 +281,10 @@ const activeCategory = computed(() =>
   .tab-item {
     padding: 0.75rem 1.5rem 0.75rem 0;
     margin-right: 1.2rem;
+  }
+
+  .tab-text {
+    font-size: 12px; /* 모바일화면: 기존 크기 유지 */
   }
 
   .projects-list {

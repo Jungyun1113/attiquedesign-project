@@ -90,9 +90,9 @@ const steps = [
 }
 
 .process-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 500;
   color: #312E2D;
 }
 
