@@ -264,7 +264,7 @@ const prodOffset = ref(0)
 const itemsPerView = computed(() => isMobile.value ? 2 : 3)
 const maxOffset = computed(() => Math.max(0, selections.value.length - itemsPerView.value))
 
-const GAP = 16
+const GAP = 20
 
 const trackStyle = computed(() => {
   if (!wrapWidth.value) return {}
