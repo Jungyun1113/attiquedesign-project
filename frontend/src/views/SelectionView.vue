@@ -7,20 +7,7 @@
     <template v-if="viewMode === 'hero'">
 
       <div class="hero-container">
-        <!-- ── 섹션 1: 히어로 텍스트 (상단 텍스트 전용 영역) ── -->
-        <section class="sec-hero-text">
-          <div class="hero-text-content">
-            <h2 class="brand-title">Living Edit · Space Creation</h2>
-            <div class="brand-desc-wrap">
-              <p class="brand-desc1">
-                가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
-                한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- ── 섹션 2: 히어로 슬라이더 (하단 이미지 영역) ── -->
+        <!-- ── 풀블리드 히어로 슬라이더 (Chanel-style) ── -->
         <section class="sec-hero" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
           <div
             v-for="(slide, idx) in heroSlides"
@@ -59,6 +46,18 @@
               </div>
             </template>
           </div>
+
+          <!-- ── 이미지 위 에디토리얼 텍스트 오버레이 (Chanel-style) ── -->
+          <div class="hero-overlay">
+            <h2 class="brand-title">Living Edit · Space Creation</h2>
+            <p class="brand-desc1">
+              가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
+              한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
+            </p>
+          </div>
+
+          <!-- ── 텍스트 가독성용 하단 비네팅 ── -->
+          <div class="hero-vignette"></div>
 
           <!-- 슬라이드 인디케이터 -->
           <div class="hero-indicators" v-if="heroSlides.length > 1">
@@ -318,14 +317,14 @@ function updateWrapWidth() {
   position: relative;
 }
 
-/* ── 섹션 1: 이미지 영역 ── */
+/* ── 풀블리드 히어로 (Chanel-style: 이미지가 전체 영역 차지) ── */
 .sec-hero {
-  flex: 1; /* 남은 공간 차지 */
+  flex: 1;
   position: relative;
   width: 100%;
-  max-height: 70vh; /* PC에서 이미지 영역 제한 */
+  height: 100%;
   overflow: hidden;
-  background-color: #F5F0E8; /* 검은색에서 아이보리로 변경 */
+  background-color: #1a1a1a; /* 이미지 로딩 전 다크 배경 */
 }
 
 .hero-slide {
@@ -367,26 +366,12 @@ function updateWrapWidth() {
 
 @media (min-width: 1024px) {
   .hero-container {
-    height: calc(100vh - 90px) !important; /* 헤더 공간을 확보하여 스크롤 없이 한 페이지에 사진이 온전히 들어오게 함 */
+    height: calc(100vh - 90px) !important; /* 헤더 공간 확보 */
   }
   .sec-hero {
-    flex: 1;
-    height: auto;
-    max-height: 65vh; /* 무조건 한 화면에 들어오도록 사진 영역의 최대 높이를 65vh로 제한하여 크기 축소 */
-    min-height: 0;    /* Flex 속성으로 인해 원본 사진 크기만큼 강제로 늘어나는 현상 방지 */
+    height: 100%;
   }
-  .hero-img-full {
-    object-fit: contain;
-  }
-  .hero-img-half {
-    object-fit: contain;
-  }
-  .hero-img-half:first-child {
-    object-position: right; 
-  }
-  .hero-img-half:last-child {
-    object-position: left;
-  }
+  /* PC도 cover 유지 — 이미지가 가장자리까지 꽉 채워지는 풀블리드 (Chanel-style) */
 }
 
 .hero-indicators {
@@ -415,62 +400,48 @@ function updateWrapWidth() {
   transform: scale(1.25);
 }
 
-/* ── 섹션 2: 텍스트 영역 ── */
-.sec-hero-text {
-  height: 22vh;
-  min-height: 160px;
-  background-color: #F5F0E8;
-  display: flex;
-  align-items: center; /* 세로 중앙 */
-  padding: 0 8%; /* 기본 여백 */
+/* ── 이미지 위 에디토리얼 오버레이 (Chanel-style) ── */
+.hero-overlay {
+  position: absolute;
+  left: 4rem;
+  bottom: 4rem;
+  z-index: 5;
+  max-width: 560px;
+  pointer-events: none;
 }
 
-.hero-text-content {
-  width: 100%;
-  max-width: 1200px;
-  text-align: left;
-}
-
-@media (min-width: 1024px) {
-  .sec-hero-text {
-    height: auto; 
-    min-height: 0; /* 강제 최소 높이를 해제하여 위로 더 올라갈 수 있게 함 */
-    padding: 1rem 0 1rem; /* 상단 여백을 줄여 전체를 올리고, 하단 여백을 줄여 사진과의 간격을 타이트하게 조절 */
-    justify-content: center;
-  }
-  .hero-text-content {
-    /* 사진(비율 3:2)이 높이 65vh일 때의 가로 너비(97.5vh)와 완벽히 일치시켜 왼쪽 정렬 시작점을 맞춤 */
-    max-width: 97.5vh; 
-    padding: 0;
-  }
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.15) 35%,
+    transparent 60%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .brand-title {
   font-family: 'Playfair Display', serif;
-  font-size: 2.4rem;
+  font-size: clamp(2rem, 4vw, 3.4rem);
   font-weight: 400;
   font-style: italic;
-  line-height: 1.2;
-  color: #2C2C2C;
+  line-height: 1.15;
+  color: #FFFFFF;
   margin: 0;
   letter-spacing: -0.01em;
-}
-
-.brand-desc-wrap {
-  margin-top: 1rem; /* 간격 축소 */
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
 }
 
 .brand-desc1 {
   font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
-  color: #2C2C2C;
+  color: rgba(255, 255, 255, 0.92);
   line-height: 1.6;
-  margin: 0;
+  margin: 1.2rem 0 0;
   word-break: keep-all;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
 .brand-desc2 {
@@ -619,10 +590,10 @@ function updateWrapWidth() {
   .scroll-indicator.mobile-only {
     display: flex;
     position: absolute;
-    bottom: 18vh; /* 이전보다 더 위로 올려서 사진과 가까워지게 조절 */
+    bottom: 2rem; /* 풀블리드 이미지 하단으로 이동 */
     left: 50%;
     transform: translateX(-50%);
-    color: #888780; /* 부드러운 색상 적용 */
+    color: rgba(255, 255, 255, 0.7); /* 어두운 이미지 위 가독성 */
     animation: bounce 2.5s infinite;
     z-index: 10;
     justify-content: center;
@@ -641,38 +612,26 @@ function updateWrapWidth() {
     position: relative;
   }
 
-  .sec-hero-text {
-    flex: none;
-    height: auto;
-    min-height: 0;
-    padding: 2rem 1.5rem 1.5rem; /* 로고-메뉴 간격 확장으로 인해 문구를 메뉴쪽으로 더 당겨올림 */
-    align-items: flex-start;
-  }
-
   .sec-hero {
-    flex: none; /* 이전 버전의 사진 비율을 그대로 유지하기 위해 flex: 1 해제 */
-    height: 38svh; /* 이전 버전과 동일한 높이로 강제 고정 (가로세로 안 잘림) */
-    max-height: 40svh;
+    flex: 1;
+    height: 100%;
     position: relative;
   }
 
-  .brand-title {
-    font-size: 1.6rem;
-    margin-bottom: 0.8rem;
+  .hero-overlay {
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 5rem;
+    max-width: none;
   }
 
-  .brand-desc-wrap {
-    margin-top: 0.8rem;
-    gap: 0.4rem;
+  .brand-title {
+    font-size: 1.7rem;
   }
 
   .brand-desc1 {
     font-size: 13px;
-  }
-
-  .brand-desc2 {
-    font-size: 11px;
-    opacity: 0.6;
+    margin-top: 0.8rem;
   }
 
   /* 인디케이터 위치 조정 */
