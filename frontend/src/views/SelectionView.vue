@@ -626,22 +626,23 @@ function updateWrapWidth() {
   .hero-overlay {
     left: 1.5rem;
     right: 1.5rem;
-    bottom: 5rem;
+    bottom: 2rem;
     max-width: none;
   }
 
   .brand-title {
-    font-size: 1.7rem;
+    font-size: 1.25rem;
   }
 
   .brand-desc1 {
-    font-size: 13px;
-    margin-top: 0.8rem;
+    font-size: 11px;
+    margin-top: 0.5rem;
+    line-height: 1.5;
   }
 
   /* 인디케이터 위치 조정 */
   .hero-indicators {
-    bottom: 12px; /* 이미지가 38svh로 고정되었으므로 다시 하단 12px 위치로 복구 */
+    bottom: 10px;
   }
 
   .selection-header {

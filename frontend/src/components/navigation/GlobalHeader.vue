@@ -1,21 +1,36 @@
 <template>
-  <header class="global-header" :class="{ 'is-scrolled': scrolled, 'is-menu-collapsed': menuCollapsed, 'is-hovered': hovered, 'is-solid': !isHeroRoute }">
+  <header class="global-header" :class="{ 'is-scrolled': scrolled, 'is-menu-collapsed': menuCollapsed, 'is-hovered': hovered, 'is-solid': !isHeroRoute, 'is-mobile-open': mobileMenuOpen }">
     <div class="header-inner">
-      <!-- Logo Center -->
+      <!-- Logo Center (desktop only) -->
       <div class="logo-wrap">
         <router-link to="/selection" class="logo-link" aria-label="ATTIQUE DESIGN">
           <span class="header-logo" role="img" aria-hidden="true"></span>
         </router-link>
       </div>
 
+      <!-- Mobile hamburger toggle -->
+      <button
+        type="button"
+        class="menu-toggle"
+        :class="{ 'is-open': mobileMenuOpen }"
+        :aria-label="mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'"
+        :aria-expanded="mobileMenuOpen"
+        @click="mobileMenuOpen = !mobileMenuOpen"
+      >
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
       <!-- Navigation Bottom -->
       <nav class="gnb">
         <ul class="gnb-list">
           <li v-for="item in menuItems" :key="item.path">
-            <router-link 
-              :to="item.path" 
-              class="gnb-link" 
+            <router-link
+              :to="item.path"
+              class="gnb-link"
               :class="{ 'is-active': isLinkActive(item) }"
+              @click="mobileMenuOpen = false"
             >
               {{ item.label }}
             </router-link>
@@ -28,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -39,6 +54,11 @@ const scrolled = ref(false)
 const menuCollapsed = ref(isHeroRoute.value)
 const hoveredRaw = ref(false)
 const hovered = computed(() => hoveredRaw.value && isHeroRoute.value)
+const mobileMenuOpen = ref(false)
+
+watch(() => route.fullPath, () => {
+  mobileMenuOpen.value = false
+})
 const menuItems = [
   { label: '소개', path: '/philosophy' },
   { label: '셀렉션', path: '/selection?view=grid' },
@@ -290,32 +310,128 @@ onUnmounted(() => {
   display: none;
 }
 
+/* ── Mobile hamburger toggle (hidden on desktop) ───── */
+.menu-toggle {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 20;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hamburger-line {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background-color: #953735;
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+  transform-origin: center;
+}
+
+.is-solid .hamburger-line {
+  background-color: #F5F0E8;
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
 @media (max-width: 768px) {
   .global-header {
-    padding: 0.5rem 0 0.4rem;
-  }
-  .logo-wrap {
-    margin-bottom: 0.4rem;
-  }
-  .header-inner {
-    padding: 0 1rem;
-  }
-  .gnb-list {
-    gap: 0.6rem 0.7rem; /* 한 줄에 다 들어오도록 메뉴 간격 축소 */
-    flex-wrap: nowrap; /* 강제로 한 줄 유지 */
-    justify-content: center;
-    overflow-x: auto; /* 너무 작은 화면에서는 가로 스크롤 허용 (하지만 기본적으로 맞도록 설정) */
-  }
-  .gnb-link {
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-  }
-  .logo-link {
     padding: 0;
   }
-  .header-utils {
+
+  .header-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    height: 56px;
+  }
+
+  /* Hide logo on mobile */
+  .logo-wrap {
     display: none;
+  }
+
+  /* Show hamburger */
+  .menu-toggle {
+    display: flex;
+  }
+
+  /* GNB: hidden by default, slides down when open */
+  .gnb {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #953735;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      max-height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+    transform: none;
+    margin: 0;
+  }
+
+  .global-header.is-mobile-open .gnb {
+    max-height: 360px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .gnb-list {
+    flex-direction: column;
+    gap: 0;
+    padding: 0.4rem 0;
+    margin: 0;
+  }
+
+  .gnb-list li {
+    width: 100%;
+  }
+
+  .gnb-link {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.95rem 1.5rem;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    color: #F5F0E8 !important;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .gnb-link::after {
+    display: none;
+  }
+
+  .gnb-link.is-active {
+    background-color: rgba(0, 0, 0, 0.15);
   }
 }
 </style>

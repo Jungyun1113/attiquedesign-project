@@ -59,7 +59,7 @@
 
 @media (max-width: 768px) {
   .main-content {
-    padding-top: 120px;
+    padding-top: 56px;
   }
 }
 
