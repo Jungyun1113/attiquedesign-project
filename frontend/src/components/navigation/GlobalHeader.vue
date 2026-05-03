@@ -1,10 +1,10 @@
 <template>
-  <header class="global-header" :class="{ 'is-scrolled': scrolled }">
+  <header class="global-header" :class="{ 'is-scrolled': scrolled, 'is-menu-collapsed': menuCollapsed, 'is-hovered': hovered, 'is-solid': !isHeroRoute }">
     <div class="header-inner">
       <!-- Logo Center -->
       <div class="logo-wrap">
-        <router-link to="/selection" class="logo-link">
-          <img src="/logo.svg" alt="ATTIQUE DESIGN" class="header-logo" />
+        <router-link to="/selection" class="logo-link" aria-label="ATTIQUE DESIGN">
+          <span class="header-logo" role="img" aria-hidden="true"></span>
         </router-link>
       </div>
 
@@ -28,58 +28,167 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const isHeroRoute = computed(
+  () => route.path === '/selection' && route.query.view !== 'grid'
+)
 const scrolled = ref(false)
+const menuCollapsed = ref(isHeroRoute.value)
+const hoveredRaw = ref(false)
+const hovered = computed(() => hoveredRaw.value && isHeroRoute.value)
 const menuItems = [
-  { label: 'About', path: '/philosophy' },
-  { label: 'Interior', path: '/interior' },
-  { label: 'Selection', path: '/selection?view=grid' },
-  { label: 'Portfolio', path: '/portfolio' },
-  { label: 'Contact', path: '/contact' },
+  { label: '소개', path: '/philosophy' },
+  { label: '셀렉션', path: '/selection?view=grid' },
+  { label: '포트폴리오', path: '/portfolio' },
+  { label: '인테리어 문의', path: '/contact' },
 ]
 
 function isLinkActive(item: { label: string; path: string }) {
   // 1. Selection의 경우: 경로가 /selection 이고 query.view가 grid일 때만 active
-  if (item.label === 'Selection') {
+  if (item.label === '셀렉션') {
     return route.path === '/selection' && route.query.view === 'grid'
   }
-  
+
   // 2. 나머지는 단순 경로 포함 여부 (또는 완전 일치)로 판단
   // router-link의 기본 active 로직과 유사하게 구현
   return route.path.startsWith(item.path.split('?')[0])
 }
 
+// ── Aesop-style minimal header ─────────────────────────
+// 페이지 상단이거나 커서가 상단 영역에 있을 때만 메뉴 노출, 그 외에는 로고만
+const SHOW_AT_TOP = 100         // 스크롤이 이 값 이하이면 항상 노출
+const HOVER_REVEAL_PX = 120     // 커서가 화면 상단 120px 이내면 노출
+let cursorNearTop = false
+let scrollFrame = 0
+
+function refreshMenuState() {
+  if (isHeroRoute.value) {
+    menuCollapsed.value = !cursorNearTop
+    return
+  }
+  const atTop = window.scrollY < SHOW_AT_TOP
+  menuCollapsed.value = !atTop && !cursorNearTop
+}
+
 function handleScroll() {
-  scrolled.value = window.scrollY > 20
+  if (scrollFrame) return
+  scrollFrame = requestAnimationFrame(() => {
+    scrolled.value = window.scrollY > 20
+    refreshMenuState()
+    scrollFrame = 0
+  })
+}
+
+function handleMouseMove(e: MouseEvent) {
+  const next = e.clientY <= HOVER_REVEAL_PX
+  if (next !== cursorNearTop) {
+    cursorNearTop = next
+    hoveredRaw.value = next
+    refreshMenuState()
+  }
+}
+
+function handleMouseLeave() {
+  cursorNearTop = false
+  hoveredRaw.value = false
+  refreshMenuState()
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  refreshMenuState()
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('mousemove', handleMouseMove, { passive: true })
+  document.addEventListener('mouseleave', handleMouseLeave)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('mousemove', handleMouseMove)
+  document.removeEventListener('mouseleave', handleMouseLeave)
+  if (scrollFrame) cancelAnimationFrame(scrollFrame)
 })
 </script>
 
 <style scoped>
 .global-header {
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   z-index: 1000;
-  background-color: #F5F0E8;
-  padding: 1rem 0 1.2rem;
-  transition: all 0.4s ease;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  background-color: transparent;
+  padding: 0.4rem 0 0.5rem;
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid transparent;
 }
 
-.global-header.is-scrolled {
-  padding: 0.7rem 0 0.8rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+/* 사진 위에서도 버건디 글자가 또렷하게 보이도록 상단에 부드러운 크림 그라디언트 */
+.global-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(245, 240, 232, 0.85) 0%,
+    rgba(245, 240, 232, 0.55) 60%,
+    rgba(245, 240, 232, 0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.global-header.is-hovered,
+.global-header.is-solid {
+  background-color: #953735;
+  border-bottom-color: rgba(0, 0, 0, 0.03);
+}
+
+.global-header.is-hovered::before,
+.global-header.is-solid::before {
+  opacity: 0;
+}
+
+/* Aesop-style: 메뉴는 페이지 상단이거나 커서가 상단에 올 때만 노출 */
+.gnb {
+  width: 100%;
+  opacity: 1;
+  max-height: 80px;
+  transform: translateY(0);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    margin-top 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.global-header.is-menu-collapsed .gnb {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(-6px);
+  margin-top: -0.6rem;
+  pointer-events: none;
+}
+
+/* 모바일/터치 디바이스에서는 호버가 없으므로 항상 메뉴 노출 */
+@media (hover: none) {
+  .global-header.is-menu-collapsed .gnb {
+    opacity: 1;
+    max-height: 80px;
+    transform: none;
+    margin-top: 0;
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gnb {
+    transition: none;
+  }
 }
 
 .header-inner {
@@ -93,26 +202,34 @@ onUnmounted(() => {
 }
 
 .logo-wrap {
-  margin-bottom: 0.8rem;
-  transition: transform 0.4s ease;
+  margin-bottom: 0.5rem;
 }
 
 .logo-link {
   display: inline-block;
-  background-color: #953735;
-  padding: 0 1.4rem;
+  padding: 0;
   line-height: 0; /* img 아래 여분 공간 제거 */
 }
 
-.is-scrolled .logo-wrap {
-  transform: scale(0.65);
-  margin-bottom: 0.4rem;
+.header-logo {
+  display: block;
+  height: 80px;
+  aspect-ratio: 990 / 495;
+  background-color: #953735;
+  -webkit-mask-image: url('/logo-text.svg');
+  mask-image: url('/logo-text.svg');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  transition: background-color 0.3s ease;
 }
 
-.header-logo {
-  height: 87px;
-  width: auto;
-  display: block;
+.is-hovered .header-logo,
+.is-solid .header-logo {
+  background-color: #F5F0E8;
 }
 
 .gnb {
@@ -129,17 +246,24 @@ onUnmounted(() => {
 }
 
 .gnb-link {
-  font-family: 'Raleway', sans-serif;
-  font-size: 13px; /* 모바일과 비슷한 비율로 글씨를 더 키움 (기존 11px) */
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', sans-serif;
+  font-size: 14px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.15em; /* 글씨가 커진 만큼 자간을 살짝 좁힘 (기존 0.3em) */
-  color: #222222;
+  letter-spacing: 0.02em;
+  color: #953735;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
   text-decoration: none;
   padding: 0.5rem 0 0;
   position: relative;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
+  opacity: 0.9;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.is-hovered .gnb-link,
+.is-solid .gnb-link {
+  color: #F5F0E8;
 }
 
 .gnb-link:hover, .gnb-link.is-active {
@@ -153,8 +277,8 @@ onUnmounted(() => {
   left: 50%;
   width: 0;
   height: 1px;
-  background-color: #953735;
-  transition: all 0.3s ease;
+  background-color: currentColor;
+  transition: width 0.3s ease;
   transform: translateX(-50%);
 }
 
@@ -168,10 +292,10 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .global-header {
-    padding: 1.4rem 0 0.4rem; /* 상단 여백을 늘려 로고를 살짝 아래로 내림 */
+    padding: 0.5rem 0 0.4rem;
   }
   .logo-wrap {
-    margin-bottom: 0.8rem; /* 로고가 내려온 만큼 메뉴와의 간격을 좁힘 */
+    margin-bottom: 0.4rem;
   }
   .header-inner {
     padding: 0 1rem;
@@ -183,15 +307,12 @@ onUnmounted(() => {
     overflow-x: auto; /* 너무 작은 화면에서는 가로 스크롤 허용 (하지만 기본적으로 맞도록 설정) */
   }
   .gnb-link {
-    font-size: 10.5px; /* 한 줄에 들어올 수 있도록 12px에서 소폭 축소 */
-    letter-spacing: 0.05em; /* 글자 간격 축소 */
+    font-size: 11px;
+    letter-spacing: 0.05em;
     white-space: nowrap;
   }
-  .header-logo {
-    height: 65px;
-  }
   .logo-link {
-    padding: 0 1rem;
+    padding: 0;
   }
   .header-utils {
     display: none;

@@ -49,8 +49,8 @@
 
           <!-- ── 이미지 위 에디토리얼 텍스트 오버레이 (Chanel-style) ── -->
           <div class="hero-overlay">
-            <h2 class="brand-title">Living Edit · Space Creation</h2>
-            <p class="brand-desc1">
+            <h2 class="brand-title" v-reveal="{ delay: 200 }">Living Edit · Space Creation</h2>
+            <p class="brand-desc1" v-reveal="{ delay: 500 }">
               가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
               한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
             </p>
@@ -81,7 +81,7 @@
 
       <!-- ── 섹션 3: 제품 슬라이더 (스크롤해야 보임) ── -->
       <section class="sec-selection">
-        <div class="selection-header">
+        <div class="selection-header" v-reveal>
           <span class="selection-spacer"></span>
           <p class="selection-label">ATTIQUE SELECTION</p>
           <div class="selection-arrows">
@@ -98,13 +98,14 @@
                 <div class="skeleton-info"></div>
               </div>
             </template>
-            
+
             <!-- 실제 데이터 -->
             <div
-              v-for="sel in selections"
+              v-for="(sel, i) in selections"
               :key="sel.id"
               class="archive-item"
               :style="itemStyle"
+              v-reveal="{ delay: i * 120 }"
               @click="viewSelection(sel.id)"
             >
               <div class="archive-img-wrap">
@@ -124,7 +125,7 @@
     <!-- Grid Exhibition View (GNB Entry)            -->
     <!-- ═══════════════════════════════════════════ -->
     <div v-else class="global-page-container sel-grid-view">
-      <header class="grid-header">
+      <header class="grid-header" v-reveal>
         <h1 class="global-eng-subtitle grid-title">Living Edit · <em>Space Creation.</em></h1>
         <p class="global-kor-desc grid-subtitle">제품당 1~2점만 입고되는 희소성 있는 셀렉션.</p>
         <p class="global-kor-desc grid-desc" style="opacity: 0.7; margin-top: 0.5rem;">한정 수량의 수입 오브제를 한남 쇼룸에서 직접 경험해 보세요.</p>
@@ -141,9 +142,10 @@
 
         <!-- 실제 데이터 -->
         <div
-          v-for="sel in selections"
+          v-for="(sel, i) in selections"
           :key="sel.id"
           class="archive-item"
+          v-reveal="{ delay: (i % 6) * 90 }"
           @click="viewSelection(sel.id)"
         >
           <div class="archive-img-wrap">
@@ -366,7 +368,7 @@ function updateWrapWidth() {
 
 @media (min-width: 1024px) {
   .hero-container {
-    height: calc(100vh - 90px) !important; /* 헤더 공간 확보 */
+    height: 100vh !important; /* 헤더가 오버레이되므로 풀 뷰포트 */
   }
   .sec-hero {
     height: 100%;

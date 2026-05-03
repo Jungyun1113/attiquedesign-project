@@ -173,3 +173,31 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   v-reveal: scroll-triggered fade-up reveal (editorial motion)
+   ═══════════════════════════════════════════════════════════ */
+[data-reveal],
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+[data-reveal].is-revealed,
+.reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

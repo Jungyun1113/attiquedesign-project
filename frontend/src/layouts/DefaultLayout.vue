@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen flex flex-col">
+  <div class="min-h-screen flex flex-col" :class="{ 'is-hero-route': isHeroRoute }">
     <!-- Global Header (Logo Center + GNB) -->
     <GlobalHeader />
 
     <!-- Main content -->
-    <main class="flex-1">
+    <main class="flex-1 main-content">
       <router-view />
     </main>
 
@@ -49,6 +49,20 @@
 </template>
 
 <style scoped>
+.main-content {
+  padding-top: 140px;
+}
+
+.is-hero-route .main-content {
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 120px;
+  }
+}
+
 .footer-global {
   background-color: #953735;
   color: #F1EFE7;
@@ -186,6 +200,8 @@
 </style>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { storeToRefs } from 'pinia'
@@ -195,5 +211,10 @@ const cartStore = useCartStore()
 const authStore = useAuthStore()
 const { totalCount: cartCount } = storeToRefs(cartStore)
 const { isLoggedIn } = storeToRefs(authStore)
+
+const route = useRoute()
+const isHeroRoute = computed(
+  () => route.path === '/selection' && route.query.view !== 'grid'
+)
 
 </script>

@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: 'selection', name: 'Selection', component: () => import('@/views/SelectionView.vue') },
       { path: 'philosophy', name: 'Philosophy', component: () => import('@/views/PhilosophyView.vue') },
-      { path: 'interior', name: 'Interior', component: () => import('@/views/InteriorView.vue') },
+      { path: 'interior', redirect: '/contact' },
       { path: 'portfolio', name: 'Portfolio', component: () => import('@/views/PortfolioView.vue') },
       { path: 'contact', name: 'Contact', component: () => import('@/views/ContactView.vue') },
       

@@ -1,7 +1,7 @@
 <template>
   <div class="portfolio-page">
     <div class="global-page-container">
-      <div class="portfolio-header">
+      <div class="portfolio-header" v-reveal>
         <h2 class="global-eng-subtitle portfolio-title">Curated <em class="portfolio-title-accent">Spaces</em>.</h2>
         <p class="global-kor-desc portfolio-subtitle">아띠끄 디자인의 시선으로 완성한 공간들.</p>
       </div>
@@ -30,9 +30,10 @@
 
           <div class="projects-list">
             <section
-              v-for="portfolio in activeCategory?.portfolios"
+              v-for="(portfolio, i) in activeCategory?.portfolios"
               :key="portfolio.id"
               class="project-card"
+              v-reveal="{ delay: (i % 3) * 120 }"
             >
               <div class="project-title-row">
                 <h2 class="project-title">{{ portfolio.title }}</h2>
