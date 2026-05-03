@@ -15,7 +15,7 @@
         :class="{ 'is-open': mobileMenuOpen }"
         :aria-label="mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'"
         :aria-expanded="mobileMenuOpen"
-        @click="mobileMenuOpen = !mobileMenuOpen"
+        @click.stop="toggleMobileMenu"
       >
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
@@ -55,6 +55,10 @@ const menuCollapsed = ref(isHeroRoute.value)
 const hoveredRaw = ref(false)
 const hovered = computed(() => hoveredRaw.value && isHeroRoute.value)
 const mobileMenuOpen = ref(false)
+
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
 
 watch(() => route.fullPath, () => {
   mobileMenuOpen.value = false
@@ -330,11 +334,14 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   padding: 0;
-  z-index: 20;
+  z-index: 1100;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 5px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
 }
 
 .hamburger-line {
