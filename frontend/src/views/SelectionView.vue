@@ -605,27 +605,20 @@ function updateWrapWidth() {
   }
 
   .hero-container {
-    height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
   }
 
+  /* 모바일: 100vh 대신 이미지 본연의 비율(3:2)로 컨테이너 사이즈를 맞춰
+     사진은 잘리지도, 위아래 빈 여백도 생기지 않도록 함 */
   .sec-hero {
-    flex: 1;
-    height: 100%;
+    flex: none;
+    height: auto;
+    aspect-ratio: 3 / 2;
     position: relative;
-  }
-
-  /* 모바일에서는 사진이 잘리지 않도록 전체를 보여줌 (위/아래 다크 레터박스) */
-  .hero-img-full,
-  .hero-img-half {
-    object-fit: contain;
-  }
-
-  .hero-dual {
-    flex-direction: column;
   }
 
   .hero-overlay {
