@@ -163,13 +163,15 @@ onUnmounted(() => {
 }
 
 .global-header.is-hovered,
-.global-header.is-solid {
+.global-header.is-solid,
+.global-header.is-mobile-open {
   background-color: #953735;
   border-bottom-color: rgba(0, 0, 0, 0.03);
 }
 
 .global-header.is-hovered::before,
-.global-header.is-solid::before {
+.global-header.is-solid::before,
+.global-header.is-mobile-open::before {
   opacity: 0;
 }
 
@@ -248,7 +250,12 @@ onUnmounted(() => {
 }
 
 .is-hovered .header-logo,
-.is-solid .header-logo {
+.is-solid .header-logo,
+.is-mobile-open .header-logo {
+  background-color: #F5F0E8;
+}
+
+.is-mobile-open .hamburger-line {
   background-color: #F5F0E8;
 }
 
@@ -368,9 +375,14 @@ onUnmounted(() => {
     height: 56px;
   }
 
-  /* Hide logo on mobile */
+  /* Logo on left, smaller */
   .logo-wrap {
-    display: none;
+    margin: 0;
+    padding-left: 1rem;
+  }
+
+  .header-logo {
+    height: 36px;
   }
 
   /* Show hamburger */
@@ -378,8 +390,10 @@ onUnmounted(() => {
     display: flex;
   }
 
-  /* GNB: hidden by default, slides down when open */
-  .gnb {
+  /* GNB: hidden by default, slides down when open.
+     Override desktop .is-menu-collapsed positioning. */
+  .global-header .gnb,
+  .global-header.is-menu-collapsed .gnb {
     position: absolute;
     top: 100%;
     left: 0;
@@ -397,10 +411,13 @@ onUnmounted(() => {
     margin: 0;
   }
 
-  .global-header.is-mobile-open .gnb {
+  .global-header.is-mobile-open .gnb,
+  .global-header.is-mobile-open.is-menu-collapsed .gnb {
     max-height: 360px;
     opacity: 1;
     pointer-events: auto;
+    transform: none;
+    margin: 0;
   }
 
   .gnb-list {
