@@ -618,6 +618,16 @@ function updateWrapWidth() {
     position: relative;
   }
 
+  /* 모바일에서는 사진이 잘리지 않도록 전체를 보여줌 (위/아래 다크 레터박스) */
+  .hero-img-full,
+  .hero-img-half {
+    object-fit: contain;
+  }
+
+  .hero-dual {
+    flex-direction: column;
+  }
+
   .hero-overlay {
     left: 1.5rem;
     right: 1.5rem;
