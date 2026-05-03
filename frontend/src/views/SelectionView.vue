@@ -49,7 +49,7 @@
 
           <!-- ── 이미지 위 에디토리얼 텍스트 오버레이 (Chanel-style) ── -->
           <div class="hero-overlay">
-            <h2 class="brand-title" v-reveal="{ delay: 200 }">Living Edit · Space Creation</h2>
+            <h2 class="brand-title" v-reveal="{ delay: 200 }">Curated Living · Crafted Spaces</h2>
             <p class="brand-desc1" v-reveal="{ delay: 500 }">
               가구 큐레이션부터 인테리어 시공까지,<br class="mobile-br" />
               한남동 쇼룸에서 완성하는 하이엔드 토탈 리빙
@@ -126,7 +126,7 @@
     <!-- ═══════════════════════════════════════════ -->
     <div v-else class="global-page-container sel-grid-view">
       <header class="grid-header" v-reveal>
-        <h1 class="global-eng-subtitle grid-title">Living Edit · <em>Space Creation.</em></h1>
+        <h1 class="global-eng-subtitle grid-title">Curated Living · <em>Crafted Spaces.</em></h1>
         <p class="global-kor-desc grid-subtitle">제품당 1~2점만 입고되는 희소성 있는 셀렉션.</p>
         <p class="global-kor-desc grid-desc" style="opacity: 0.7; margin-top: 0.5rem;">한정 수량의 수입 오브제를 한남 쇼룸에서 직접 경험해 보세요.</p>
       </header>
@@ -425,7 +425,7 @@ function updateWrapWidth() {
 
 .brand-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
   font-weight: 400;
   font-style: italic;
   line-height: 1.15;
@@ -433,6 +433,7 @@ function updateWrapWidth() {
   margin: 0;
   letter-spacing: -0.01em;
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 .brand-desc1 {
@@ -631,7 +632,7 @@ function updateWrapWidth() {
   }
 
   .brand-title {
-    font-size: 1.25rem;
+    font-size: clamp(0.95rem, 4.4vw, 1.25rem);
   }
 
   .brand-desc1 {

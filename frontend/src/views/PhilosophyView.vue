@@ -20,23 +20,56 @@
 
       <!-- Section 2: History -->
       <section class="philo-section history-section">
-        <div class="eyebrow">HISTORY</div>
-        <div class="history-list">
-          <div class="history-item">
-            <span class="year">2012</span>
-            <span class="global-kor-desc event">아띠끄 디자인 설립</span>
-          </div>
-          <div class="history-item">
-            <span class="year">2010s</span>
-            <span class="global-kor-desc event">청담 쇼룸 운영 · 드라마·잡지 스타일링 · 주거/상업 프로젝트</span>
-          </div>
-          <div class="history-item">
-            <span class="year">2020</span>
-            <span class="global-kor-desc event">한남동 아띠끄빌딩 건립 및 쇼룸 이전</span>
-          </div>
-          <div class="history-item">
-            <span class="year highlight">2026.05</span>
-            <span class="global-kor-desc event">한남 쇼룸 리뉴얼 오픈</span>
+        <!-- Asymmetric stagger: two showroom eras -->
+        <header class="stagger-header">
+          <span class="stagger-tag">청담 · CHEONGDAM</span>
+          <span class="stagger-rule"></span>
+        </header>
+
+        <div class="history-stagger">
+          <figure class="history-cover history-cover-lead">
+            <div class="history-img-wrap">
+              <img
+                src="/images/about/original.png"
+                alt="The original ATTIQUE DESIGN showroom"
+                class="history-img"
+              />
+            </div>
+            <span class="history-mark">2012</span>
+          </figure>
+
+          <figure class="history-cover history-cover-follow">
+            <div class="history-img-wrap">
+              <img
+                src="/images/about/original_second.png"
+                alt="The second ATTIQUE DESIGN showroom"
+                class="history-img"
+              />
+            </div>
+            <span class="history-mark">2017</span>
+          </figure>
+        </div>
+
+        <!-- Timeline -->
+        <div class="history-content">
+          <div class="eyebrow eyebrow-centered">HISTORY</div>
+          <div class="history-list">
+            <div class="history-item">
+              <span class="year">2012</span>
+              <span class="global-kor-desc event">아띠끄 디자인 설립</span>
+            </div>
+            <div class="history-item">
+              <span class="year">2010s</span>
+              <span class="global-kor-desc event">청담 쇼룸 운영 · 드라마·잡지 스타일링 · 주거/상업 프로젝트</span>
+            </div>
+            <div class="history-item">
+              <span class="year">2020</span>
+              <span class="global-kor-desc event">한남동 아띠끄빌딩 건립 및 쇼룸 이전</span>
+            </div>
+            <div class="history-item">
+              <span class="year highlight">2026.05</span>
+              <span class="global-kor-desc event">한남 쇼룸 리뉴얼 오픈</span>
+            </div>
           </div>
         </div>
       </section>
@@ -117,9 +150,158 @@ onMounted(() => {
   margin-left: auto;
 }
 
-/* Section 2: History */
+/* Section 2: History — editorial cover shot + timeline */
 .history-section {
-  max-width: 900px;
+  max-width: none;
+}
+
+/* Header above the stagger pair */
+.stagger-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.stagger-tag {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  color: #953735;
+  text-transform: uppercase;
+}
+
+.stagger-rule {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(149, 55, 53, 0.2);
+}
+
+.stagger-meta {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #6D6059;
+}
+
+/* Asymmetric stagger: editorial layout with two photos at different sizes/positions */
+.history-stagger {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 0;
+  margin: 0 0 5rem 0;
+  position: relative;
+}
+
+.history-cover {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Lead photo: larger, anchored to left, top */
+.history-cover-lead {
+  padding-right: 4rem;
+}
+
+/* Follow photo: smaller, pushed down, anchored to right */
+.history-cover-follow {
+  margin-top: 28%;
+  padding-left: 1rem;
+}
+
+/* Subtle year tag — tucked into the corner of the photo */
+.history-mark {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 500;
+  color: #F5F0E8;
+  line-height: 1;
+  z-index: 3;
+  letter-spacing: 0.32em;
+  pointer-events: none;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.history-cover-follow .history-mark {
+  left: auto;
+  right: 1.2rem;
+  top: 1.2rem;
+}
+
+.history-img-wrap {
+  position: relative;
+}
+
+.history-img-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background-color: #EFE9DD;
+  filter: grayscale(0.15);
+  transition: filter 0.6s ease;
+}
+
+.history-img-wrap:hover {
+  filter: grayscale(0);
+}
+
+.history-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.history-img-wrap:hover .history-img {
+  transform: scale(1.02);
+}
+
+
+/* Timeline: centered, narrow column */
+.history-content {
+  max-width: 640px;
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+.eyebrow-centered {
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.eyebrow-centered::after {
+  display: none;
+}
+
+.eyebrow-centered::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background-color: #953735;
+  opacity: 0.3;
+  margin-right: 1rem;
+}
+
+.eyebrow-centered::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background-color: #953735;
+  opacity: 0.3;
+  margin-left: 0;
 }
 
 .history-list {
@@ -165,6 +347,50 @@ onMounted(() => {
   font-size: 32px;
   margin-bottom: 1.5rem;
   font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .history-stagger {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .history-cover-lead {
+    padding-right: 0;
+  }
+
+  .history-cover-follow {
+    margin-top: 0;
+    padding-left: 18%;
+  }
+
+  .history-mark {
+    font-size: 10px;
+    top: 0.8rem;
+    left: 0.8rem;
+  }
+
+  .history-cover-follow .history-mark {
+    right: 0.8rem;
+    top: 0.8rem;
+  }
+
+  .stagger-header {
+    margin-bottom: 1.8rem;
+    gap: 0.8rem;
+  }
+
+  .history-content {
+    max-width: 100%;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .history-cover-follow {
+    padding-left: 0;
+  }
 }
 
 @media (max-width: 768px) {

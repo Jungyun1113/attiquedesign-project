@@ -259,10 +259,6 @@ onUnmounted(() => {
   background-color: #F5F0E8;
 }
 
-.is-mobile-open .hamburger-line {
-  background-color: #F5F0E8;
-}
-
 .gnb {
   width: 100%;
 }
@@ -346,14 +342,16 @@ onUnmounted(() => {
 
 .hamburger-line {
   display: block;
-  width: 22px;
-  height: 1.5px;
+  width: 24px;
+  height: 2px;
   background-color: #953735;
   transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
   transform-origin: center;
+  border-radius: 1px;
 }
 
-.is-solid .hamburger-line {
+.global-header.is-solid .hamburger-line,
+.global-header.is-mobile-open .hamburger-line {
   background-color: #F5F0E8;
 }
 
