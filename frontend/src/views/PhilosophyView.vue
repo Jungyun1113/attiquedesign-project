@@ -13,7 +13,7 @@
             미국과 유럽의 하이엔드 가구와 소품을 국내에 직접 소개하고자 아띠끄 디자인을 설립했습니다.<br>
             청담 쇼룸을 시작으로 인테리어와 리빙을 아우르는 브랜드로 자리잡았고,<br>
             단일 브랜드가 아닌 대표의 안목으로 엄선한 다양한 해외 가구와 소품을 조합해 고객만의 공간을 완성해왔습니다.<br>
-            2020년 한남동 아띠끄빌딩을 세우고 쇼룸을 이전해, 인테리어 시공과 가구·소품 판매를 이어오고 있습니다.
+            2020년 한남동 아띠끄빌딩을 신축하고 쇼룸을 이전해, 인테리어 시공과 가구·소품 판매를 이어오고 있습니다.
           </p>
         </div>
       </section>
@@ -64,7 +64,7 @@
             </div>
             <div class="history-item">
               <span class="year">2020</span>
-              <span class="global-kor-desc event">한남동 아띠끄빌딩 건립 및 쇼룸 이전</span>
+              <span class="global-kor-desc event">한남동 아띠끄빌딩 신축 및 쇼룸 이전</span>
             </div>
             <div class="history-item">
               <span class="year highlight">2026.05</span>
