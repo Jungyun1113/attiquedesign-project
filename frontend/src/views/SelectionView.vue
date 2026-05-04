@@ -109,7 +109,7 @@
               @click="viewSelection(sel.id)"
             >
               <div class="archive-img-wrap">
-                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" @error="(e) => (e.target as HTMLElement).classList.add('loaded')" />
+                <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" />
               </div>
               <div class="archive-info">
                 <h3 class="archive-name">{{ sel.title }}</h3>
@@ -149,7 +149,7 @@
           @click="viewSelection(sel.id)"
         >
           <div class="archive-img-wrap">
-            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" class="fade-in" @load="(e) => (e.target as HTMLElement).classList.add('loaded')" @error="(e) => (e.target as HTMLElement).classList.add('loaded')" />
+            <img :src="sel.images?.[0]?.image_url ?? ''" :alt="sel.title" />
           </div>
           <div class="archive-info">
             <h3 class="archive-name">{{ sel.title }}</h3>
@@ -203,7 +203,7 @@ function startAutoplay() {
   if (currentLength.value <= 1) return
   autoplayTimer = setInterval(() => {
     activeSlide.value = (activeSlide.value + 1) % currentLength.value
-  }, 2000)
+  }, 5000)
 }
 
 function stopAutoplay() {
@@ -244,11 +244,8 @@ const isDataLoading = ref(true)
 async function loadData() {
   try {
     isDataLoading.value = true
-    // 1. 슬라이더 전용 데이터 (category: 'slider')
-    await selectionService.getSelections({ category: 'slider', limit: 20 })
-    
-    // 2. 전체 셀렉션 데이터 (초기 로딩량 최적화: 100 -> 24)
-    const allData = await selectionService.getSelections({ limit: 24 })
+    // 전체 셀렉션 데이터
+    const allData = await selectionService.getSelections({ limit: 500 })
 
     // 슬라이더가 아닌 셀렉션만 제품 영역에 표시
     selections.value = allData.filter((s: Selection) => s.category !== 'slider')
@@ -705,15 +702,7 @@ function updateWrapWidth() {
   }
 }
 
-/* ── 스켈레톤 & 애니메이션 ── */
-.fade-in {
-  opacity: 0;
-  transition: opacity 0.8s ease-out;
-}
-.fade-in.loaded {
-  opacity: 1;
-}
-
+/* 스켈레톤 & 애니메이션 제거됨 */
 .skeleton-img {
   background: linear-gradient(90deg, #eee 25%, #f5f5f5 50%, #eee 75%);
   background-size: 200% 100%;
