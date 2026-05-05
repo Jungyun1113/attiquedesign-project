@@ -4,13 +4,26 @@
     <!-- ═════ Magazine masthead ═════ -->
     <header class="mag-masthead" v-reveal>
       <div class="mag-masthead-inner">
-        <span class="mag-issue">ATTIQUE · VOL 2026</span>
+        <span class="mag-issue">ATTIQUE · ARCHIVE</span>
         <h1 class="mag-title">
           Curated <em>Spaces</em>.
         </h1>
-        <p class="mag-lead">아띠끄 디자인의 시선으로 완성한 공간들.</p>
+        <p class="mag-lead">아띠끄가 짓고 채워온 공간의 아카이브.</p>
       </div>
     </header>
+
+    <!-- ═════ Long editorial intro ═════ -->
+    <section class="mag-intro" v-reveal>
+      <p class="mag-intro-body">
+        주거부터 상업, 드라마와 매거진 스타일링까지,<br />
+        아띠끄가 십여 년간 마주해온 다양한 챕터를 한자리에 모았습니다.<br /><br />
+        획일된 양식이 아닌, 머무는 이의 결을 따라<br />
+        다르게 완성된 공간의 흔적들.
+      </p>
+      <p class="mag-intro-closer">
+        한 권의 매거진처럼, 페이지를 넘기며 펼쳐 보세요.
+      </p>
+    </section>
 
     <!-- Loading -->
     <div v-if="loading" class="loading-state">
@@ -19,25 +32,26 @@
 
     <template v-else-if="categories.length">
 
-      <!-- Category tabs -->
-      <nav class="mag-nav" v-reveal>
-        <ul class="tab-list">
+      <!-- ═════ Chapter sub-nav (Chanel-style minimal) ═════ -->
+      <nav class="chapter-nav" v-reveal>
+        <ul class="chapter-list">
           <li
             v-for="cat in categories"
             :key="cat.id"
-            class="tab-item"
+            class="chapter-item"
             :class="{ 'is-active': activeCategoryId === cat.id }"
             @click="activeCategoryId = cat.id"
           >
-            <span class="tab-en">{{ catLabel(cat.id) }}</span>
-            <span class="tab-kr">{{ cat.name }}</span>
+            <span class="chapter-kr">{{ cat.name }}</span>
+            <span class="chapter-en">{{ catLabel(cat.id) }}</span>
           </li>
         </ul>
       </nav>
 
-      <p v-if="activeCategory?.description" class="category-desc" v-reveal>
-        {{ activeCategory.description }}
-      </p>
+      <!-- ═════ Rich per-category description ═════ -->
+      <div class="chapter-desc-wrap" v-reveal :key="activeCategoryId">
+        <p class="chapter-desc">{{ richDesc }}</p>
+      </div>
 
       <!-- ═════ Magazine spreads ═════ -->
       <div class="spread-list">
@@ -193,6 +207,25 @@ const activeCategory = computed(() =>
   categories.value.find(c => c.id === activeCategoryId.value) ?? categories.value[0]
 )
 
+// Rich per-category descriptions (Chanel-style luxury copy)
+const CATEGORY_RICH: Record<string, string> = {
+  residential:
+    '한 사람의 일상이 머무는 가장 사적인 공간.\n클래식과 모던, 색과 소재의 균형 안에서 머무는 이의 결을 따라 다르게 완성합니다.\n공간의 처음부터 마지막 한 올까지, 한남 쇼룸의 1:1 큐레이션으로.',
+  commercial:
+    '브랜드의 정체성이 공간의 언어가 되는 자리.\nF&B, 리테일, 오피스 — 그 브랜드만의 결을 따라 풀어낸 아띠끄의 상업 프로젝트.\n방문하는 이의 시선과 동선을 함께 설계합니다.',
+  drama:
+    '도깨비, 상속자들, 괜찮아 사랑이야.\n극 중 인물의 일상이 그 자리에서 진짜처럼 머물도록,\n스토리와 인물의 결을 공간으로 옮겨낸 아띠끄의 스타일링.',
+  magazine:
+    '행복이 가득한 집, 메종, 까사리빙, 노블레스.\n한 컷의 페이지가 곧 한 사람의 일상이 되도록,\n국내 대표 리빙 매거진과 함께 만들어온 아띠끄의 스타일링 아카이브.',
+}
+
+const richDesc = computed(
+  () =>
+    CATEGORY_RICH[activeCategoryId.value] ??
+    activeCategory.value?.description ??
+    ''
+)
+
 const VARIANTS = ['cover', 'asym', 'centered', 'split'] as const
 type Variant = typeof VARIANTS[number]
 
@@ -262,82 +295,137 @@ const secondImg = (p: Portfolio) =>
   word-break: keep-all;
 }
 
-/* ── Category nav ───────────────────────────────────── */
-.mag-nav {
-  max-width: 1320px;
+/* ── Long editorial intro ───────────────────────────── */
+.mag-intro {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 4rem;
-  border-bottom: 1px solid rgba(49, 46, 45, 0.1);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  padding: 1rem 4rem 4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
 }
 
-.mag-nav::-webkit-scrollbar { display: none; }
+.mag-intro-body {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #555250;
+  margin: 0;
+  font-weight: 400;
+  word-break: keep-all;
+}
 
-.tab-list {
+.mag-intro-closer {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #6D6059;
+  margin: 0;
+  letter-spacing: 0.01em;
+  word-break: keep-all;
+}
+
+/* ── Chanel-style chapter nav (middle-dot separators) ── */
+.chapter-nav {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.4rem 4rem;
+  border-top: 1px solid rgba(49, 46, 45, 0.1);
+  border-bottom: 1px solid rgba(49, 46, 45, 0.1);
+}
+
+.chapter-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 2.5rem;
-  width: max-content;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+  row-gap: 0.6rem;
 }
 
-.tab-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 1rem 0;
+.chapter-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
   cursor: pointer;
-  border-bottom: 1px solid transparent;
-  margin-bottom: -1px;
-  transition: border-color 0.3s ease;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-.tab-en {
+.chapter-item + .chapter-item::before {
+  content: '·';
+  margin: 0 1.6rem;
+  color: rgba(49, 46, 45, 0.25);
+  font-size: 14px;
+  align-self: center;
+  pointer-events: none;
+}
+
+.chapter-kr {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(49, 46, 45, 0.55);
+  transition: color 0.3s ease;
+}
+
+.chapter-en {
   font-family: 'Montserrat', 'Pretendard', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.32em;
-  color: rgba(49, 46, 45, 0.5);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: rgba(49, 46, 45, 0.4);
   text-transform: uppercase;
   transition: color 0.3s ease;
 }
 
-.tab-kr {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(49, 46, 45, 0.5);
-  letter-spacing: 0.02em;
-  transition: color 0.3s ease;
-}
-
-.tab-item:hover .tab-en,
-.tab-item:hover .tab-kr {
+.chapter-item:hover .chapter-kr,
+.chapter-item:hover .chapter-en {
   color: #312E2D;
 }
 
-.tab-item.is-active {
-  border-bottom-color: #953735;
-}
-
-.tab-item.is-active .tab-en,
-.tab-item.is-active .tab-kr {
+.chapter-item.is-active .chapter-kr {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
   color: #953735;
 }
 
-/* ── Category description ───────────────────────────── */
-.category-desc {
+.chapter-item.is-active .chapter-en {
+  color: #953735;
+  opacity: 0.9;
+}
+
+/* ── Rich per-category description ──────────────────── */
+.chapter-desc-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 3rem 4rem 0;
+  text-align: center;
+  animation: chapter-fade 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chapter-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chapter-desc {
   font-family: 'Pretendard', sans-serif;
   font-size: 14px;
-  line-height: 1.75;
+  line-height: 1.85;
   color: #6D6059;
   white-space: pre-line;
-  margin: 2rem 0 0;
-  padding: 0 4rem;
-  max-width: calc(720px + 8rem);
+  margin: 0;
+  font-weight: 400;
   word-break: keep-all;
 }
 
@@ -794,8 +882,9 @@ const secondImg = (p: Portfolio) =>
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 1100px) {
   .mag-masthead,
-  .mag-nav,
-  .category-desc,
+  .mag-intro,
+  .chapter-nav,
+  .chapter-desc-wrap,
   .asym-grid,
   .centered-spread,
   .split-grid,
@@ -820,27 +909,48 @@ const secondImg = (p: Portfolio) =>
     padding: 3rem 1.5rem 2rem;
   }
 
-  .mag-nav {
-    padding: 0 1.5rem;
+  .mag-intro {
+    padding: 0.5rem 1.5rem 2.5rem;
+    gap: 1.2rem;
   }
 
-  .tab-list {
-    gap: 1.5rem;
+  .mag-intro-body {
+    font-size: 13px;
+    line-height: 1.75;
   }
 
-  .tab-en {
-    font-size: 9px;
-    letter-spacing: 0.28em;
+  .mag-intro-closer {
+    font-size: 14px;
   }
 
-  .tab-kr {
+  .chapter-nav {
+    padding: 1rem 1.5rem;
+  }
+
+  .chapter-item + .chapter-item::before {
+    margin: 0 0.7rem;
+  }
+
+  .chapter-kr {
     font-size: 13px;
   }
 
-  .category-desc {
-    padding: 0 1.5rem;
-    margin-top: 1.4rem;
+  .chapter-en {
+    font-size: 8px;
+    letter-spacing: 0.26em;
+  }
+
+  .chapter-item.is-active .chapter-kr {
+    font-size: 15px;
+  }
+
+  .chapter-desc-wrap {
+    padding: 1.8rem 1.5rem 0;
+  }
+
+  .chapter-desc {
     font-size: 13px;
+    line-height: 1.75;
   }
 
   .spread-list {

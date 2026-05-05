@@ -859,7 +859,12 @@ function updateWrapWidth() {
 .archive-img-wrap {
   width: 100%;
   aspect-ratio: 4 / 5;
-  background-color: #EFE9DD;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    #F5F0E8 0%,
+    #EBE3D3 65%,
+    #E2D7BF 100%
+  );
   overflow: hidden;
   margin-bottom: 0.8rem;
 }
