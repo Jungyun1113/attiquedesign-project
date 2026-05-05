@@ -265,7 +265,7 @@ const secondImg = (p: Portfolio) =>
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.34em;
-  color: #9B1B30;
+  color: #7E1A2C;
   text-transform: uppercase;
 }
 
@@ -281,7 +281,7 @@ const secondImg = (p: Portfolio) =>
 
 .mag-title em {
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: inherit;
 }
 
@@ -396,11 +396,11 @@ const secondImg = (p: Portfolio) =>
   font-style: italic;
   font-weight: 400;
   font-size: 17px;
-  color: #9B1B30;
+  color: #7E1A2C;
 }
 
 .chapter-item.is-active .chapter-en {
-  color: #9B1B30;
+  color: #7E1A2C;
   opacity: 0.9;
 }
 
@@ -450,7 +450,7 @@ const secondImg = (p: Portfolio) =>
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.34em;
-  color: #9B1B30;
+  color: #7E1A2C;
   text-transform: uppercase;
 }
 
@@ -493,8 +493,8 @@ const secondImg = (p: Portfolio) =>
 
 .spread-cta:hover {
   gap: 1rem;
-  color: #9B1B30;
-  border-bottom-color: #9B1B30;
+  color: #7E1A2C;
+  border-bottom-color: #7E1A2C;
 }
 
 /* ───────────────────────────────────────────────────────
@@ -715,7 +715,7 @@ const secondImg = (p: Portfolio) =>
   display: block;
   width: 28px;
   height: 1px;
-  background-color: rgba(155, 27, 48, 0.5);
+  background-color: rgba(126, 26, 44, 0.5);
 }
 
 .centered-title {
@@ -805,7 +805,7 @@ const secondImg = (p: Portfolio) =>
   font-size: clamp(3rem, 6vw, 5.4rem);
   font-weight: 400;
   line-height: 1;
-  color: #9B1B30;
+  color: #7E1A2C;
   letter-spacing: -0.02em;
   margin-bottom: 0.4rem;
 }

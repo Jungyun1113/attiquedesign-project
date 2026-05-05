@@ -12,12 +12,12 @@
 :root {
   --color-primary: #2B1D1B;
   --color-secondary: #6D6059;
-  --color-burgundy: #9B1B30;
-  --color-burgundy-dark: #9B1B30;
+  --color-burgundy: #7E1A2C;
+  --color-burgundy-dark: #7E1A2C;
   --color-background: #F5F0E8;
   --color-surface: #F5F0E8;
   --color-border: #E8E2D7;
-  --color-overlay: #9B1B30;
+  --color-overlay: #7E1A2C;
   --color-cream: #F5E6D3;
 }
 
@@ -110,7 +110,7 @@ body {
 
 .global-eng-subtitle em {
   font-style: italic;
-  color: #9B1B30; /* Brand Accent Red */
+  color: #7E1A2C; /* Brand Accent Red */
   font-weight: inherit;
 }
 
@@ -168,7 +168,7 @@ body {
 }
 
 .global-btn-main:hover {
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   padding-right: 3.8rem;
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);

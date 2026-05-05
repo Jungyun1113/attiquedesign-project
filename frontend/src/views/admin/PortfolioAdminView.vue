@@ -568,8 +568,8 @@ onMounted(() => loadPortfolios('residential'))
 .btn-new { font-size: 11px; color: #555; background: none; border: 1px solid #ddd; padding: 4px 10px; cursor: pointer; border-radius: 4px; }
 .btn-new:hover { background: #f5f5f5; }
 .btn-save-project-order { font-size: 11px; background: #eee; color: #999; border: 1px solid #ddd; padding: 4px 10px; cursor: not-allowed; border-radius: 4px; margin-right: 4px; transition: all 0.2s; }
-.btn-save-project-order.active { background: #9B1B30; color: #fff; border-color: #9B1B30; cursor: pointer; }
-.btn-save-project-order.active:hover { background: #7a2d2b; box-shadow: 0 2px 4px rgba(155, 27, 48, 0.2); }
+.btn-save-project-order.active { background: #7E1A2C; color: #fff; border-color: #7E1A2C; cursor: pointer; }
+.btn-save-project-order.active:hover { background: #7a2d2b; box-shadow: 0 2px 4px rgba(126, 26, 44, 0.2); }
 
 .list-loading { padding: 20px 16px; font-size: 13px; color: #999; }
 .project-items { list-style: none; padding: 0; margin: 0; }
@@ -582,7 +582,7 @@ onMounted(() => loadPortfolios('residential'))
 .project-item.is-dragging { 
   opacity: 0.9; 
   background-color: #F5F0E8 !important; /* 연한 베이지색 */
-  border: 1px dashed #9B1B30;
+  border: 1px dashed #7E1A2C;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transform: scale(1.02);
   z-index: 10;
@@ -659,7 +659,7 @@ onMounted(() => loadPortfolios('residential'))
 .image-card { position: relative; aspect-ratio: 4/3; background: #f0f0f0; border-radius: 4px; overflow: hidden; cursor: grab; }
 .image-card.dragging { opacity: 0.4; outline: 2px dashed #888; }
 .image-card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.main-badge { position: absolute; top: 6px; left: 6px; background: #9B1B30; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 1; }
+.main-badge { position: absolute; top: 6px; left: 6px; background: #7E1A2C; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 1; }
 .order-badge { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.55); color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1; }
 .btn-delete-img { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
 .image-card:hover .btn-delete-img { opacity: 1; }

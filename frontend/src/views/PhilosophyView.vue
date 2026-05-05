@@ -278,7 +278,7 @@ const timeline = [
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.34em;
-  color: #9B1B30;
+  color: #7E1A2C;
   text-transform: uppercase;
 }
 
@@ -315,7 +315,7 @@ const timeline = [
 
 .story-pullquote em {
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: inherit;
 }
 
@@ -356,7 +356,7 @@ const timeline = [
 
 .section-title em {
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: inherit;
 }
 
@@ -507,7 +507,7 @@ const timeline = [
 }
 
 .timeline-item.is-highlight .timeline-year {
-  color: #9B1B30;
+  color: #7E1A2C;
 }
 
 .timeline-event {
@@ -546,7 +546,7 @@ const timeline = [
 
 .philosophy-statement em {
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: inherit;
 }
 
@@ -564,7 +564,7 @@ const timeline = [
   display: block;
   width: 40px;
   height: 1px;
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   opacity: 0.5;
   margin: 1.4rem 0;
 }

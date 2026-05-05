@@ -169,7 +169,7 @@ onUnmounted(() => {
 .global-header.is-hovered,
 .global-header.is-solid,
 .global-header.is-mobile-open {
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   border-bottom-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -241,7 +241,7 @@ onUnmounted(() => {
   display: block;
   height: 80px;
   aspect-ratio: 990 / 495;
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   -webkit-mask-image: url('/logo-text.svg');
   mask-image: url('/logo-text.svg');
   -webkit-mask-repeat: no-repeat;
@@ -277,7 +277,7 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  color: #9B1B30;
+  color: #7E1A2C;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
@@ -344,7 +344,7 @@ onUnmounted(() => {
   display: block;
   width: 24px;
   height: 2px;
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
   transform-origin: center;
   border-radius: 1px;
@@ -372,7 +372,7 @@ onUnmounted(() => {
      No hover-driven inversion (touch mousemove caused flicker). */
   .global-header {
     padding: 0;
-    background-color: #9B1B30;
+    background-color: #7E1A2C;
   }
 
   .global-header::before {
@@ -419,7 +419,7 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     width: 100%;
-    background-color: #9B1B30;
+    background-color: #7E1A2C;
     overflow: hidden;
     max-height: 0;
     opacity: 0;

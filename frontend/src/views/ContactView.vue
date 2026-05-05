@@ -284,7 +284,7 @@ const processSteps = [
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.32em;
-  color: #9B1B30;
+  color: #7E1A2C;
   text-transform: uppercase;
 }
 
@@ -301,7 +301,7 @@ const processSteps = [
 
 .section-title em {
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: inherit;
 }
 
@@ -414,7 +414,7 @@ const processSteps = [
 }
 
 .process-cta:hover {
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   color: #FFFFFF;
   gap: 1rem;
 }
@@ -464,15 +464,15 @@ const processSteps = [
 .touch-card:hover {
   padding-left: 1.2rem;
   padding-right: 1.2rem;
-  color: #9B1B30;
-  background-color: rgba(155, 27, 48, 0.03);
+  color: #7E1A2C;
+  background-color: rgba(126, 26, 44, 0.03);
 }
 
 .touch-num {
   font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-style: italic;
   font-size: 14px;
-  color: #9B1B30;
+  color: #7E1A2C;
   letter-spacing: 0.02em;
   min-width: 24px;
 }
@@ -542,7 +542,7 @@ const processSteps = [
   font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: 18px;
   font-style: italic;
-  color: #9B1B30;
+  color: #7E1A2C;
   font-weight: 400;
   min-width: 32px;
   padding-top: 0.05rem;
@@ -602,7 +602,7 @@ const processSteps = [
   font-weight: 600;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: #9B1B30;
+  color: #7E1A2C;
 }
 
 .endcap-sep {
@@ -646,11 +646,11 @@ const processSteps = [
 }
 
 .endcap-link:hover {
-  color: #9B1B30;
+  color: #7E1A2C;
 }
 
 .endcap-link:hover::after {
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
 }
 
 /* ── Responsive ─────────────────────────────────────── */

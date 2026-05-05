@@ -64,7 +64,7 @@
 }
 
 .footer-global {
-  background-color: #9B1B30;
+  background-color: #7E1A2C;
   color: #F1EFE7;
   padding: 3rem 0 2.5rem;
   font-family: 'Montserrat', 'Pretendard', sans-serif;

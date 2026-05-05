@@ -86,7 +86,7 @@ const steps = [
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #9B1B30;
+  color: #7E1A2C;
 }
 
 .process-title {
