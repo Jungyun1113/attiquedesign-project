@@ -79,6 +79,73 @@
         </div>
       </div>
 
+      <!-- ═════ Brand intro — editorial introduction ═════ -->
+      <section class="sec-intro" v-reveal>
+        <div class="intro-inner">
+          <span class="intro-kicker">ATTIQUE DESIGN</span>
+          <h2 class="intro-title">
+            공간에 깊이를 더하는,<br /><em>아띠끄디자인.</em>
+          </h2>
+          <p class="intro-body">
+            한남 쇼룸을 거점으로 인테리어 시공과 가구·소품 큐레이션을<br />
+            함께 운영하는 인테리어 스튜디오입니다.<br /><br />
+            미국과 유럽의 하이엔드 메종에서 직접 들여온 셀렉션과<br />
+            1:1 맞춤 시공으로, 2012년부터 고객만의 공간을 완성해왔습니다.
+          </p>
+          <router-link to="/philosophy" class="intro-link">
+            <span>More About Us</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </router-link>
+        </div>
+      </section>
+
+      <!-- ═════ Editorial gallery — 3-up asymmetric ═════ -->
+      <section class="sec-gallery">
+        <div class="gallery-grid">
+          <figure class="gallery-item gallery-lead" v-reveal="{ delay: 100 }">
+            <img
+              src="/images/showroom-building.png"
+              alt="ATTIQUE DESIGN — Hannam showroom"
+              loading="lazy"
+            />
+            <figcaption class="gallery-caption">
+              <span class="gallery-place">HANNAM</span>
+              <span class="gallery-sep"></span>
+              <span class="gallery-text">Showroom</span>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-item gallery-top" v-reveal="{ delay: 200 }">
+            <img
+              src="/images/about/original_second.png"
+              alt="ATTIQUE DESIGN — Cheongdam archive"
+              loading="lazy"
+            />
+            <figcaption class="gallery-caption">
+              <span class="gallery-place">CHEONGDAM</span>
+              <span class="gallery-sep"></span>
+              <span class="gallery-text">Archive</span>
+            </figcaption>
+          </figure>
+
+          <figure class="gallery-item gallery-bottom" v-reveal="{ delay: 300 }">
+            <img
+              src="/images/contact/consultation-table.png"
+              alt="ATTIQUE DESIGN — Consultation table"
+              loading="lazy"
+            />
+            <figcaption class="gallery-caption">
+              <span class="gallery-place">PRIVATE</span>
+              <span class="gallery-sep"></span>
+              <span class="gallery-text">Consultation</span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       <!-- ── 섹션 3: 제품 슬라이더 (스크롤해야 보임) ── -->
       <section class="sec-selection">
         <div class="selection-header" v-reveal>
@@ -549,6 +616,179 @@ function updateWrapWidth() {
   }
 }
 
+/* ── Brand intro section ─────────────────────────────── */
+.sec-intro {
+  background-color: #F5F0E8;
+  padding: 7rem 4rem 5rem;
+}
+
+.intro-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.intro-kicker {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  color: #953735;
+  text-transform: uppercase;
+}
+
+.intro-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #312E2D;
+  margin: 0.2rem 0 0;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.intro-title em {
+  font-style: italic;
+  color: #953735;
+  font-weight: inherit;
+}
+
+.intro-body {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #555250;
+  margin: 0.6rem 0 0;
+  font-weight: 400;
+  word-break: keep-all;
+}
+
+.intro-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #312E2D;
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #312E2D;
+  transition: gap 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.intro-link:hover {
+  gap: 1rem;
+  color: #953735;
+  border-bottom-color: #953735;
+}
+
+/* ── Editorial gallery — 3-up asymmetric ─────────────── */
+.sec-gallery {
+  background-color: #F5F0E8;
+  padding: 2rem 4rem 7rem;
+}
+
+.gallery-grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+  grid-template-rows: auto auto;
+  gap: 1.2rem;
+}
+
+.gallery-item {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #EFE9DD;
+}
+
+.gallery-lead {
+  grid-row: 1 / span 2;
+  aspect-ratio: 4 / 5;
+}
+
+.gallery-top {
+  aspect-ratio: 16 / 11;
+}
+
+.gallery-bottom {
+  aspect-ratio: 16 / 11;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.03);
+}
+
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.48) 0%,
+    rgba(0, 0, 0, 0.12) 38%,
+    transparent 65%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.gallery-place {
+  font-weight: 600;
+  letter-spacing: 0.36em;
+}
+
+.gallery-sep {
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+.gallery-text {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
 .sec-selection {
   padding: 1.5rem 8% 6rem; /* 상단 여백을 5rem -> 1.5rem으로 대폭 축소 */
   background-color: #F5F0E8;
@@ -721,11 +961,76 @@ function updateWrapWidth() {
   }
 
   .sec-selection {
-    padding: 0.5rem 1.5rem 4rem; 
+    padding: 0.5rem 1.5rem 4rem;
   }
 
   .archive-img-wrap {
     margin-bottom: 0.8rem;
+  }
+
+  /* Brand intro */
+  .sec-intro {
+    padding: 4rem 1.5rem 3rem;
+  }
+
+  .intro-inner {
+    gap: 1rem;
+  }
+
+  .intro-kicker {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+  }
+
+  .intro-title {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+
+  .intro-body {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .intro-link {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    margin-top: 0.8rem;
+  }
+
+  /* Gallery: stack to single column */
+  .sec-gallery {
+    padding: 1rem 1.5rem 4rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .gallery-lead {
+    grid-row: auto;
+    aspect-ratio: 4 / 5;
+  }
+
+  .gallery-top,
+  .gallery-bottom {
+    aspect-ratio: 4 / 3;
+  }
+
+  .gallery-caption {
+    bottom: 0.9rem;
+    left: 0.9rem;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    gap: 0.5rem;
+  }
+
+  .gallery-sep {
+    width: 14px;
+  }
+
+  .gallery-text {
+    font-size: 10px;
   }
 }
 
