@@ -1,172 +1,166 @@
 <template>
   <div class="contact-page">
-    <div class="contact-asymmetric">
 
-      <!-- ── Left: Photo-dominant column ───────────────── -->
-      <div class="photo-side" v-reveal>
-        <div class="photo-frame">
-          <img
-            src="/images/showroom-building.png"
-            alt="Attique Design Showroom Building"
-            class="photo-img"
-          />
-        </div>
+    <!-- ── Full-bleed editorial hero (Chanel-style) ───────── -->
+    <section class="contact-hero">
+      <img
+        src="/images/hero/rugs.png"
+        alt="Custom fabrics and rugs by ATTIQUE DESIGN"
+        class="contact-hero-img"
+        fetchpriority="high"
+      />
+
+      <div class="hero-vignette"></div>
+
+      <div class="hero-overlay">
+        <span class="hero-kicker" v-reveal="{ delay: 100 }">CONTACT</span>
+        <h1 class="hero-title" v-reveal="{ delay: 200 }">
+          Private Consultation,<br /><em>to the last thread.</em>
+        </h1>
+        <p class="hero-desc" v-reveal="{ delay: 400 }">
+          가구와 인테리어부터 맞춤 패브릭과 러그까지,<br class="mobile-br" />
+          공간의 모든 디테일을 한남 쇼룸에서 1:1로 큐레이션합니다.
+        </p>
       </div>
+    </section>
 
-      <!-- ── Right: Editorial content column ───────────── -->
-      <div class="content-side">
-        <div class="content-inner">
+    <!-- ── Editorial body ─────────────────────────────────── -->
+    <div class="contact-body">
 
-          <!-- Title block -->
-          <header class="content-header" v-reveal>
-            <span class="kicker">CONTACT</span>
-            <h1 class="title">
-              Private<br />
-              <em>Consultation.</em>
-            </h1>
-            <p class="lead">
-              한남동 쇼룸에서 직접 만나뵙고,<br />
-              공간과 가구를 1:1로 큐레이션해 드립니다.
-            </p>
-          </header>
+      <!-- ═════ Process — image-paired editorial split ═════ -->
+      <section class="process-section" v-reveal>
+        <header class="section-head">
+          <span class="block-label">상담 프로세스 · OUR PROCESS</span>
+          <h2 class="section-title">
+            Built, Furnished and <em>Styled.</em>
+          </h2>
+          <p class="section-lead">
+            상담부터 완공까지, 당신의 공간에 온전히 집중합니다.
+          </p>
+        </header>
 
-          <hr class="rule" />
-
-          <!-- Process / How we work -->
-          <section class="process-block" v-reveal="{ delay: 100 }">
-            <span class="block-label">OUR PROCESS</span>
-            <h2 class="process-headline">
-              Built, Furnished and <em>Styled.</em>
-            </h2>
-            <p class="process-intro">
-              상담부터 완공까지, 당신의 공간에 온전히 집중합니다.
-            </p>
-
-            <ol class="process-list">
-              <li
-                v-for="(step, i) in processSteps"
-                :key="i"
-                class="process-step"
-              >
-                <span class="process-num">0{{ i + 1 }}</span>
-                <div class="process-text">
-                  <h3 class="process-name">{{ step.title }}</h3>
-                  <p class="process-desc">{{ step.desc }}</p>
-                </div>
-              </li>
-            </ol>
-          </section>
-
-          <hr class="rule" />
-
-          <!-- Address block -->
-          <section class="address-block" v-reveal="{ delay: 150 }">
-            <span class="block-label">SHOWROOM</span>
-            <p class="address">
-              서울시 용산구 한남대로 21길 27<br />
-              아띠끄 빌딩
-            </p>
+        <div class="process-split">
+          <figure class="process-figure" v-reveal="{ delay: 120 }">
+            <img
+              src="/images/contact/consultation-table.jpeg"
+              alt="Top-down view of the ATTIQUE consultation table"
+              class="process-img"
+              loading="lazy"
+            />
+            <div class="process-img-vignette"></div>
+            <figcaption class="process-figcaption">
+              <span class="figcaption-place">한남 쇼룸</span>
+              <span class="figcaption-sep"></span>
+              <span class="figcaption-text">프라이빗 상담 테이블</span>
+            </figcaption>
             <a
-              href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
+              href="https://m.booking.naver.com/booking/6/bizes/1563733/items/7301622?area=plt&lang=ko&theme=place"
               target="_blank"
               rel="noopener noreferrer"
-              class="directions-link"
+              class="process-cta"
             >
-              <span>길찾기</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
+              <span class="process-cta-label">방문 예약</span>
+              <svg class="process-cta-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </a>
-          </section>
+          </figure>
 
-          <hr class="rule" />
+          <ol class="process-list" v-reveal="{ delay: 200 }">
+            <li
+              v-for="(step, i) in processSteps"
+              :key="i"
+              class="process-step"
+            >
+              <span class="process-num">0{{ i + 1 }}</span>
+              <div class="process-text">
+                <h3 class="process-name">{{ step.title }}</h3>
+                <p class="process-desc">{{ step.desc }}</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
 
-          <!-- Contact methods -->
-          <section class="methods" v-reveal="{ delay: 200 }">
-            <span class="block-label">GET IN TOUCH</span>
+      <!-- ═════ 빠른 문의 — 2-up card grid ═════ -->
+      <section class="touch-section" v-reveal>
+        <header class="section-head">
+          <span class="block-label">빠른 문의 · QUICK ENQUIRY</span>
+          <h2 class="section-title">
+            가장 편한 방법으로 <em>닿아주세요.</em>
+          </h2>
+        </header>
 
-            <ul class="method-list">
-              <li class="method-item">
-                <a href="tel:02-3443-8170" class="method-link">
-                  <span class="method-num">01</span>
-                  <div class="method-body">
-                    <h3 class="method-name">Call</h3>
-                    <p class="method-detail">02-3443-8170</p>
-                    <p class="method-meta">Mon — Sat · 10:00 – 19:00</p>
-                  </div>
-                  <svg class="method-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7 7 17 7 17 17"></polyline>
-                  </svg>
-                </a>
-              </li>
+        <div class="touch-grid">
+          <a href="tel:02-3443-8170" class="touch-card">
+            <span class="touch-num">01</span>
+            <h3 class="touch-name">전화 상담</h3>
+            <p class="touch-detail">02-3443-8170</p>
+            <svg class="touch-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
 
-              <li class="method-item">
-                <a
-                  href="https://pf.kakao.com/_attiquedesign"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="method-link"
-                >
-                  <span class="method-num">02</span>
-                  <div class="method-body">
-                    <h3 class="method-name">KakaoTalk</h3>
-                    <p class="method-detail">실시간 상담</p>
-                    <p class="method-meta">@아띠끄디자인</p>
-                  </div>
-                  <svg class="method-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7 7 17 7 17 17"></polyline>
-                  </svg>
-                </a>
-              </li>
-
-              <li class="method-item">
-                <a
-                  href="https://m.booking.naver.com/booking/6/bizes/1563733/items/7301622?area=plt&lang=ko&theme=place"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="method-link is-primary"
-                >
-                  <span class="method-num">03</span>
-                  <div class="method-body">
-                    <h3 class="method-name">Book a Visit</h3>
-                    <p class="method-detail">1:1 프라이빗 방문 상담</p>
-                    <p class="method-meta">예약 후 방문</p>
-                  </div>
-                  <svg class="method-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <line x1="7" y1="17" x2="17" y2="7"></line>
-                    <polyline points="7 7 17 7 17 17"></polyline>
-                  </svg>
-                </a>
-              </li>
-            </ul>
-          </section>
-
-          <hr class="rule" />
-
-          <!-- Social -->
-          <section class="social-row" v-reveal="{ delay: 300 }">
-            <span class="block-label">FOLLOW</span>
-            <div class="social-links">
-              <a
-                href="https://www.instagram.com/attiquedesign?igsh=d2dmM3Awamo1aWkz"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link"
-              >Instagram</a>
-              <a
-                href="https://blog.naver.com/attique_"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link"
-              >Blog</a>
-            </div>
-          </section>
+          <a
+            href="https://pf.kakao.com/_attiquedesign"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="touch-card"
+          >
+            <span class="touch-num">02</span>
+            <h3 class="touch-name">카카오톡 상담</h3>
+            <p class="touch-detail">@아띠끄디자인</p>
+            <svg class="touch-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
 
         </div>
-      </div>
+      </section>
+
+      <!-- ═════ Footer endcap — Showroom + Social ═════ -->
+      <section class="endcap" v-reveal>
+        <div class="endcap-col endcap-showroom">
+          <span class="block-label">한남 쇼룸 · SHOWROOM</span>
+          <p class="endcap-address">
+            서울시 용산구 한남대로 21길 27<br />
+            아띠끄 빌딩
+          </p>
+          <a
+            href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="directions-link"
+          >
+            <span>길찾기</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+
+        <div class="endcap-col endcap-social">
+          <span class="block-label">소식 받기 · FOLLOW</span>
+          <div class="social-links">
+            <a
+              href="https://www.instagram.com/attiquedesign?igsh=d2dmM3Awamo1aWkz"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+            >Instagram</a>
+            <a
+              href="https://blog.naver.com/attique_"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="social-link"
+            >Blog</a>
+          </div>
+        </div>
+      </section>
 
     </div>
   </div>
@@ -184,7 +178,7 @@ const processSteps = [
   },
   {
     title: '시공 & 스타일링',
-    desc: '전문 시공팀의 꼼꼼한 시공과 아띠끄 셀렉션의 가구·소품 배치까지 원스톱으로 완성합니다.',
+    desc: '전문 시공팀의 꼼꼼한 시공과 아띠끄 셀렉션의 가구·소품·맞춤 패브릭/러그까지 원스톱으로 완성합니다.',
   },
 ]
 </script>
@@ -195,62 +189,109 @@ const processSteps = [
   width: 100%;
 }
 
-/* ── Asymmetric grid: photo dominant left, content right ── */
-.contact-asymmetric {
-  display: grid;
-  grid-template-columns: 58fr 42fr;
-  min-height: calc(100vh - 140px);
-  width: 100%;
-}
-
-/* ── Left: Photo side ───────────────────────────────── */
-.photo-side {
-  background-color: #EFE9DD;
+/* ── Hero ───────────────────────────────────────────── */
+.contact-hero {
   position: relative;
-  overflow: hidden;
-}
-
-.photo-frame {
-  position: sticky;
-  top: 0;
   width: 100%;
-  height: 100vh;
-  max-height: calc(100vh - 0px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 3rem;
-  box-sizing: border-box;
+  height: calc(100vh - 140px);
+  min-height: 520px;
+  overflow: hidden;
+  background-color: #1a1a1a;
 }
 
-.photo-img {
+.contact-hero-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
-  filter: drop-shadow(0 16px 48px rgba(0, 0, 0, 0.08));
+  display: block;
 }
 
-/* ── Right: Content side ────────────────────────────── */
-.content-side {
-  display: flex;
-  align-items: flex-start;
-  padding: 5rem 4rem 6rem;
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.2) 38%,
+    transparent 65%);
+  z-index: 2;
+  pointer-events: none;
 }
 
-.content-inner {
-  width: 100%;
-  max-width: 520px;
+.hero-overlay {
+  position: absolute;
+  left: 4rem;
+  bottom: 4rem;
+  z-index: 5;
+  max-width: 620px;
+  pointer-events: none;
+}
+
+.hero-kicker {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  margin-bottom: 1.4rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #FFFFFF;
+  margin: 0 0 1.4rem 0;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+}
+
+.hero-title em {
+  font-style: italic;
+  color: #E8C7A0;
+  font-weight: inherit;
+}
+
+.hero-desc {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+  font-weight: 300;
+  word-break: keep-all;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+.mobile-br {
+  display: none;
+}
+
+/* ── Body ───────────────────────────────────────────── */
+.contact-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 7rem 4rem 6rem;
   display: flex;
   flex-direction: column;
+  gap: 7rem;
 }
 
-/* ── Header block ───────────────────────────────────── */
-.content-header {
-  margin-bottom: 3rem;
+/* Reusable section head */
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+  max-width: 720px;
 }
 
-.kicker,
 .block-label {
   display: inline-block;
   font-family: 'Montserrat', sans-serif;
@@ -261,95 +302,170 @@ const processSteps = [
   text-transform: uppercase;
 }
 
-.kicker {
-  margin-bottom: 1.5rem;
-}
-
-.block-label {
-  margin-bottom: 1.4rem;
-  color: #6D6059;
-}
-
-.title {
+.section-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(40px, 5vw, 72px);
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.15;
   color: #312E2D;
-  margin: 0 0 1.6rem 0;
+  margin: 0;
   letter-spacing: -0.01em;
+  word-break: keep-all;
 }
 
-.title em {
+.section-title em {
   font-style: italic;
   color: #953735;
   font-weight: inherit;
 }
 
-.lead {
+.section-lead {
   font-family: 'Pretendard', sans-serif;
   font-size: 15px;
-  line-height: 1.8;
-  color: #6D6059;
-  margin: 0;
-  font-weight: 300;
-}
-
-/* ── Horizontal rule between sections ──────────────── */
-.rule {
-  border: none;
-  border-top: 1px solid #E8E2D7;
-  margin: 0;
-  width: 100%;
-}
-
-/* ── Process block ──────────────────────────────────── */
-.process-block {
-  padding: 2.5rem 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.process-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 400;
-  line-height: 1.2;
-  color: #312E2D;
-  margin: 0 0 0.8rem 0;
-  letter-spacing: -0.01em;
-}
-
-.process-headline em {
-  font-style: italic;
-  color: #953735;
-  font-weight: inherit;
-}
-
-.process-intro {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
   line-height: 1.7;
   color: #6D6059;
-  margin: 0 0 2rem 0;
+  margin: 0;
   font-weight: 300;
+  word-break: keep-all;
 }
 
+/* ── Process — image-paired editorial split ─────────── */
+.process-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 3.5rem;
+  align-items: stretch;
+}
+
+.process-figure {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #1a1a1a;
+  min-height: 480px;
+}
+
+.process-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.process-figure:hover .process-img {
+  transform: scale(1.03);
+}
+
+.process-img-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.65) 0%,
+    rgba(0, 0, 0, 0.2) 38%,
+    transparent 60%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.process-figcaption {
+  position: absolute;
+  left: 1.6rem;
+  top: 1.6rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.figcaption-place {
+  font-weight: 600;
+  letter-spacing: 0.34em;
+}
+
+.figcaption-sep {
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+.figcaption-text {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+/* Overlaid CTA on the consultation image (bottom-right) */
+.process-cta {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+  background-color: rgba(255, 255, 255, 0.94);
+  color: #312E2D;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background-color 0.4s ease, gap 0.3s ease;
+}
+
+.process-cta:hover {
+  background-color: #953735;
+  color: #FFFFFF;
+  gap: 1rem;
+}
+
+.process-cta-label {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.process-cta-arrow {
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.process-cta:hover .process-cta-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Numbered process list (right side) */
 .process-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
+  align-self: center;
 }
 
 .process-step {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 1.2rem;
+  gap: 1.4rem;
   align-items: start;
-  padding-top: 1.2rem;
+  padding: 1.6rem 0;
   border-top: 1px solid #E8E2D7;
 }
 
@@ -358,26 +474,30 @@ const processSteps = [
   padding-top: 0;
 }
 
+.process-step:last-child {
+  padding-bottom: 0;
+}
+
 .process-num {
   font-family: 'Playfair Display', serif;
-  font-size: 14px;
+  font-size: 18px;
   font-style: italic;
   color: #953735;
   font-weight: 400;
-  min-width: 28px;
-  padding-top: 0.15rem;
+  min-width: 32px;
+  padding-top: 0.05rem;
 }
 
 .process-text {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .process-name {
   font-family: 'Pretendard', sans-serif;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
   color: #312E2D;
   margin: 0;
@@ -386,26 +506,105 @@ const processSteps = [
 
 .process-desc {
   font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
-  line-height: 1.7;
-  color: #6D6059;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #555250;
   margin: 0;
-  font-weight: 300;
+  font-weight: 400;
+  word-break: keep-all;
 }
 
-/* ── Address block ──────────────────────────────────── */
-.address-block {
-  padding: 2.5rem 0;
+/* ── Quick enquiry — 2-up minimal Chanel cards ──────── */
+.touch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.touch-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 1.2rem;
+  padding: 1.4rem 1.4rem;
+  background-color: #EFE9DD;
+  text-decoration: none;
+  color: #312E2D;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.touch-card:hover {
+  background-color: #312E2D;
+  color: #F5F0E8;
+}
+
+.touch-num {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #953735;
+  letter-spacing: 0.02em;
+  align-self: center;
+}
+
+.touch-name {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: inherit;
+  margin: 0;
+  line-height: 1.2;
+  align-self: center;
+}
+
+.touch-detail {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: inherit;
+  opacity: 0.7;
+  margin: 0;
+  font-weight: 400;
+  align-self: center;
+}
+
+.touch-arrow {
+  color: inherit;
+  opacity: 0.7;
+  align-self: center;
+  margin-left: 0.6rem;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.touch-card:hover .touch-arrow {
+  transform: translate(3px, -3px);
+  opacity: 1;
+}
+
+/* ── Endcap (Showroom + Social) ─────────────────────── */
+.endcap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 4rem;
+  padding-top: 4rem;
+  border-top: 1px solid #E8E2D7;
+  align-items: start;
+}
+
+.endcap-col {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
 
-.address {
+.endcap-address {
   font-family: 'Playfair Display', serif;
   font-size: 22px;
   line-height: 1.45;
   color: #312E2D;
-  margin: 0 0 1.4rem 0;
+  margin: 0;
   font-weight: 400;
 }
 
@@ -423,6 +622,7 @@ const processSteps = [
   padding-bottom: 0.3rem;
   border-bottom: 1px solid #312E2D;
   align-self: flex-start;
+  margin-top: 0.4rem;
   transition: gap 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -432,109 +632,8 @@ const processSteps = [
   border-bottom-color: #953735;
 }
 
-/* ── Methods ────────────────────────────────────────── */
-.methods {
-  padding: 2.5rem 0;
-}
-
-.method-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.method-item + .method-item {
-  border-top: 1px dashed #E8E2D7;
-}
-
-.method-link {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1.4rem;
-  padding: 1.4rem 0.4rem;
-  text-decoration: none;
-  color: #312E2D;
-  transition: padding 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
-              background-color 0.4s ease;
-}
-
-.method-link:hover {
-  padding-left: 1.2rem;
-  padding-right: 1.2rem;
-  background-color: rgba(149, 55, 53, 0.04);
-}
-
-.method-num {
-  font-family: 'Playfair Display', serif;
-  font-size: 14px;
-  font-style: italic;
-  color: #953735;
-  font-weight: 400;
-  min-width: 28px;
-}
-
-.method-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-}
-
-.method-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: #312E2D;
-  margin: 0;
-  line-height: 1.2;
-  transition: color 0.3s ease;
-}
-
-.method-link:hover .method-name {
-  color: #953735;
-}
-
-.method-detail {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
-  color: #312E2D;
-  margin: 0;
-  font-weight: 400;
-}
-
-.method-meta {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: #6D6059;
-  margin: 0;
-  text-transform: uppercase;
-  font-weight: 400;
-}
-
-.method-arrow {
-  color: #6D6059;
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
-              color 0.3s ease;
-  flex-shrink: 0;
-}
-
-.method-link:hover .method-arrow {
-  transform: translate(4px, -4px);
-  color: #953735;
-}
-
-.method-link.is-primary .method-num {
-  color: #953735;
-}
-
-/* ── Social ─────────────────────────────────────────── */
-.social-row {
-  padding-top: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.endcap-social .social-links {
+  margin-top: 0.4rem;
 }
 
 .social-links {
@@ -545,7 +644,7 @@ const processSteps = [
 
 .social-link {
   font-family: 'Playfair Display', serif;
-  font-size: 16px;
+  font-size: 18px;
   font-style: italic;
   color: #312E2D;
   text-decoration: none;
@@ -574,74 +673,183 @@ const processSteps = [
 
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 1100px) {
-  .content-side {
-    padding: 4rem 2.5rem 5rem;
+  .hero-overlay {
+    left: 2.5rem;
+    bottom: 3rem;
   }
 
-  .photo-frame {
-    padding: 3rem 2rem;
+  .contact-body {
+    padding: 5rem 2.5rem 5rem;
+    gap: 5rem;
+  }
+
+  .process-split {
+    gap: 2.5rem;
+  }
+
+  .process-figure {
+    min-height: 420px;
+  }
+
+  .endcap {
+    gap: 2.5rem;
   }
 }
 
-@media (max-width: 900px) {
-  .contact-asymmetric {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .mobile-br {
+    display: block;
+  }
+
+  /* Match hero container to image aspect (3:2) on mobile —
+     no crop, no letterbox. */
+  .contact-hero {
+    height: auto;
+    aspect-ratio: 3 / 2;
     min-height: 0;
   }
 
-  .photo-side {
-    width: 100%;
+  .hero-overlay {
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: 1.6rem;
+    max-width: none;
   }
 
-  .photo-frame {
-    position: relative;
-    height: 50vh;
-    min-height: 320px;
-    padding: 2rem 1.5rem;
+  .hero-kicker {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    margin-bottom: 0.8rem;
   }
 
-  .content-side {
-    padding: 3rem 1.5rem 5rem;
-    justify-content: center;
+  .hero-title {
+    font-size: clamp(1.4rem, 6.5vw, 2rem);
+    margin-bottom: 0.8rem;
   }
 
-  .content-inner {
-    max-width: 100%;
+  .hero-desc {
+    font-size: 12px;
+    line-height: 1.55;
   }
 
-  .title {
-    font-size: clamp(36px, 9vw, 56px);
+  .contact-body {
+    padding: 3.5rem 1.5rem 4rem;
+    gap: 4rem;
   }
 
-  .address {
-    font-size: 18px;
+  .section-head {
+    margin-bottom: 2rem;
   }
 
-  .method-name {
-    font-size: 20px;
+  .section-title {
+    font-size: clamp(1.5rem, 6vw, 2rem);
   }
 
-  .process-headline {
-    font-size: 22px;
+  .section-lead {
+    font-size: 13px;
+  }
+
+  /* Process: stack image then list */
+  .process-split {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .process-figure {
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+  }
+
+  .process-figcaption {
+    left: 1rem;
+    top: 1rem;
+    gap: 0.5rem;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+  }
+
+  .figcaption-sep {
+    width: 14px;
+  }
+
+  .figcaption-text {
+    font-size: 10px;
+  }
+
+  .process-cta {
+    right: 0.9rem;
+    bottom: 0.9rem;
+    padding: 0.6rem 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .process-cta-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+  }
+
+  .process-cta-arrow {
+    width: 12px;
+    height: 12px;
+  }
+
+  .process-step {
+    padding: 1.2rem 0;
+    gap: 1rem;
+  }
+
+  .process-num {
+    font-size: 15px;
   }
 
   .process-name {
     font-size: 15px;
   }
+
+  .process-desc {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  /* Touch grid: stack */
+  .touch-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .touch-card {
+    column-gap: 0.9rem;
+    padding: 1.1rem 1.1rem;
+  }
+
+  .touch-name {
+    font-size: 13px;
+  }
+
+  .touch-detail {
+    font-size: 10px;
+  }
+
+  /* Endcap: stack */
+  .endcap {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 2.5rem;
+  }
+
+  .endcap-address {
+    font-size: 19px;
+  }
 }
 
 @media (max-width: 600px) {
-  .photo-frame {
-    height: 42vh;
-    min-height: 280px;
+  .hero-overlay {
+    bottom: 1.2rem;
   }
 
-  .content-side {
-    padding: 2.5rem 1.25rem 4rem;
-  }
-
-  .lead {
-    font-size: 14px;
+  /* Hide the figcaption on very small screens — CTA is enough */
+  .process-figcaption {
+    display: none;
   }
 }
 </style>
