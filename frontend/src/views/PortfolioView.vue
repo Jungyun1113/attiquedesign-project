@@ -1,78 +1,178 @@
 <template>
   <div class="portfolio-page">
-    <div class="global-page-container">
-      <div class="portfolio-header" v-reveal>
-        <h2 class="global-eng-subtitle portfolio-title">Curated <em class="portfolio-title-accent">Spaces</em>.</h2>
-        <p class="global-kor-desc portfolio-subtitle">아띠끄 디자인의 시선으로 완성한 공간들.</p>
+
+    <!-- ═════ Magazine masthead ═════ -->
+    <header class="mag-masthead" v-reveal>
+      <div class="mag-masthead-inner">
+        <span class="mag-issue">ATTIQUE · VOL 2026</span>
+        <h1 class="mag-title">
+          Curated <em>Spaces</em>.
+        </h1>
+        <p class="mag-lead">아띠끄 디자인의 시선으로 완성한 공간들.</p>
       </div>
+    </header>
 
-      <div v-if="loading" class="loading-state">
-        <span class="loading-text">Loading.</span>
-      </div>
+    <!-- Loading -->
+    <div v-if="loading" class="loading-state">
+      <span class="loading-text">Loading.</span>
+    </div>
 
-      <template v-else-if="categories.length">
-        <div class="portfolio-nav">
-          <ul class="tab-list">
-            <li
-              v-for="cat in categories"
-              :key="cat.id"
-              class="tab-item"
-              :class="{ 'is-active': activeCategoryId === cat.id }"
-              @click="activeCategoryId = cat.id"
-            >
-              <span class="tab-text">{{ cat.name }}</span>
-            </li>
-          </ul>
-        </div>
+    <template v-else-if="categories.length">
 
-        <div class="portfolio-content">
-          <p class="global-kor-desc category-desc">{{ activeCategory?.description }}</p>
+      <!-- Category tabs -->
+      <nav class="mag-nav" v-reveal>
+        <ul class="tab-list">
+          <li
+            v-for="cat in categories"
+            :key="cat.id"
+            class="tab-item"
+            :class="{ 'is-active': activeCategoryId === cat.id }"
+            @click="activeCategoryId = cat.id"
+          >
+            <span class="tab-en">{{ catLabel(cat.id) }}</span>
+            <span class="tab-kr">{{ cat.name }}</span>
+          </li>
+        </ul>
+      </nav>
 
-          <div class="projects-list">
-            <section
-              v-for="(portfolio, i) in activeCategory?.portfolios"
-              :key="portfolio.id"
-              class="project-card"
-              v-reveal="{ delay: (i % 3) * 120 }"
-            >
-              <div class="project-title-row">
-                <h2 class="project-title">{{ portfolio.title }}</h2>
-              </div>
+      <p v-if="activeCategory?.description" class="category-desc" v-reveal>
+        {{ activeCategory.description }}
+      </p>
 
-              <div class="project-gallery">
-                <div
-                  v-for="(img, idx) in portfolio.images.slice(0, 2)"
-                  :key="idx"
-                  class="gallery-item"
+      <!-- ═════ Magazine spreads ═════ -->
+      <div class="spread-list">
+        <section
+          v-for="(p, i) in (activeCategory?.portfolios ?? [])"
+          :key="p.id"
+          class="spread"
+          :class="`spread-${variantOf(i)}`"
+          v-reveal
+        >
+          <!-- ── Variant A · Cover (full-bleed) ── -->
+          <template v-if="variantOf(i) === 'cover'">
+            <router-link :to="`/portfolio/${p.id}`" class="cover-link">
+              <figure class="cover-figure">
+                <img class="cover-img" :src="firstImg(p)" :alt="p.title" loading="lazy" />
+                <div class="cover-vignette"></div>
+
+                <span class="cover-cat">{{ catLabel(p.category) }} · {{ catKr(p.category) }}</span>
+
+                <figcaption class="cover-overlay">
+                  <span class="cover-num">PROJECT {{ formattedNum(i) }}</span>
+                  <h2 class="cover-title">{{ p.title }}</h2>
+                  <span class="cover-cta">
+                    <span>Into the Space</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </span>
+                </figcaption>
+              </figure>
+            </router-link>
+          </template>
+
+          <!-- ── Variant B · Asymmetric 2-up ── -->
+          <template v-else-if="variantOf(i) === 'asym'">
+            <div class="asym-grid">
+              <router-link :to="`/portfolio/${p.id}`" class="asym-main">
+                <figure class="asym-figure">
+                  <img :src="firstImg(p)" :alt="p.title" loading="lazy" />
+                </figure>
+              </router-link>
+
+              <aside class="asym-side">
+                <span class="spread-num">PROJECT {{ formattedNum(i) }}</span>
+                <span class="spread-cat">{{ catLabel(p.category) }}</span>
+                <h2 class="spread-title">{{ p.title }}</h2>
+
+                <router-link
+                  v-if="secondImg(p)"
+                  :to="`/portfolio/${p.id}`"
+                  class="asym-thumb"
                 >
-                  <img :src="img.image_url" :alt="portfolio.title + ' ' + (idx + 1)" />
-                </div>
-                <div v-if="portfolio.images.length === 0 && portfolio.cover_image_url" class="gallery-item">
-                  <img :src="portfolio.cover_image_url" :alt="portfolio.title" />
-                </div>
-              </div>
+                  <img :src="secondImg(p)" :alt="p.title + ' detail'" loading="lazy" />
+                </router-link>
 
-              <div class="project-footer">
-                <router-link :to="`/portfolio/${portfolio.id}`" class="view-detail-link">
-                  View Project Details
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                <router-link :to="`/portfolio/${p.id}`" class="spread-cta">
+                  <span>View Project</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </router-link>
+              </aside>
+            </div>
+          </template>
+
+          <!-- ── Variant C · Centered single ── -->
+          <template v-else-if="variantOf(i) === 'centered'">
+            <div class="centered-spread">
+              <header class="centered-head">
+                <span class="spread-num">PROJECT {{ formattedNum(i) }}</span>
+                <span class="centered-rule"></span>
+                <span class="spread-cat">{{ catLabel(p.category) }}</span>
+              </header>
+
+              <h2 class="centered-title">
+                <em>{{ p.title }}</em>
+              </h2>
+
+              <router-link :to="`/portfolio/${p.id}`" class="centered-figure-link">
+                <figure class="centered-figure">
+                  <img :src="firstImg(p)" :alt="p.title" loading="lazy" />
+                </figure>
+              </router-link>
+
+              <footer class="centered-foot">
+                <span class="centered-caption"><em>An ATTIQUE study.</em></span>
+                <router-link :to="`/portfolio/${p.id}`" class="spread-cta">
+                  <span>View Project</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </router-link>
+              </footer>
+            </div>
+          </template>
+
+          <!-- ── Variant D · Split (text · image) ── -->
+          <template v-else>
+            <div class="split-grid">
+              <div class="split-text">
+                <span class="split-big-num">{{ formattedNum(i) }}</span>
+                <span class="spread-cat">{{ catLabel(p.category) }} · {{ catKr(p.category) }}</span>
+                <h2 class="split-title">{{ p.title }}</h2>
+                <router-link :to="`/portfolio/${p.id}`" class="spread-cta">
+                  <span>View Project</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
                 </router-link>
               </div>
-            </section>
-          </div>
-        </div>
-      </template>
 
-      <div v-else class="portfolio-content">
-        <p class="global-kor-desc">등록된 포트폴리오가 없습니다.</p>
+              <router-link :to="`/portfolio/${p.id}`" class="split-figure-link">
+                <figure class="split-figure">
+                  <img :src="firstImg(p)" :alt="p.title" loading="lazy" />
+                </figure>
+              </router-link>
+            </div>
+          </template>
+        </section>
       </div>
+    </template>
+
+    <div v-else class="empty-state">
+      <p class="global-kor-desc">등록된 포트폴리오가 없습니다.</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { portfolioService, type PortfolioCategory } from '@/services/portfolio.service'
+import { portfolioService, type Portfolio, type PortfolioCategory } from '@/services/portfolio.service'
 
 const categories = ref<PortfolioCategory[]>([])
 const loading = ref(true)
@@ -92,81 +192,577 @@ onMounted(async () => {
 const activeCategory = computed(() =>
   categories.value.find(c => c.id === activeCategoryId.value) ?? categories.value[0]
 )
+
+const VARIANTS = ['cover', 'asym', 'centered', 'split'] as const
+type Variant = typeof VARIANTS[number]
+
+const variantOf = (i: number): Variant => VARIANTS[i % VARIANTS.length]
+const formattedNum = (i: number) => String(i + 1).padStart(2, '0')
+const catLabel = (catId: string) => (catId ?? '').toUpperCase()
+const catKr = (catId: string) =>
+  categories.value.find(c => c.id === catId)?.name ?? ''
+const firstImg = (p: Portfolio) =>
+  p.images[0]?.image_url ?? p.cover_image_url ?? ''
+const secondImg = (p: Portfolio) =>
+  p.images[1]?.image_url ?? ''
 </script>
 
 <style scoped>
 .portfolio-page {
   background-color: #F5F0E8;
+  color: #312E2D;
   min-height: calc(100vh - 160px);
 }
 
-.portfolio-header {
+/* ── Masthead ───────────────────────────────────────── */
+.mag-masthead {
+  padding: 5rem 4rem 3rem;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.mag-masthead-inner {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem; /* PC 여백 추가 축소 */
+  gap: 1rem;
 }
 
-.portfolio-title {
-  margin-bottom: 0.5rem; /* 기본 3rem에서 대폭 축소하여 설명과 밀착 */
+.mag-issue {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  color: #953735;
+  text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
-  .portfolio-header {
-    margin-bottom: 1.5rem; /* 모바일 여백 축소 (기존 2.5rem) */
-  }
+.mag-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-weight: 400;
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.01em;
+  color: #312E2D;
 }
 
-.portfolio-nav {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 0.5rem; /* 탭과 컨텐츠 사이 여백 최소화 (기존 2rem) */
-  overflow-x: auto; /* 가로 스크롤 허용 */
+.mag-title em {
+  font-style: italic;
+  color: #953735;
+  font-weight: inherit;
+}
+
+.mag-lead {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6D6059;
+  margin: 0;
+  font-weight: 300;
+  word-break: keep-all;
+}
+
+/* ── Category nav ───────────────────────────────────── */
+.mag-nav {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 4rem;
+  border-bottom: 1px solid rgba(49, 46, 45, 0.1);
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+
+.mag-nav::-webkit-scrollbar { display: none; }
 
 .tab-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 0;
-  width: max-content; /* 자식 요소 너비 유지 */
+  gap: 2.5rem;
+  width: max-content;
 }
 
 .tab-item {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem 0.75rem 0;
-  margin-right: 2rem;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 0;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-bottom: 1px solid transparent;
   margin-bottom: -1px;
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease;
 }
 
-.tab-text {
-  font-family: 'Raleway', sans-serif;
-  font-size: 17px; /* PC화면: 위 설명(16px)보다 약간 큰 크기 */
-  font-weight: 400;
+.tab-en {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: rgba(49, 46, 45, 0.5);
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: rgba(49, 46, 45, 0.4);
   transition: color 0.3s ease;
 }
 
-.tab-item:hover .tab-text {
-  color: #2C2C2C;
+.tab-kr {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(49, 46, 45, 0.5);
+  letter-spacing: 0.02em;
+  transition: color 0.3s ease;
 }
 
-.tab-item.is-active .tab-text {
-  color: #953735;
-  font-weight: 600;
+.tab-item:hover .tab-en,
+.tab-item:hover .tab-kr {
+  color: #312E2D;
 }
 
 .tab-item.is-active {
   border-bottom-color: #953735;
 }
 
+.tab-item.is-active .tab-en,
+.tab-item.is-active .tab-kr {
+  color: #953735;
+}
+
+/* ── Category description ───────────────────────────── */
+.category-desc {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6D6059;
+  white-space: pre-line;
+  margin: 2rem 0 0;
+  padding: 0 4rem;
+  max-width: calc(720px + 8rem);
+  word-break: keep-all;
+}
+
+/* ── Spread list ────────────────────────────────────── */
+.spread-list {
+  display: flex;
+  flex-direction: column;
+  padding: 5rem 0 8rem;
+}
+
+.spread {
+  margin-bottom: 8rem;
+}
+
+.spread:last-child {
+  margin-bottom: 0;
+}
+
+/* Shared spread typography */
+.spread-num {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  color: #953735;
+  text-transform: uppercase;
+}
+
+.spread-cat {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  color: rgba(49, 46, 45, 0.55);
+  text-transform: uppercase;
+}
+
+.spread-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #312E2D;
+  margin: 0;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.spread-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #312E2D;
+  text-decoration: none;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #312E2D;
+  align-self: flex-start;
+  transition: gap 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.spread-cta:hover {
+  gap: 1rem;
+  color: #953735;
+  border-bottom-color: #953735;
+}
+
+/* ───────────────────────────────────────────────────────
+   A · Cover (full-bleed)
+   ─────────────────────────────────────────────────── */
+.cover-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cover-figure {
+  position: relative;
+  width: 100%;
+  height: 85vh;
+  min-height: 560px;
+  margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #1a1a1a;
+}
+
+.cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cover-link:hover .cover-img {
+  transform: scale(1.03);
+}
+
+.cover-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.18) 40%,
+    rgba(0, 0, 0, 0.15) 80%,
+    rgba(0, 0, 0, 0.35) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cover-cat {
+  position: absolute;
+  top: 1.8rem;
+  right: 2rem;
+  z-index: 3;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  color: rgba(255, 255, 255, 0.86);
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cover-overlay {
+  position: absolute;
+  left: 4rem;
+  bottom: 3.5rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 640px;
+  color: #FFFFFF;
+}
+
+.cover-num {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.36em;
+  color: rgba(255, 255, 255, 0.86);
+  text-transform: uppercase;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cover-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.08;
+  margin: 0;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.35);
+  color: #F5F0E8;
+}
+
+.cover-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  margin-top: 0.4rem;
+  align-self: flex-start;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+  transition: gap 0.3s ease, border-color 0.3s ease;
+}
+
+.cover-link:hover .cover-cta {
+  gap: 1rem;
+  border-bottom-color: rgba(255, 255, 255, 1);
+}
+
+/* ───────────────────────────────────────────────────────
+   B · Asymmetric 2-up
+   ─────────────────────────────────────────────────── */
+.asym-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.7fr);
+  gap: 2.5rem;
+  align-items: start;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 4rem;
+}
+
+.asym-main {
+  display: block;
+  text-decoration: none;
+  align-self: stretch;
+}
+
+.asym-figure {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  background-color: #EFE9DD;
+}
+
+.asym-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asym-main:hover .asym-figure img {
+  transform: scale(1.03);
+}
+
+.asym-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.asym-side .spread-cat {
+  margin-top: -0.4rem;
+}
+
+.asym-side .spread-title {
+  margin-top: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.asym-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background-color: #EFE9DD;
+  margin: 1rem 0 0.6rem;
+}
+
+.asym-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.asym-thumb:hover img {
+  transform: scale(1.03);
+}
+
+/* ───────────────────────────────────────────────────────
+   C · Centered single
+   ─────────────────────────────────────────────────── */
+.centered-spread {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2rem;
+}
+
+.centered-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.centered-rule {
+  display: block;
+  width: 28px;
+  height: 1px;
+  background-color: rgba(149, 55, 53, 0.5);
+}
+
+.centered-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #312E2D;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.centered-title em {
+  font-style: italic;
+}
+
+.centered-figure-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.centered-figure {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: #EFE9DD;
+  margin: 0;
+}
+
+.centered-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.centered-figure-link:hover .centered-figure img {
+  transform: scale(1.03);
+}
+
+.centered-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.centered-caption {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #6D6059;
+  letter-spacing: 0.005em;
+}
+
+.centered-caption em {
+  font-style: italic;
+}
+
+/* ───────────────────────────────────────────────────────
+   D · Split (text · image)
+   ─────────────────────────────────────────────────── */
+.split-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 3rem;
+  align-items: stretch;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 4rem;
+}
+
+.split-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding-right: 1rem;
+}
+
+.split-big-num {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: clamp(3rem, 6vw, 5.4rem);
+  font-weight: 400;
+  line-height: 1;
+  color: #953735;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.split-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #312E2D;
+  margin: 0.4rem 0 0.6rem 0;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.split-figure-link {
+  display: block;
+  text-decoration: none;
+  align-self: stretch;
+}
+
+.split-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  overflow: hidden;
+  background-color: #EFE9DD;
+}
+
+.split-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.split-figure-link:hover .split-figure img {
+  transform: scale(1.03);
+}
+
+/* ── Loading / empty ────────────────────────────────── */
 @keyframes quiet-pulse {
   0%, 100% { opacity: 0.2; }
   50% { opacity: 0.7; }
@@ -180,120 +776,191 @@ const activeCategory = computed(() =>
 }
 
 .loading-text {
-  font-family: 'Raleway', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   font-weight: 300;
   letter-spacing: 0.18em;
-  color: #2C2C2C;
+  color: #312E2D;
   text-transform: uppercase;
   animation: quiet-pulse 3s ease-in-out infinite;
 }
 
-.portfolio-content {
-  padding: 0.5rem 0 8rem; /* 상단 패딩 축소 (기존 2rem) */
+.empty-state {
+  padding: 4rem 4rem 8rem;
+  max-width: 1320px;
+  margin: 0 auto;
 }
 
-.category-desc {
-  white-space: pre-line;
-  margin: 0 0 1.5rem 0; /* 설명과 프로젝트 사이 여백 축소 (기존 3rem) */
-  max-width: 600px;
-}
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .mag-masthead,
+  .mag-nav,
+  .category-desc,
+  .asym-grid,
+  .centered-spread,
+  .split-grid,
+  .empty-state {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
 
-.projects-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8rem;
-}
+  .cover-overlay {
+    left: 2.5rem;
+    bottom: 2.5rem;
+  }
 
-.project-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.project-title-row {
-  display: flex;
-  align-items: baseline;
-}
-
-.project-title {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 22px;
-  font-weight: 500;
-  color: #2C2C2C;
-  margin: 0;
-}
-
-.project-gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.gallery-item {
-  aspect-ratio: 4/3;
-  background-color: #eee;
-  overflow: hidden;
-}
-
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.8s ease;
-}
-
-.gallery-item:hover img {
-  transform: scale(1.05);
-}
-
-.project-footer {
-  display: flex;
-}
-
-.view-detail-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-  font-family: 'Raleway', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: #2C2C2C;
-  text-decoration: none;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.view-detail-link:hover {
-  color: #953735;
-  border-bottom-color: #953735;
+  .cover-cat {
+    right: 2.5rem;
+    top: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .portfolio-nav {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1px;
+  .mag-masthead {
+    padding: 3rem 1.5rem 2rem;
   }
 
-  .tab-item {
-    padding: 0.75rem 1.5rem 0.75rem 0;
-    margin-right: 1.2rem;
+  .mag-nav {
+    padding: 0 1.5rem;
   }
 
-  .tab-text {
-    font-size: 12px; /* 모바일화면: 기존 크기 유지 */
+  .tab-list {
+    gap: 1.5rem;
   }
 
-  .projects-list {
-    gap: 4rem;
+  .tab-en {
+    font-size: 9px;
+    letter-spacing: 0.28em;
   }
 
-  .project-title {
-    font-size: 18px;
+  .tab-kr {
+    font-size: 13px;
+  }
+
+  .category-desc {
+    padding: 0 1.5rem;
+    margin-top: 1.4rem;
+    font-size: 13px;
+  }
+
+  .spread-list {
+    padding: 3rem 0 5rem;
+  }
+
+  .spread {
+    margin-bottom: 4.5rem;
+  }
+
+  /* A · Cover */
+  .cover-figure {
+    height: auto;
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+  }
+
+  .cover-cat {
+    top: 1rem;
+    right: 1.2rem;
+    font-size: 9px;
+    letter-spacing: 0.28em;
+  }
+
+  .cover-overlay {
+    left: 1.4rem;
+    right: 1.4rem;
+    bottom: 1.4rem;
+    gap: 0.7rem;
+  }
+
+  .cover-num {
+    font-size: 9px;
+    letter-spacing: 0.32em;
+  }
+
+  .cover-title {
+    font-size: clamp(1.4rem, 6.5vw, 2rem);
+  }
+
+  .cover-cta {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+
+  /* B · Asymmetric → stack */
+  .asym-grid {
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .asym-side {
+    padding-top: 0.4rem;
+    gap: 0.8rem;
+  }
+
+  .asym-thumb {
+    aspect-ratio: 4 / 3;
+    margin: 0.5rem 0 0.5rem;
+  }
+
+  /* C · Centered */
+  .centered-spread {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    gap: 1.3rem;
+  }
+
+  .centered-figure {
+    aspect-ratio: 4 / 3;
+  }
+
+  .centered-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .centered-caption {
+    font-size: 12px;
+  }
+
+  /* D · Split → stack */
+  .split-grid {
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .split-text {
+    padding-right: 0;
+    gap: 0.7rem;
+  }
+
+  .split-big-num {
+    font-size: clamp(2.4rem, 13vw, 3.6rem);
+  }
+
+  .split-figure {
+    min-height: 0;
+    aspect-ratio: 4 / 5;
+  }
+
+  .spread-title,
+  .split-title {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+
+  .spread-cta {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+  }
+}
+
+@media (max-width: 600px) {
+  .empty-state {
+    padding: 2rem 1.5rem 4rem;
   }
 }
 </style>

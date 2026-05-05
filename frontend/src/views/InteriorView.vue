@@ -82,7 +82,7 @@ const steps = [
 }
 
 .process-number {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;

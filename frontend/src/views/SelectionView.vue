@@ -113,7 +113,6 @@
               </div>
               <div class="archive-info">
                 <h3 class="archive-name">{{ sel.title }}</h3>
-                <button class="archive-btn">VIEW DETAILS</button>
               </div>
             </div>
           </div>
@@ -124,12 +123,67 @@
 
     <!-- Grid Exhibition View (GNB Entry)            -->
     <!-- ═══════════════════════════════════════════ -->
-    <div v-else class="global-page-container sel-grid-view">
+    <template v-else>
+      <!-- ═════ Chanel-style merchandise bar ═════ -->
+      <section class="sel-banner">
+        <img
+          src="/images/selection-bar.png"
+          alt="ATTIQUE Selection"
+          class="sel-banner-img"
+          fetchpriority="high"
+        />
+        <div class="sel-banner-vignette"></div>
+        <div class="sel-banner-overlay">
+          <div class="sel-banner-stack">
+            <span class="sel-banner-kr">셀렉션</span>
+            <h1 class="sel-banner-en">Selection</h1>
+          </div>
+        </div>
+      </section>
+
+    <div class="global-page-container sel-grid-view">
       <header class="grid-header" v-reveal>
-        <h1 class="global-eng-subtitle grid-title">Curated Living · <em>Crafted Spaces.</em></h1>
-        <p class="global-kor-desc grid-subtitle">제품당 1~2점만 입고되는 희소성 있는 셀렉션.</p>
-        <p class="global-kor-desc grid-desc" style="opacity: 0.7; margin-top: 0.5rem;">한정 수량의 수입 오브제를 한남 쇼룸에서 직접 경험해 보세요.</p>
+        <p class="global-kor-desc grid-subtitle">오랜 안목으로 골라낸, 단 한두 점의 오브제.</p>
+        <p class="global-kor-desc grid-desc" style="opacity: 0.7; margin-top: 0.5rem;">
+          미국과 유럽의 메종과 공방을 직접 찾아, 한 점씩 정성스럽게 들여옵니다.<br />
+          클래식과 모던, 빈티지와 컨템포러리가 자연스럽게 어우러지는 조합 안에서<br />
+          같은 디자인을 두 번 마주할 수 없는, 한남 쇼룸만의 셀렉션이 완성됩니다.<br /><br />
+          한 점에 깃든 시간과 손길, 한남 쇼룸에서 직접 마주하실 수 있습니다.
+        </p>
       </header>
+
+      <!-- ═════ Filter / sort toolbar (acts as boundary) ═════ -->
+      <div class="grid-toolbar" v-reveal>
+        <ul class="filter-list">
+          <li
+            class="filter-item"
+            :class="{ 'is-active': activeCategory === null }"
+            @click="activeCategory = null"
+          >
+            <span>전체</span>
+            <span class="filter-count">{{ selections.length }}</span>
+          </li>
+          <li
+            v-for="cat in allCategories"
+            :key="cat"
+            class="filter-item"
+            :class="{ 'is-active': activeCategory === cat }"
+            @click="activeCategory = cat"
+          >
+            <span>{{ cat }}</span>
+            <span class="filter-count">{{ countByCategory(cat) }}</span>
+          </li>
+        </ul>
+
+        <div class="sort-control">
+          <label for="sel-sort" class="sort-label">정렬</label>
+          <select id="sel-sort" v-model="sortMode" class="sort-select">
+            <option value="default">기본</option>
+            <option value="asc">이름순 A–Z</option>
+            <option value="desc">이름순 Z–A</option>
+          </select>
+        </div>
+      </div>
 
       <div class="grid-container">
         <!-- 로딩 중 스켈레톤 -->
@@ -142,7 +196,7 @@
 
         <!-- 실제 데이터 -->
         <div
-          v-for="(sel, i) in selections"
+          v-for="(sel, i) in displayedSelections"
           :key="sel.id"
           class="archive-item"
           v-reveal="{ delay: (i % 6) * 90 }"
@@ -153,11 +207,11 @@
           </div>
           <div class="archive-info">
             <h3 class="archive-name">{{ sel.title }}</h3>
-            <button class="archive-btn">VIEW DETAILS</button>
           </div>
         </div>
       </div>
     </div>
+    </template>
 
   </div>
 </template>
@@ -240,6 +294,37 @@ onUnmounted(() => {
 // ── 데이터 로딩 ──────────────────────────
 const selections = ref<Selection[]>([])
 const isDataLoading = ref(true)
+
+// ── Filter / sort ────────────────────────
+const activeCategory = ref<string | null>(null)
+const sortMode = ref<'default' | 'asc' | 'desc'>('default')
+
+const allCategories = computed(() => {
+  const set = new Set<string>()
+  for (const s of selections.value) {
+    if (s.category) set.add(s.category)
+  }
+  return [...set].sort()
+})
+
+function countByCategory(cat: string) {
+  return selections.value.filter(s => s.category === cat).length
+}
+
+const displayedSelections = computed(() => {
+  let items = selections.value
+  if (activeCategory.value) {
+    items = items.filter(s => s.category === activeCategory.value)
+  }
+  if (sortMode.value !== 'default') {
+    items = [...items].sort((a, b) =>
+      sortMode.value === 'asc'
+        ? a.title.localeCompare(b.title, 'ko')
+        : b.title.localeCompare(a.title, 'ko')
+    )
+  }
+  return items
+})
 
 async function loadData() {
   try {
@@ -421,7 +506,7 @@ function updateWrapWidth() {
 }
 
 .brand-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(1.6rem, 3vw, 2.6rem);
   font-weight: 400;
   font-style: italic;
@@ -477,7 +562,7 @@ function updateWrapWidth() {
 }
 
 .selection-label {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.2em;
@@ -534,9 +619,9 @@ function updateWrapWidth() {
 .archive-img-wrap {
   width: 100%;
   aspect-ratio: 4 / 5;
-  background-color: #F5F0E8;
+  background-color: #EFE9DD;
   overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .archive-img-wrap img {
@@ -551,34 +636,22 @@ function updateWrapWidth() {
 }
 
 .archive-info {
-  text-align: left;
+  text-align: center;
 }
 
 .archive-name {
-  font-family: 'Raleway', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2C2C2C;
-  margin: 0 0 0.8rem;
-}
-
-.archive-btn {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   color: #312E2D;
-  background: transparent;
-  border: 1px solid rgba(49, 46, 45, 0.2);
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
+  margin: 0;
+  line-height: 1.4;
+  transition: color 0.3s ease;
 }
 
-.archive-btn:hover {
-  background: #312E2D;
-  color: #F5F0E8;
+.archive-item:hover .archive-name {
+  color: #953735;
 }
 
 .scroll-indicator {
@@ -654,9 +727,99 @@ function updateWrapWidth() {
   .archive-img-wrap {
     margin-bottom: 0.8rem;
   }
+}
 
-  .archive-name {
-    font-size: 12px;
+/* ── Chanel-style merchandise banner ─────────────────── */
+.sel-banner {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.sel-banner-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.sel-banner-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.22) 40%,
+    rgba(0, 0, 0, 0.06) 75%,
+    transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sel-banner-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: clamp(5rem, 12vw, 11rem);
+  pointer-events: none;
+  color: #FFFFFF;
+}
+
+.sel-banner-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sel-banner-kr {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.sel-banner-en {
+  font-family: 'Inter', 'Pretendard', sans-serif;
+  font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .sel-banner {
+    height: 200px;
+  }
+
+  .sel-banner-overlay {
+    padding-left: clamp(2rem, 8vw, 4rem);
+  }
+
+  .sel-banner-stack {
+    gap: 0.4rem;
+  }
+
+  .sel-banner-kr {
+    font-size: 10px;
+    letter-spacing: 0.36em;
+  }
+
+  .sel-banner-en {
+    font-size: clamp(1.2rem, 5.5vw, 1.7rem);
   }
 }
 
@@ -666,7 +829,7 @@ function updateWrapWidth() {
 }
 
 .grid-header {
-  text-align: left;
+  text-align: center;
   margin-bottom: 5rem; /* PC에서 사진과의 여백 확보 */
 }
 
@@ -680,15 +843,151 @@ function updateWrapWidth() {
   white-space: nowrap; /* 타이틀만 줄바꿈 방지 */
 }
 
+/* ── Filter / sort toolbar ───────────────────────────── */
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(49, 46, 45, 0.12);
+  border-bottom: 1px solid rgba(49, 46, 45, 0.12);
+  margin: 3rem 0 4rem;
+  flex-wrap: wrap;
+}
+
+.filter-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+  padding: 0;
+  margin: 0;
+}
+
+.filter-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(49, 46, 45, 0.55);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.filter-item:hover {
+  color: #312E2D;
+}
+
+.filter-item.is-active {
+  color: #953735;
+  border-bottom-color: #953735;
+}
+
+.filter-count {
+  font-family: 'Inter', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: rgba(49, 46, 45, 0.4);
+}
+
+.filter-item.is-active .filter-count {
+  color: rgba(149, 55, 53, 0.6);
+}
+
+.sort-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sort-label {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(49, 46, 45, 0.55);
+}
+
+.sort-select {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: #312E2D;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(49, 46, 45, 0.2);
+  padding: 0.25rem 1.4rem 0.25rem 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23312E2D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.2rem center;
+  background-size: 10px;
+  transition: border-color 0.3s ease;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-bottom-color: #953735;
+}
+
+@media (max-width: 768px) {
+  .grid-toolbar {
+    margin: 2rem 0 2.5rem;
+    padding: 0.8rem 0;
+    gap: 0.8rem;
+  }
+
+  .filter-list {
+    gap: 1rem;
+  }
+
+  .filter-item {
+    font-size: 11px;
+  }
+
+  .filter-count {
+    font-size: 9px;
+  }
+
+  .sort-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+
+  .sort-select {
+    font-size: 11px;
+  }
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3rem 2rem;
+  gap: 4rem 1.4rem;
+}
+
+@media (min-width: 1400px) {
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4.5rem 1.2rem;
+  }
 }
 
 @media (max-width: 1024px) {
   .grid-container {
     grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 1rem;
   }
 }
 
@@ -698,7 +997,11 @@ function updateWrapWidth() {
   }
   .grid-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem 1rem;
+    gap: 2.4rem 0.7rem;
+  }
+
+  .archive-name {
+    font-size: 11px;
   }
 }
 

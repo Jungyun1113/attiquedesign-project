@@ -26,7 +26,7 @@
         </div>
 
         <div class="mt-12 fade-in-delay">
-          <button class="back-btn" @click="goBack" style="font-family: 'Montserrat', sans-serif;">
+          <button class="back-btn" @click="goBack" style="font-family: 'Montserrat', 'Pretendard', sans-serif;">
             ← Back to Selection
           </button>
         </div>
@@ -34,7 +34,7 @@
 
       <div v-else class="detail-loading">
         <p>셀렉션을 찾을 수 없습니다.</p>
-        <button class="back-btn" @click="goBack" style="font-family: 'Montserrat', sans-serif; margin-top: 1rem;">
+        <button class="back-btn" @click="goBack" style="font-family: 'Montserrat', 'Pretendard', sans-serif; margin-top: 1rem;">
           ← Back to Selection
         </button>
       </div>
@@ -138,7 +138,7 @@ function goBack() {
 }
 
 .detail-eyebrow {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -147,7 +147,7 @@ function goBack() {
 }
 
 .detail-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 400;
   color: #111;

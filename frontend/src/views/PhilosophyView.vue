@@ -30,7 +30,7 @@
         <div class="story-aside" v-reveal>
           <span class="block-label">BRAND STORY</span>
           <h2 class="story-pullquote">
-            <em>For over a decade,</em> ATTIQUE has curated spaces that live.
+            공간에 깊이를 더하는,<br /><em>아띠끄디자인.</em>
           </h2>
         </div>
         <div class="story-body" v-reveal="{ delay: 150 }">
@@ -164,7 +164,7 @@ const timeline = [
   height: calc(100vh - 140px);
   min-height: 540px;
   overflow: hidden;
-  background-color: #1a1a1a;
+  background-color: #3D1C1B;
 }
 
 .philo-hero-img {
@@ -172,7 +172,7 @@ const timeline = [
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   display: block;
 }
@@ -181,8 +181,8 @@ const timeline = [
   position: absolute;
   inset: 0;
   background: linear-gradient(to top,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.2) 38%,
+    rgba(30, 12, 11, 0.55) 0%,
+    rgba(30, 12, 11, 0.18) 38%,
     transparent 65%);
   z-index: 2;
   pointer-events: none;
@@ -195,29 +195,30 @@ const timeline = [
   z-index: 5;
   max-width: 640px;
   pointer-events: none;
-  color: #FFFFFF;
+  color: #F5F0E8;
 }
 
 .hero-kicker {
   display: inline-block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.34em;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(245, 240, 232, 0.86);
   text-transform: uppercase;
   margin-bottom: 1.4rem;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 8px rgba(30, 12, 11, 0.5);
 }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2rem, 4.4vw, 3.8rem);
   font-weight: 400;
   line-height: 1.08;
+  color: #F5F0E8;
   margin: 0 0 1.6rem 0;
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 24px rgba(30, 12, 11, 0.45);
 }
 
 .hero-title em {
@@ -231,13 +232,13 @@ const timeline = [
   align-items: center;
   gap: 1rem;
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.86);
+  color: rgba(245, 240, 232, 0.82);
   text-transform: uppercase;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 10px rgba(30, 12, 11, 0.5);
 }
 
 .hero-meta-place {
@@ -249,7 +250,7 @@ const timeline = [
   display: inline-block;
   width: 28px;
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.55);
+  background-color: rgba(245, 240, 232, 0.5);
 }
 
 .hero-meta-addr {
@@ -273,7 +274,7 @@ const timeline = [
 
 .block-label {
   display: inline-block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.34em;
@@ -302,7 +303,7 @@ const timeline = [
 }
 
 .story-pullquote {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(1.6rem, 2.6vw, 2.4rem);
   font-weight: 400;
   line-height: 1.2;
@@ -344,7 +345,7 @@ const timeline = [
 }
 
 .section-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2rem, 3.6vw, 3rem);
   font-weight: 400;
   line-height: 1.1;
@@ -444,7 +445,7 @@ const timeline = [
 }
 
 .mark-place {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.36em;
@@ -455,7 +456,7 @@ const timeline = [
 }
 
 .mark-year {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2.6rem, 5vw, 4.6rem);
   font-weight: 400;
   line-height: 1;
@@ -497,7 +498,7 @@ const timeline = [
 }
 
 .timeline-year {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-style: italic;
   font-size: 22px;
   font-weight: 400;
@@ -534,7 +535,7 @@ const timeline = [
 }
 
 .philosophy-statement {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   font-weight: 400;
   line-height: 1.1;
@@ -602,10 +603,10 @@ const timeline = [
 
 @media (max-width: 768px) {
   /* Match hero container to image aspect on mobile —
-     no crop, no letterbox. */
+     no crop, no letterbox. Building image is 1:1. */
   .philo-hero {
     height: auto;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 1 / 1;
     min-height: 0;
   }
 

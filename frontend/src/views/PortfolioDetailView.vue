@@ -125,7 +125,7 @@ onMounted(async () => {
 }
 
 .project-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(24px, 3.5vw, 44px);
   font-weight: 400;
   line-height: 1.2;

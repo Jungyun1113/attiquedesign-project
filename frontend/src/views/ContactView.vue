@@ -15,7 +15,7 @@
       <div class="hero-overlay">
         <span class="hero-kicker" v-reveal="{ delay: 100 }">CONTACT</span>
         <h1 class="hero-title" v-reveal="{ delay: 200 }">
-          Private Consultation,<br /><em>to the last thread.</em>
+          <em>Private Consultation.</em>
         </h1>
         <p class="hero-desc" v-reveal="{ delay: 400 }">
           가구와 인테리어부터 맞춤 패브릭과 러그까지,<br class="mobile-br" />
@@ -42,7 +42,7 @@
         <div class="process-split">
           <figure class="process-figure" v-reveal="{ delay: 120 }">
             <img
-              src="/images/contact/consultation-table.jpeg"
+              src="/images/contact/consultation-table.png"
               alt="Top-down view of the ATTIQUE consultation table"
               class="process-img"
               loading="lazy"
@@ -117,49 +117,42 @@
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
           </a>
-
         </div>
       </section>
 
-      <!-- ═════ Footer endcap — Showroom + Social ═════ -->
+      <!-- ═════ Minimal endcap — address + thin link row ═════ -->
       <section class="endcap" v-reveal>
-        <div class="endcap-col endcap-showroom">
-          <span class="block-label">한남 쇼룸 · SHOWROOM</span>
-          <p class="endcap-address">
-            서울시 용산구 한남대로 21길 27<br />
-            아띠끄 빌딩
-          </p>
-          <a
-            href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="directions-link"
-          >
-            <span>길찾기</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </a>
-        </div>
-
-        <div class="endcap-col endcap-social">
-          <span class="block-label">소식 받기 · FOLLOW</span>
-          <div class="social-links">
+        <p class="endcap-address">
+          <span class="endcap-place">한남 쇼룸</span>
+          <span class="endcap-sep"></span>
+          서울시 용산구 한남대로 21길 27 · 아띠끄빌딩
+        </p>
+        <ul class="endcap-links">
+          <li>
             <a
+              class="endcap-link"
+              href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
+              target="_blank"
+              rel="noopener noreferrer"
+            >지도 보기</a>
+          </li>
+          <li>
+            <a
+              class="endcap-link"
               href="https://www.instagram.com/attiquedesign?igsh=d2dmM3Awamo1aWkz"
               target="_blank"
               rel="noopener noreferrer"
-              class="social-link"
             >Instagram</a>
+          </li>
+          <li>
             <a
+              class="endcap-link"
               href="https://blog.naver.com/attique_"
               target="_blank"
               rel="noopener noreferrer"
-              class="social-link"
             >Blog</a>
-          </div>
-        </div>
+          </li>
+        </ul>
       </section>
 
     </div>
@@ -231,7 +224,7 @@ const processSteps = [
 
 .hero-kicker {
   display: inline-block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.34em;
@@ -242,7 +235,7 @@ const processSteps = [
 }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2rem, 4.2vw, 3.6rem);
   font-weight: 400;
   line-height: 1.1;
@@ -294,7 +287,7 @@ const processSteps = [
 
 .block-label {
   display: inline-block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.32em;
@@ -303,7 +296,7 @@ const processSteps = [
 }
 
 .section-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(2rem, 3.4vw, 2.8rem);
   font-weight: 400;
   line-height: 1.15;
@@ -380,7 +373,7 @@ const processSteps = [
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.28em;
@@ -450,6 +443,75 @@ const processSteps = [
   transform: translate(2px, -2px);
 }
 
+/* ── Quick enquiry — 2-up minimal Chanel cards ──────── */
+.touch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.touch-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: 1.2rem;
+  padding: 1.4rem 1.4rem;
+  background-color: #EFE9DD;
+  text-decoration: none;
+  color: #312E2D;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.touch-card:hover {
+  background-color: #312E2D;
+  color: #F5F0E8;
+}
+
+.touch-num {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #953735;
+  letter-spacing: 0.02em;
+  align-self: center;
+}
+
+.touch-name {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: inherit;
+  margin: 0;
+  line-height: 1.2;
+  align-self: center;
+}
+
+.touch-detail {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: inherit;
+  opacity: 0.7;
+  margin: 0;
+  font-weight: 400;
+  align-self: center;
+}
+
+.touch-arrow {
+  color: inherit;
+  opacity: 0.7;
+  align-self: center;
+  margin-left: 0.6rem;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.touch-card:hover .touch-arrow {
+  transform: translate(3px, -3px);
+  opacity: 1;
+}
+
 /* Numbered process list (right side) */
 .process-list {
   list-style: none;
@@ -479,7 +541,7 @@ const processSteps = [
 }
 
 .process-num {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: 18px;
   font-style: italic;
   color: #953735;
@@ -514,161 +576,83 @@ const processSteps = [
   word-break: keep-all;
 }
 
-/* ── Quick enquiry — 2-up minimal Chanel cards ──────── */
-.touch-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.touch-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  column-gap: 1.2rem;
-  padding: 1.4rem 1.4rem;
-  background-color: #EFE9DD;
-  text-decoration: none;
-  color: #312E2D;
-  transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-.touch-card:hover {
-  background-color: #312E2D;
-  color: #F5F0E8;
-}
-
-.touch-num {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: #953735;
-  letter-spacing: 0.02em;
-  align-self: center;
-}
-
-.touch-name {
-  font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: inherit;
-  margin: 0;
-  line-height: 1.2;
-  align-self: center;
-}
-
-.touch-detail {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: inherit;
-  opacity: 0.7;
-  margin: 0;
-  font-weight: 400;
-  align-self: center;
-}
-
-.touch-arrow {
-  color: inherit;
-  opacity: 0.7;
-  align-self: center;
-  margin-left: 0.6rem;
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.touch-card:hover .touch-arrow {
-  transform: translate(3px, -3px);
-  opacity: 1;
-}
-
-/* ── Endcap (Showroom + Social) ─────────────────────── */
+/* ── Endcap — minimal address + thin link row ──────── */
 .endcap {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 4rem;
-  padding-top: 4rem;
-  border-top: 1px solid #E8E2D7;
-  align-items: start;
-}
-
-.endcap-col {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
+  padding-top: 3rem;
+  border-top: 1px solid #E8E2D7;
 }
 
 .endcap-address {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  line-height: 1.45;
-  color: #312E2D;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
   margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #6D6059;
   font-weight: 400;
 }
 
-.directions-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
+.endcap-place {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: #312E2D;
-  text-decoration: none;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid #312E2D;
-  align-self: flex-start;
-  margin-top: 0.4rem;
-  transition: gap 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.directions-link:hover {
-  gap: 0.9rem;
   color: #953735;
-  border-bottom-color: #953735;
 }
 
-.endcap-social .social-links {
-  margin-top: 0.4rem;
+.endcap-sep {
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background-color: rgba(49, 46, 45, 0.25);
 }
 
-.social-links {
+.endcap-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 1.6rem;
 }
 
-.social-link {
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
-  font-style: italic;
+.endcap-link {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: #312E2D;
   text-decoration: none;
   position: relative;
+  padding-bottom: 0.25rem;
   transition: color 0.3s ease;
 }
 
-.social-link::after {
+.endcap-link::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -4px;
-  width: 0;
+  bottom: 0;
+  width: 100%;
   height: 1px;
-  background-color: #953735;
-  transition: width 0.4s ease;
+  background-color: rgba(49, 46, 45, 0.2);
+  transition: background-color 0.3s ease;
 }
 
-.social-link:hover {
+.endcap-link:hover {
   color: #953735;
 }
 
-.social-link:hover::after {
-  width: 100%;
+.endcap-link:hover::after {
+  background-color: #953735;
 }
 
 /* ── Responsive ─────────────────────────────────────── */
@@ -689,10 +673,6 @@ const processSteps = [
 
   .process-figure {
     min-height: 420px;
-  }
-
-  .endcap {
-    gap: 2.5rem;
   }
 }
 
@@ -830,15 +810,33 @@ const processSteps = [
     font-size: 10px;
   }
 
-  /* Endcap: stack */
+  /* Minimal endcap */
   .endcap {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding-top: 2.5rem;
+    gap: 1rem;
+    padding-top: 2rem;
   }
 
   .endcap-address {
-    font-size: 19px;
+    font-size: 12px;
+    gap: 0.6rem;
+  }
+
+  .endcap-place {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+  }
+
+  .endcap-sep {
+    width: 14px;
+  }
+
+  .endcap-links {
+    gap: 1.2rem;
+  }
+
+  .endcap-link {
+    font-size: 10px;
+    letter-spacing: 0.2em;
   }
 }
 

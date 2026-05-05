@@ -66,7 +66,7 @@
 }
 
 .hero-eyebrow {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3em;
@@ -75,7 +75,7 @@
 }
 
 .hero-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: clamp(36px, 6vw, 72px);
   font-weight: 400;
   letter-spacing: 0.05em;
@@ -90,7 +90,7 @@
 }
 
 .story-label {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
   font-weight: 500;
   text-transform: uppercase;

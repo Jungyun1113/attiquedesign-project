@@ -240,7 +240,7 @@ function submitQna() {
   background-color: #312E2D;
   color: #fff;
   border: none;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
