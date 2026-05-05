@@ -53,18 +53,61 @@
               <span class="figcaption-sep"></span>
               <span class="figcaption-text">프라이빗 상담 테이블</span>
             </figcaption>
-            <a
-              href="https://m.booking.naver.com/booking/6/bizes/1563733/items/7301622?area=plt&lang=ko&theme=place"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="process-cta"
-            >
-              <span class="process-cta-label">방문 예약</span>
-              <svg class="process-cta-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="7" y1="17" x2="17" y2="7"></line>
-                <polyline points="7 7 17 7 17 17"></polyline>
-              </svg>
-            </a>
+            <div class="process-actions">
+              <button
+                type="button"
+                class="process-cta process-cta-trigger"
+                :class="{ 'is-open': contactDropdownOpen }"
+                :aria-expanded="contactDropdownOpen"
+                aria-haspopup="true"
+                @click.stop="contactDropdownOpen = !contactDropdownOpen"
+              >
+                <span class="process-cta-label">예약</span>
+                <svg class="process-cta-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <transition name="dropdown">
+                <div
+                  v-show="contactDropdownOpen"
+                  class="process-dropdown"
+                  @click.stop
+                >
+                  <a
+                    href="https://m.booking.naver.com/booking/6/bizes/1563733/items/7301622?area=plt&lang=ko&theme=place"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="process-dropdown-item"
+                  >
+                    <span class="dropdown-label">방문 예약</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </a>
+                  <a href="tel:02-3443-8170" class="process-dropdown-item">
+                    <span class="dropdown-label">전화 상담</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </a>
+                  <a
+                    href="https://pf.kakao.com/_attiquedesign"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="process-dropdown-item"
+                  >
+                    <span class="dropdown-label">카카오톡</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              </transition>
+            </div>
           </figure>
 
           <ol class="process-list" v-reveal="{ delay: 200 }">
@@ -83,69 +126,75 @@
         </div>
       </section>
 
-      <!-- ═════ Quick contact — 2-up card grid (header-less) ═════ -->
-      <section class="touch-section" v-reveal>
-        <div class="touch-grid">
-          <a href="tel:02-3443-8170" class="touch-card">
-            <span class="touch-num">01</span>
-            <h3 class="touch-name">전화 상담</h3>
-            <p class="touch-detail">02-3443-8170</p>
-            <svg class="touch-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
-          </a>
-
-          <a
-            href="https://pf.kakao.com/_attiquedesign"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="touch-card"
-          >
-            <span class="touch-num">02</span>
-            <h3 class="touch-name">카카오톡 상담</h3>
-            <p class="touch-detail">@아띠끄 디자인</p>
-            <svg class="touch-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
-          </a>
-        </div>
-      </section>
-
-      <!-- ═════ Minimal endcap — address + thin link row ═════ -->
+      <!-- ═════ Endcap — Showroom block × Social block ═════ -->
       <section class="endcap" v-reveal>
-        <p class="endcap-address">
-          <span class="endcap-place">한남 쇼룸</span>
-          <span class="endcap-sep"></span>
-          서울시 용산구 한남대로 21길 27 · 아띠끄빌딩
-        </p>
-        <ul class="endcap-links">
-          <li>
-            <a
-              class="endcap-link"
-              href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
-              target="_blank"
-              rel="noopener noreferrer"
-            >지도 보기</a>
-          </li>
-          <li>
-            <a
-              class="endcap-link"
-              href="https://www.instagram.com/attiquedesign?igsh=d2dmM3Awamo1aWkz"
-              target="_blank"
-              rel="noopener noreferrer"
-            >Instagram</a>
-          </li>
-          <li>
-            <a
-              class="endcap-link"
-              href="https://blog.naver.com/attique_"
-              target="_blank"
-              rel="noopener noreferrer"
-            >Blog</a>
-          </li>
-        </ul>
+        <div class="endcap-grid">
+          <!-- Left: Showroom (address + hours + map link) -->
+          <div class="endcap-col">
+            <span class="endcap-label">한남 쇼룸 · SHOWROOM</span>
+            <p class="endcap-address">
+              서울시 용산구 한남대로 21길 27<br />아띠끄빌딩
+            </p>
+            <p class="endcap-hours">
+              평일 · 토요일 10:00 – 19:00<br />
+              예약 후 1:1 프라이빗 상담
+            </p>
+            <ul class="endcap-links">
+              <li>
+                <a
+                  class="endcap-link"
+                  href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%EC%8B%9C%20%EC%9A%A9%EC%82%B0%EA%B5%AC%20%ED%95%9C%EB%82%A8%EB%8C%80%EB%A1%9C%2021%EA%B8%B8%2027"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >지도 보기</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right: Brand social -->
+          <div class="endcap-col endcap-col-right">
+            <span class="endcap-label">소식 받기 · FOLLOW</span>
+            <p class="endcap-social-meta">
+              아띠끄 디자인의 새 프로젝트와<br />
+              셀렉션 소식을 확인하세요.
+            </p>
+            <ul class="endcap-links">
+              <li>
+                <a
+                  class="endcap-link endcap-link-icon"
+                  href="https://www.instagram.com/attiquedesign?igsh=d2dmM3Awamo1aWkz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <svg class="endcap-link-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                  <span>Instagram</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="endcap-link endcap-link-icon"
+                  href="https://blog.naver.com/attique_"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Blog"
+                >
+                  <svg class="endcap-link-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="9" y1="13" x2="16" y2="13"></line>
+                    <line x1="9" y1="17" x2="16" y2="17"></line>
+                  </svg>
+                  <span>Blog</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </section>
 
     </div>
@@ -153,6 +202,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+
 const processSteps = [
   {
     title: '프라이빗 상담',
@@ -167,6 +218,30 @@ const processSteps = [
     desc: '전문 시공팀의 꼼꼼한 시공과 아띠끄 셀렉션의 가구·소품·맞춤 패브릭/러그까지 원스톱으로 완성합니다.',
   },
 ]
+
+const contactDropdownOpen = ref(false)
+
+function handleOutsideClick(e: MouseEvent) {
+  if (!contactDropdownOpen.value) return
+  const target = e.target as HTMLElement | null
+  if (!target?.closest('.process-actions')) {
+    contactDropdownOpen.value = false
+  }
+}
+
+function handleEscape(e: KeyboardEvent) {
+  if (e.key === 'Escape') contactDropdownOpen.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick)
+  document.addEventListener('keydown', handleEscape)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutsideClick)
+  document.removeEventListener('keydown', handleEscape)
+})
 </script>
 
 <style scoped>
@@ -395,12 +470,15 @@ const processSteps = [
   text-transform: none;
 }
 
-/* Overlaid CTA on the consultation image (bottom-right) */
-.process-cta {
+/* Overlaid trigger + dropdown on the consultation image (bottom-right) */
+.process-actions {
   position: absolute;
   right: 1.4rem;
   bottom: 1.4rem;
   z-index: 4;
+}
+
+.process-cta {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
@@ -408,15 +486,22 @@ const processSteps = [
   text-decoration: none;
   background-color: rgba(255, 255, 255, 0.94);
   color: #312E2D;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  transition: background-color 0.4s ease, gap 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 .process-cta:hover {
   background-color: #7E1A2C;
   color: #FFFFFF;
-  gap: 1rem;
+}
+
+.process-cta.is-open {
+  background-color: #312E2D;
+  color: #F5F0E8;
 }
 
 .process-cta-label {
@@ -428,86 +513,68 @@ const processSteps = [
   text-transform: uppercase;
 }
 
-.process-cta-arrow {
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+.process-cta-chevron {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.process-cta:hover .process-cta-arrow {
-  transform: translate(2px, -2px);
+.process-cta.is-open .process-cta-chevron {
+  transform: rotate(-180deg);
 }
 
-/* ── Quick enquiry — inline hairline-divided rows ──────── */
-.touch-grid {
+/* Dropdown panel — pops up above the trigger */
+.process-dropdown {
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  right: 0;
+  min-width: 180px;
+  background-color: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  z-index: 5;
+}
+
+.process-dropdown-item {
   display: flex;
-  flex-direction: column;
-}
-
-.touch-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  column-gap: 1.4rem;
-  padding: 1.5rem 0.4rem;
-  background-color: transparent;
-  border-bottom: 1px solid rgba(49, 46, 45, 0.12);
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
   text-decoration: none;
   color: #312E2D;
+  border-bottom: 1px solid rgba(49, 46, 45, 0.08);
   transition: padding 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
-              color 0.3s ease,
-              background-color 0.3s ease;
+              background-color 0.3s ease,
+              color 0.3s ease;
 }
 
-.touch-card:first-child {
-  border-top: 1px solid rgba(49, 46, 45, 0.12);
+.process-dropdown-item:last-child {
+  border-bottom: none;
 }
 
-.touch-card:hover {
-  padding-left: 1.2rem;
-  padding-right: 1.2rem;
+.process-dropdown-item:hover {
+  padding-left: 1.4rem;
+  background-color: rgba(126, 26, 44, 0.08);
   color: #7E1A2C;
-  background-color: rgba(126, 26, 44, 0.03);
 }
 
-.touch-num {
-  font-family: 'Playfair Display', 'Noto Serif KR', serif;
-  font-style: italic;
-  font-size: 14px;
-  color: #7E1A2C;
-  letter-spacing: 0.02em;
-  min-width: 24px;
-}
-
-.touch-name {
+.dropdown-label {
   font-family: 'Pretendard', sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  color: inherit;
-  margin: 0;
-  line-height: 1.2;
+  letter-spacing: 0.04em;
 }
 
-.touch-detail {
-  font-family: 'Montserrat', 'Pretendard', sans-serif;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: inherit;
-  opacity: 0.7;
-  margin: 0;
-  font-weight: 400;
+/* Dropdown enter/leave transition */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.touch-arrow {
-  color: inherit;
-  opacity: 0.55;
-  margin-left: 0.4rem;
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
-              opacity 0.3s ease;
-}
-
-.touch-card:hover .touch-arrow {
-  transform: translate(3px, -3px);
-  opacity: 1;
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 /* Numbered process list (right side) */
@@ -574,51 +641,92 @@ const processSteps = [
   word-break: keep-all;
 }
 
-/* ── Endcap — minimal address + thin link row ──────── */
+/* ── Endcap — 2-col: Showroom × Social ──────────────── */
 .endcap {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
   padding-top: 3rem;
   border-top: 1px solid #E8E2D7;
 }
 
-.endcap-address {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.9rem;
-  margin: 0;
-  font-family: 'Pretendard', sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #6D6059;
-  font-weight: 400;
+.endcap-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 3rem;
+  align-items: start;
 }
 
-.endcap-place {
+.endcap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.endcap-col-right {
+  /* visual divider on the left edge */
+  padding-left: 3rem;
+  border-left: 1px solid rgba(49, 46, 45, 0.08);
+}
+
+.endcap-label {
   font-family: 'Montserrat', 'Pretendard', sans-serif;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: #7E1A2C;
 }
 
-.endcap-sep {
-  display: inline-block;
-  width: 18px;
-  height: 1px;
-  background-color: rgba(49, 46, 45, 0.25);
+.endcap-address {
+  margin: 0;
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #312E2D;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.endcap-hours {
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #6D6059;
+  font-weight: 400;
+}
+
+.endcap-social-meta {
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #6D6059;
+  font-weight: 400;
 }
 
 .endcap-links {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0.4rem 0 0;
   display: flex;
   align-items: center;
-  gap: 1.6rem;
+  gap: 1.4rem;
+}
+
+/* Icon-paired links (Instagram, Blog) */
+.endcap-link-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.endcap-link-svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.endcap-link-icon:hover .endcap-link-svg {
+  opacity: 1;
 }
 
 .endcap-link {
@@ -789,48 +897,70 @@ const processSteps = [
     line-height: 1.7;
   }
 
-  /* Touch rows: tighter on mobile */
-  .touch-card {
-    column-gap: 0.8rem;
-    padding: 1.1rem 0.4rem;
+  /* Process actions: smaller on mobile */
+  .process-actions {
+    right: 0.8rem;
+    bottom: 0.8rem;
   }
 
-  .touch-card:hover {
-    padding-left: 0.6rem;
-    padding-right: 0.6rem;
+  .process-cta {
+    padding: 0.55rem 0.85rem;
+    gap: 0.55rem;
   }
 
-  .touch-name {
-    font-size: 13px;
+  .process-cta-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
   }
 
-  .touch-detail {
-    font-size: 10px;
+  .process-cta-chevron {
+    width: 10px;
+    height: 10px;
   }
 
-  .touch-num {
+  .process-dropdown {
+    min-width: 160px;
+  }
+
+  .process-dropdown-item {
+    padding: 0.7rem 0.95rem;
+  }
+
+  .dropdown-label {
     font-size: 12px;
-    min-width: 18px;
   }
 
-  /* Minimal endcap */
+  /* Endcap: stack 2 cols vertically */
   .endcap {
-    gap: 1rem;
+    padding-top: 2.4rem;
+  }
+
+  .endcap-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .endcap-col-right {
+    padding-left: 0;
     padding-top: 2rem;
+    border-left: none;
+    border-top: 1px solid rgba(49, 46, 45, 0.08);
   }
 
-  .endcap-address {
-    font-size: 12px;
-    gap: 0.6rem;
-  }
-
-  .endcap-place {
+  .endcap-label {
     font-size: 9px;
     letter-spacing: 0.28em;
   }
 
-  .endcap-sep {
-    width: 14px;
+  .endcap-address {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .endcap-hours,
+  .endcap-social-meta {
+    font-size: 12px;
+    line-height: 1.65;
   }
 
   .endcap-links {

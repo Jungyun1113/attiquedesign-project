@@ -121,17 +121,26 @@ function handleMouseLeave() {
   refreshMenuState()
 }
 
+// Touch devices: skip the mousemove-driven hover state to avoid color flicker
+// (taps fire synthetic mousemove events that briefly trigger the inverted state).
+const isTouchOnly = typeof window !== 'undefined'
+  && window.matchMedia('(hover: none)').matches
+
 onMounted(() => {
   refreshMenuState()
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('mousemove', handleMouseMove, { passive: true })
-  document.addEventListener('mouseleave', handleMouseLeave)
+  if (!isTouchOnly) {
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    document.addEventListener('mouseleave', handleMouseLeave)
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('mousemove', handleMouseMove)
-  document.removeEventListener('mouseleave', handleMouseLeave)
+  if (!isTouchOnly) {
+    window.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseleave', handleMouseLeave)
+  }
   if (scrollFrame) cancelAnimationFrame(scrollFrame)
 })
 </script>
@@ -368,23 +377,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  /* On mobile: always solid burgundy bg + cream text/logo.
-     No hover-driven inversion (touch mousemove caused flicker). */
   .global-header {
     padding: 0;
-    background-color: #7E1A2C;
-  }
-
-  .global-header::before {
-    display: none;
-  }
-
-  .header-logo {
-    background-color: #F5F0E8 !important;
-  }
-
-  .hamburger-line {
-    background-color: #F5F0E8 !important;
   }
 
   .header-inner {

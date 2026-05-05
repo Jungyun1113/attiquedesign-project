@@ -107,41 +107,26 @@
         <div class="gallery-grid">
           <figure class="gallery-item gallery-lead" v-reveal="{ delay: 100 }">
             <img
-              src="/images/showroom-building.png"
-              alt="ATTIQUE DESIGN — Hannam showroom"
+              src="/images/home/lead.png"
+              alt="ATTIQUE DESIGN — Curated space"
               loading="lazy"
             />
-            <figcaption class="gallery-caption">
-              <span class="gallery-place">HANNAM</span>
-              <span class="gallery-sep"></span>
-              <span class="gallery-text">Showroom</span>
-            </figcaption>
           </figure>
 
           <figure class="gallery-item gallery-top" v-reveal="{ delay: 200 }">
             <img
-              src="/images/about/original_second.png"
-              alt="ATTIQUE DESIGN — Cheongdam archive"
+              src="/images/home/object.png"
+              alt="ATTIQUE DESIGN — Curated object"
               loading="lazy"
             />
-            <figcaption class="gallery-caption">
-              <span class="gallery-place">CHEONGDAM</span>
-              <span class="gallery-sep"></span>
-              <span class="gallery-text">Archive</span>
-            </figcaption>
           </figure>
 
           <figure class="gallery-item gallery-bottom" v-reveal="{ delay: 300 }">
             <img
-              src="/images/contact/consultation-table.png"
-              alt="ATTIQUE DESIGN — Consultation table"
+              src="/images/home/hand.png"
+              alt="ATTIQUE DESIGN — Craft moment"
               loading="lazy"
             />
-            <figcaption class="gallery-caption">
-              <span class="gallery-place">PRIVATE</span>
-              <span class="gallery-sep"></span>
-              <span class="gallery-text">Consultation</span>
-            </figcaption>
           </figure>
         </div>
       </section>
@@ -782,8 +767,7 @@ function updateWrapWidth() {
   max-width: 1320px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
-  grid-template-rows: auto auto;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   gap: 1.2rem;
 }
 
@@ -795,17 +779,20 @@ function updateWrapWidth() {
   background-color: #EFE9DD;
 }
 
+/* Top-left: lead portrait — anchors the row height */
 .gallery-lead {
-  grid-row: 1 / span 2;
   aspect-ratio: 4 / 5;
 }
 
+/* Top-right: object — stretches to match lead's height */
 .gallery-top {
-  aspect-ratio: 16 / 11;
+  /* no aspect-ratio — fills the grid row height (= lead height) */
 }
 
+/* Bottom: full-width cinematic band */
 .gallery-bottom {
-  aspect-ratio: 16 / 11;
+  grid-column: 1 / -1;
+  aspect-ratio: 21 / 9;
 }
 
 .gallery-item img {
@@ -821,17 +808,7 @@ function updateWrapWidth() {
   transform: scale(1.03);
 }
 
-.gallery-item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top,
-    rgba(0, 0, 0, 0.48) 0%,
-    rgba(0, 0, 0, 0.12) 38%,
-    transparent 65%);
-  pointer-events: none;
-  z-index: 2;
-}
+/* Vignette removed — no captions to backdrop */
 
 .gallery-caption {
   position: absolute;
@@ -1279,13 +1256,16 @@ function updateWrapWidth() {
   }
 
   .gallery-lead {
-    grid-row: auto;
     aspect-ratio: 4 / 5;
   }
 
-  .gallery-top,
-  .gallery-bottom {
+  .gallery-top {
     aspect-ratio: 4 / 3;
+  }
+
+  .gallery-bottom {
+    grid-column: auto;
+    aspect-ratio: 16 / 9;
   }
 
   .gallery-caption {
