@@ -30,7 +30,7 @@
         <div class="story-aside" v-reveal>
           <span class="block-label">BRAND STORY</span>
           <h2 class="story-pullquote">
-            공간에 깊이를 더하는,<br /><em>아띠끄디자인.</em>
+            공간에 깊이를 더하는,<br /><em>아띠끄 디자인.</em>
           </h2>
         </div>
         <div class="story-body" v-reveal="{ delay: 150 }">
@@ -278,7 +278,7 @@ const timeline = [
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.34em;
-  color: #953735;
+  color: #9B1B30;
   text-transform: uppercase;
 }
 
@@ -315,7 +315,7 @@ const timeline = [
 
 .story-pullquote em {
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: inherit;
 }
 
@@ -356,7 +356,7 @@ const timeline = [
 
 .section-title em {
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: inherit;
 }
 
@@ -507,7 +507,7 @@ const timeline = [
 }
 
 .timeline-item.is-highlight .timeline-year {
-  color: #953735;
+  color: #9B1B30;
 }
 
 .timeline-event {
@@ -546,7 +546,7 @@ const timeline = [
 
 .philosophy-statement em {
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: inherit;
 }
 
@@ -564,7 +564,7 @@ const timeline = [
   display: block;
   width: 40px;
   height: 1px;
-  background-color: #953735;
+  background-color: #9B1B30;
   opacity: 0.5;
   margin: 1.4rem 0;
 }

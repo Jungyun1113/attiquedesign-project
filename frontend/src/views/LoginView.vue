@@ -2,7 +2,7 @@
   <div class="container-page section-gap max-w-md mx-auto">
     <div class="text-center mb-10">
       <h1 class="font-serif text-3xl mb-2">로그인</h1>
-      <p class="text-sm text-secondary">아띠끄디자인에 오신 것을 환영합니다.</p>
+      <p class="text-sm text-secondary">아띠끄 디자인에 오신 것을 환영합니다.</p>
     </div>
 
     <form @submit.prevent="handleLogin" class="space-y-1">

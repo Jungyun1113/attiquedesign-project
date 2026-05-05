@@ -169,7 +169,7 @@ onUnmounted(() => {
 .global-header.is-hovered,
 .global-header.is-solid,
 .global-header.is-mobile-open {
-  background-color: #953735;
+  background-color: #9B1B30;
   border-bottom-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -241,7 +241,7 @@ onUnmounted(() => {
   display: block;
   height: 80px;
   aspect-ratio: 990 / 495;
-  background-color: #953735;
+  background-color: #9B1B30;
   -webkit-mask-image: url('/logo-text.svg');
   mask-image: url('/logo-text.svg');
   -webkit-mask-repeat: no-repeat;
@@ -277,7 +277,7 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
-  color: #953735;
+  color: #9B1B30;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
@@ -344,7 +344,7 @@ onUnmounted(() => {
   display: block;
   width: 24px;
   height: 2px;
-  background-color: #953735;
+  background-color: #9B1B30;
   transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
   transform-origin: center;
   border-radius: 1px;
@@ -368,8 +368,23 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  /* On mobile: always solid burgundy bg + cream text/logo.
+     No hover-driven inversion (touch mousemove caused flicker). */
   .global-header {
     padding: 0;
+    background-color: #9B1B30;
+  }
+
+  .global-header::before {
+    display: none;
+  }
+
+  .header-logo {
+    background-color: #F5F0E8 !important;
+  }
+
+  .hamburger-line {
+    background-color: #F5F0E8 !important;
   }
 
   .header-inner {
@@ -404,7 +419,7 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     width: 100%;
-    background-color: #953735;
+    background-color: #9B1B30;
     overflow: hidden;
     max-height: 0;
     opacity: 0;

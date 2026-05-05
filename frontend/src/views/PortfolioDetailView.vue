@@ -112,7 +112,7 @@ onMounted(async () => {
 }
 
 .back-link:hover {
-  color: #953735;
+  color: #9B1B30;
 }
 
 .back-arrow {
@@ -227,13 +227,13 @@ onMounted(async () => {
   text-transform: uppercase;
   text-decoration: none;
   color: #F9F8F6;
-  background-color: #953735;
+  background-color: #9B1B30;
   padding: 16px 40px;
   transition: background-color 0.3s ease, letter-spacing 0.3s ease;
 }
 
 .cta-button:hover {
-  background-color: #953735;
+  background-color: #9B1B30;
   letter-spacing: 0.34em;
 }
 

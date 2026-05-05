@@ -84,7 +84,7 @@
         <div class="intro-inner">
           <span class="intro-kicker">ATTIQUE DESIGN</span>
           <h2 class="intro-title">
-            공간에 깊이를 더하는,<br /><em>아띠끄디자인.</em>
+            공간에 깊이를 더하는,<br /><em>아띠끄 디자인.</em>
           </h2>
           <p class="intro-body">
             한남 쇼룸을 거점으로 인테리어 시공과 가구·소품 큐레이션을<br />
@@ -146,16 +146,66 @@
         </div>
       </section>
 
-      <!-- ── 섹션 3: 제품 슬라이더 (스크롤해야 보임) ── -->
+      <!-- ═════ Curation process — text + CTA to grid ═════ -->
+      <section class="sec-curation" v-reveal>
+        <div class="curation-inner">
+          <span class="curation-kicker">SELECTION</span>
+          <h2 class="curation-title">
+            엄선된 셀렉션,<br /><em>아띠끄 디자인의 시선.</em>
+          </h2>
+          <p class="curation-body">
+            해외 메종과 공방에서 직접 엄선한 가구와 오브제.<br /><br />
+            한남 쇼룸의 1:1 프라이빗 컨설테이션을 통해 고객의 라이프스타일을 깊이 이해한 후,<br />
+            선별된 셀렉션과 맞춤 시공으로 공간을 완성합니다.
+          </p>
+          <p class="curation-closer">
+            큐레이션 · 컨설테이션 · 시공, 한자리에서.
+          </p>
+          <router-link to="/selection?view=grid" class="curation-cta">
+            <span>View All Selection</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </router-link>
+        </div>
+      </section>
+
+      <!-- ── 섹션 3: 제품 슬라이더 (refined Chanel-style) ── -->
       <section class="sec-selection">
         <div class="selection-header" v-reveal>
-          <span class="selection-spacer"></span>
-          <p class="selection-label">ATTIQUE SELECTION</p>
+          <span class="selection-counter" v-if="selections.length">
+            <span class="counter-current">{{ formattedSlideIndex }}</span>
+            <span class="counter-divider"></span>
+            <span class="counter-total">{{ formattedSlideTotal }}</span>
+          </span>
+          <span v-else class="selection-counter selection-counter-placeholder">— / —</span>
           <div class="selection-arrows">
-            <button class="arrow-btn" :disabled="prodOffset === 0" @click="prodPrev">&#8249;</button>
-            <button class="arrow-btn" :disabled="prodOffset >= maxOffset" @click="prodNext">&#8250;</button>
+            <button
+              class="arrow-btn"
+              :disabled="prodOffset === 0"
+              @click="prodPrev"
+              aria-label="Previous"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <button
+              class="arrow-btn"
+              :disabled="prodOffset >= maxOffset"
+              @click="prodNext"
+              aria-label="Next"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
+
         <div class="prod-slider-wrap" ref="sliderWrapRef">
           <div class="prod-track" :style="trackStyle">
             <!-- 로딩 중 스켈레톤 -->
@@ -182,6 +232,19 @@
                 <h3 class="archive-name">{{ sel.title }}</h3>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Hermès-style thin progress track -->
+        <div class="prod-progress" v-if="selections.length > 1">
+          <div class="prod-progress-track">
+            <div
+              class="prod-progress-bar"
+              :style="{
+                width: progressBarWidth + '%',
+                left: progressBarLeft + '%'
+              }"
+            ></div>
           </div>
         </div>
       </section>
@@ -438,6 +501,24 @@ const itemStyle = computed(() => {
   return { width: `${itemW}px` }
 })
 
+// ── Slider counter / progress ──────────────
+const formattedSlideIndex = computed(() =>
+  String(prodOffset.value + 1).padStart(2, '0')
+)
+const formattedSlideTotal = computed(() =>
+  String(selections.value.length).padStart(2, '0')
+)
+const progressBarWidth = computed(() => {
+  const total = selections.value.length
+  if (total === 0) return 0
+  return (itemsPerView.value / total) * 100
+})
+const progressBarLeft = computed(() => {
+  const total = selections.value.length
+  if (total === 0) return 0
+  return (prodOffset.value / total) * 100
+})
+
 function prodPrev() {
   prodOffset.value = Math.max(0, prodOffset.value - 1)
 }
@@ -637,7 +718,7 @@ function updateWrapWidth() {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.34em;
-  color: #953735;
+  color: #9B1B30;
   text-transform: uppercase;
 }
 
@@ -654,7 +735,7 @@ function updateWrapWidth() {
 
 .intro-title em {
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: inherit;
 }
 
@@ -687,8 +768,8 @@ function updateWrapWidth() {
 
 .intro-link:hover {
   gap: 1rem;
-  color: #953735;
-  border-bottom-color: #953735;
+  color: #9B1B30;
+  border-bottom-color: #9B1B30;
 }
 
 /* ── Editorial gallery — 3-up asymmetric ─────────────── */
@@ -789,6 +870,92 @@ function updateWrapWidth() {
   text-transform: none;
 }
 
+/* ── Curation process section ────────────────────────── */
+.sec-curation {
+  background-color: #F5F0E8;
+  padding: 5rem 4rem 4rem;
+  border-top: 1px solid rgba(49, 46, 45, 0.08);
+}
+
+.curation-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.curation-kicker {
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  color: #9B1B30;
+  text-transform: uppercase;
+}
+
+.curation-title {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: #312E2D;
+  margin: 0.2rem 0 0;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.curation-title em {
+  font-style: italic;
+  color: #9B1B30;
+  font-weight: inherit;
+}
+
+.curation-body {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #555250;
+  margin: 0.6rem 0 0;
+  font-weight: 400;
+  word-break: keep-all;
+}
+
+.curation-closer {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #6D6059;
+  margin: 0.4rem 0 0;
+  letter-spacing: 0.005em;
+  word-break: keep-all;
+}
+
+.curation-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.6rem;
+  font-family: 'Montserrat', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #F5F0E8;
+  background-color: #312E2D;
+  text-decoration: none;
+  padding: 0.95rem 1.6rem;
+  transition: background-color 0.4s ease, gap 0.3s ease;
+}
+
+.curation-cta:hover {
+  background-color: #9B1B30;
+  gap: 1rem;
+}
+
 .sec-selection {
   padding: 1.5rem 8% 6rem; /* 상단 여백을 5rem -> 1.5rem으로 대폭 축소 */
   background-color: #F5F0E8;
@@ -798,47 +965,112 @@ function updateWrapWidth() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: 2.4rem;
 }
 
-.selection-label {
-  font-family: 'Montserrat', 'Pretendard', sans-serif;
+/* ── Editorial slide counter (Hermès-style) ── */
+.selection-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: 'Inter', 'Pretendard', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: #312E2D;
+}
+
+.counter-current {
+  font-family: 'Playfair Display', 'Noto Serif KR', serif;
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 400;
+  color: #312E2D;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.counter-divider {
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  background-color: rgba(49, 46, 45, 0.35);
+}
+
+.counter-total {
+  font-family: 'Inter', 'Pretendard', sans-serif;
+  font-style: normal;
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  color: #888780;
-  text-transform: uppercase;
-  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: rgba(49, 46, 45, 0.55);
 }
 
+.selection-counter-placeholder {
+  font-family: 'Inter', 'Pretendard', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: rgba(49, 46, 45, 0.4);
+}
+
+/* ── Refined arrow controls ── */
 .selection-arrows {
   display: flex;
   gap: 8px;
 }
 
 .arrow-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  color: #2C2C2A;
+  color: #312E2D;
   background: transparent;
-  border: 1px solid rgba(44, 44, 42, 0.15);
+  border: 1px solid rgba(49, 46, 45, 0.2);
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s ease;
+  padding: 0;
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, opacity 0.3s ease;
 }
 
 .arrow-btn:hover:not(:disabled) {
-  background: #2C2C2A;
+  background-color: #312E2D;
   color: #F5F0E8;
-  border-color: #2C2C2A;
+  border-color: #312E2D;
 }
 
 .arrow-btn:disabled {
-  opacity: 0.2;
+  opacity: 0.3;
   cursor: default;
+}
+
+.arrow-btn svg {
+  display: block;
+}
+
+/* ── Hermès-style progress track below slider ── */
+.prod-progress {
+  margin-top: 2rem;
+  padding: 0 2px;
+}
+
+.prod-progress-track {
+  position: relative;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(49, 46, 45, 0.12);
+  overflow: hidden;
+}
+
+.prod-progress-bar {
+  position: absolute;
+  top: 0;
+  height: 1px;
+  background-color: #312E2D;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+              left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  min-width: 24px;
 }
 
 .prod-slider-wrap {
@@ -896,7 +1128,7 @@ function updateWrapWidth() {
 }
 
 .archive-item:hover .archive-name {
-  color: #953735;
+  color: #9B1B30;
 }
 
 .scroll-indicator {
@@ -1000,6 +1232,40 @@ function updateWrapWidth() {
     font-size: 10px;
     letter-spacing: 0.22em;
     margin-top: 0.8rem;
+  }
+
+  /* Curation section */
+  .sec-curation {
+    padding: 3.5rem 1.5rem 3rem;
+  }
+
+  .curation-inner {
+    gap: 1rem;
+  }
+
+  .curation-kicker {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+  }
+
+  .curation-title {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+  }
+
+  .curation-body {
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .curation-closer {
+    font-size: 14px;
+  }
+
+  .curation-cta {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    padding: 0.85rem 1.4rem;
+    margin-top: 1.2rem;
   }
 
   /* Gallery: stack to single column */
@@ -1196,8 +1462,8 @@ function updateWrapWidth() {
 }
 
 .filter-item.is-active {
-  color: #953735;
-  border-bottom-color: #953735;
+  color: #9B1B30;
+  border-bottom-color: #9B1B30;
 }
 
 .filter-count {
@@ -1209,7 +1475,7 @@ function updateWrapWidth() {
 }
 
 .filter-item.is-active .filter-count {
-  color: rgba(149, 55, 53, 0.6);
+  color: rgba(155, 27, 48, 0.6);
 }
 
 .sort-control {
@@ -1249,7 +1515,7 @@ function updateWrapWidth() {
 
 .sort-select:focus {
   outline: none;
-  border-bottom-color: #953735;
+  border-bottom-color: #9B1B30;
 }
 
 @media (max-width: 768px) {

@@ -83,15 +83,8 @@
         </div>
       </section>
 
-      <!-- ═════ 빠른 문의 — 2-up card grid ═════ -->
+      <!-- ═════ Quick contact — 2-up card grid (header-less) ═════ -->
       <section class="touch-section" v-reveal>
-        <header class="section-head">
-          <span class="block-label">빠른 문의 · QUICK ENQUIRY</span>
-          <h2 class="section-title">
-            가장 편한 방법으로 <em>닿아주세요.</em>
-          </h2>
-        </header>
-
         <div class="touch-grid">
           <a href="tel:02-3443-8170" class="touch-card">
             <span class="touch-num">01</span>
@@ -111,7 +104,7 @@
           >
             <span class="touch-num">02</span>
             <h3 class="touch-name">카카오톡 상담</h3>
-            <p class="touch-detail">@아띠끄디자인</p>
+            <p class="touch-detail">@아띠끄 디자인</p>
             <svg class="touch-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="7" y1="17" x2="17" y2="7"></line>
               <polyline points="7 7 17 7 17 17"></polyline>
@@ -291,7 +284,7 @@ const processSteps = [
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.32em;
-  color: #953735;
+  color: #9B1B30;
   text-transform: uppercase;
 }
 
@@ -308,7 +301,7 @@ const processSteps = [
 
 .section-title em {
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: inherit;
 }
 
@@ -421,7 +414,7 @@ const processSteps = [
 }
 
 .process-cta:hover {
-  background-color: #953735;
+  background-color: #9B1B30;
   color: #FFFFFF;
   gap: 1rem;
 }
@@ -443,68 +436,73 @@ const processSteps = [
   transform: translate(2px, -2px);
 }
 
-/* ── Quick enquiry — 2-up minimal Chanel cards ──────── */
+/* ── Quick enquiry — inline hairline-divided rows ──────── */
 .touch-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .touch-card {
-  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: baseline;
-  column-gap: 1.2rem;
-  padding: 1.4rem 1.4rem;
-  background-color: #EFE9DD;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  column-gap: 1.4rem;
+  padding: 1.5rem 0.4rem;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(49, 46, 45, 0.12);
   text-decoration: none;
   color: #312E2D;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: padding 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              color 0.3s ease,
+              background-color 0.3s ease;
+}
+
+.touch-card:first-child {
+  border-top: 1px solid rgba(49, 46, 45, 0.12);
 }
 
 .touch-card:hover {
-  background-color: #312E2D;
-  color: #F5F0E8;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  color: #9B1B30;
+  background-color: rgba(155, 27, 48, 0.03);
 }
 
 .touch-num {
   font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-style: italic;
-  font-size: 13px;
-  color: #953735;
+  font-size: 14px;
+  color: #9B1B30;
   letter-spacing: 0.02em;
-  align-self: center;
+  min-width: 24px;
 }
 
 .touch-name {
   font-family: 'Pretendard', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: inherit;
   margin: 0;
   line-height: 1.2;
-  align-self: center;
 }
 
 .touch-detail {
   font-family: 'Montserrat', 'Pretendard', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   color: inherit;
   opacity: 0.7;
   margin: 0;
   font-weight: 400;
-  align-self: center;
 }
 
 .touch-arrow {
   color: inherit;
-  opacity: 0.7;
-  align-self: center;
-  margin-left: 0.6rem;
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  opacity: 0.55;
+  margin-left: 0.4rem;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+              opacity 0.3s ease;
 }
 
 .touch-card:hover .touch-arrow {
@@ -544,7 +542,7 @@ const processSteps = [
   font-family: 'Playfair Display', 'Noto Serif KR', serif;
   font-size: 18px;
   font-style: italic;
-  color: #953735;
+  color: #9B1B30;
   font-weight: 400;
   min-width: 32px;
   padding-top: 0.05rem;
@@ -604,7 +602,7 @@ const processSteps = [
   font-weight: 600;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: #953735;
+  color: #9B1B30;
 }
 
 .endcap-sep {
@@ -648,11 +646,11 @@ const processSteps = [
 }
 
 .endcap-link:hover {
-  color: #953735;
+  color: #9B1B30;
 }
 
 .endcap-link:hover::after {
-  background-color: #953735;
+  background-color: #9B1B30;
 }
 
 /* ── Responsive ─────────────────────────────────────── */
@@ -791,15 +789,15 @@ const processSteps = [
     line-height: 1.7;
   }
 
-  /* Touch grid: stack */
-  .touch-grid {
-    grid-template-columns: 1fr;
-    gap: 0.7rem;
+  /* Touch rows: tighter on mobile */
+  .touch-card {
+    column-gap: 0.8rem;
+    padding: 1.1rem 0.4rem;
   }
 
-  .touch-card {
-    column-gap: 0.9rem;
-    padding: 1.1rem 1.1rem;
+  .touch-card:hover {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
   }
 
   .touch-name {
@@ -808,6 +806,11 @@ const processSteps = [
 
   .touch-detail {
     font-size: 10px;
+  }
+
+  .touch-num {
+    font-size: 12px;
+    min-width: 18px;
   }
 
   /* Minimal endcap */

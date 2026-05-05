@@ -95,7 +95,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: #953735;
+  color: #9B1B30;
   margin-bottom: 1.5rem;
 }
 

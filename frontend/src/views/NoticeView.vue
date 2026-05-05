@@ -134,11 +134,11 @@ function submitQna() {
 }
 
 .tab-item.is-active {
-  border-bottom-color: #953735;
+  border-bottom-color: #9B1B30;
 }
 
 .tab-item.is-active .tab-text {
-  color: #953735;
+  color: #9B1B30;
   font-weight: 600;
 }
 
@@ -164,7 +164,7 @@ function submitQna() {
 .item-tag {
   font-size: 10px;
   font-weight: 600;
-  color: #953735;
+  color: #9B1B30;
   letter-spacing: 0.1em;
 }
 
@@ -249,7 +249,7 @@ function submitQna() {
 }
 
 .btn-submit:hover {
-  background-color: #953735;
+  background-color: #9B1B30;
 }
 
 .text-center { text-align: center; }

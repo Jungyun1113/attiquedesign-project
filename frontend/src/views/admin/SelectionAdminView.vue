@@ -491,16 +491,16 @@ onMounted(loadSelections)
   font-weight: 500;
 }
 .btn-save-selection-order.active { 
-  background: #953735; 
+  background: #9B1B30; 
   color: #fff; 
-  border-color: #953735; 
+  border-color: #9B1B30; 
   cursor: pointer; 
-  box-shadow: 0 2px 6px rgba(149, 55, 53, 0.2);
+  box-shadow: 0 2px 6px rgba(155, 27, 48, 0.2);
 }
 .btn-save-selection-order.active:hover { 
   background: #7a2d2b; 
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(149, 55, 53, 0.3);
+  box-shadow: 0 4px 12px rgba(155, 27, 48, 0.3);
 }
 .btn-save-selection-order.active:active {
   transform: translateY(0);
@@ -518,7 +518,7 @@ onMounted(loadSelections)
 .project-item.is-dragging { 
   opacity: 0.9; 
   background-color: #F5F0E8 !important; 
-  border: 1px dashed #953735;
+  border: 1px dashed #9B1B30;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   transform: scale(1.02);
   z-index: 10;
@@ -537,7 +537,7 @@ onMounted(loadSelections)
   user-select: none;
 }
 .project-item:hover .drag-handle { 
-  color: #953735; 
+  color: #9B1B30; 
 }
 .drag-handle:active { 
   cursor: grabbing; 
