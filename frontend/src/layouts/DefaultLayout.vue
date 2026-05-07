@@ -30,7 +30,7 @@
               <div class="social-links">
                 <a href="https://instagram.com/attiquedesign" target="_blank">Instagram</a>
                 <a href="https://blog.naver.com/attique_" target="_blank">Blog</a>
-                <a href="https://pf.kakao.com/_attiquedesign" target="_blank">KakaoTalk</a>
+                <a href="http://pf.kakao.com/_ffbxbX/chat" target="_blank">KakaoTalk</a>
               </div>
             </div>
           </div>
