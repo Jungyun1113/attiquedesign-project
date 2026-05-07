@@ -34,6 +34,7 @@ def _serialize_portfolio(session, p: Portfolio) -> dict:
         "title": p.title,
         "description": p.description,
         "cover_image_url": get_image_display_url(p.cover_image_url) if p.cover_image_url else None,
+        "photo_credit": p.photo_credit,
         "images": [_img_dict(img) for img in images],
     }
 
@@ -84,6 +85,7 @@ def list_portfolios():
                     "title": p.title,
                     "description": p.description,
                     "cover_image_url": get_image_display_url(p.cover_image_url) if p.cover_image_url else None,
+                    "photo_credit": p.photo_credit,
                     "images": [_img_dict(img) for img in images_by_portfolio.get(str(p.id), [])],
                 }
                 for p in items
@@ -137,7 +139,7 @@ def create_portfolio():
 def patch_portfolio(portfolio_id):
     try:
         body = portfolios_bp.current_request.json_body or {}
-        allowed = {"category", "title", "description", "cover_image_url"}
+        allowed = {"category", "title", "description", "cover_image_url", "photo_credit"}
         data = {k: v for k, v in body.items() if k in allowed}
 
         with get_session() as session:

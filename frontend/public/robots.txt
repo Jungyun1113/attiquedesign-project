@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /mypage
+Disallow: /cart
+Allow: /
+
+Sitemap: https://attiquedesign.com/sitemap.xml

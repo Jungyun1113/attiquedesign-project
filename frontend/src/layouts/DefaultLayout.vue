@@ -41,6 +41,11 @@
             <p>(주) 아띠끄 디자인 | 대표이사 홍민영 | 사업자등록번호 116-01-39525</p>
             <p>주소: 서울시 용산구 한남대로 21길 27 | 개인정보관리책임자: 홍민영</p>
           </div>
+          <div class="footer-legal-links">
+            <RouterLink to="/privacy">개인정보처리방침</RouterLink>
+            <span class="footer-legal-divider">|</span>
+            <RouterLink to="/terms">이용약관</RouterLink>
+          </div>
           <p class="copyright">© 2026 ATTIQUE DESIGN. All rights reserved.</p>
         </div>
       </div>
@@ -167,6 +172,31 @@
   opacity: 0.5;
   margin: 0;
   letter-spacing: -0.01em;
+}
+
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.footer-legal-links a {
+  font-size: 10px;
+  color: #F1EFE7;
+  opacity: 0.55;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.footer-legal-links a:hover {
+  opacity: 1;
+}
+
+.footer-legal-divider {
+  font-size: 10px;
+  opacity: 0.3;
+  color: #F1EFE7;
 }
 
 .copyright {

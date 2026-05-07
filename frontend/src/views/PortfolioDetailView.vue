@@ -42,6 +42,11 @@
           </div>
         </section>
 
+        <div v-if="portfolio.photo_credit" class="photo-credit">
+          <span class="photo-credit-label">Photo</span>
+          <span class="photo-credit-text">{{ portfolio.photo_credit }}</span>
+        </div>
+
         <footer class="detail-cta">
           <div class="cta-divider"></div>
           <p class="cta-eyebrow">이 공간이 마음에 드신다면.</p>
@@ -194,6 +199,28 @@ onMounted(async () => {
 
 .gallery-grid-item:hover .gallery-grid-image {
   transform: scale(1.03);
+}
+
+.photo-credit {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+}
+
+.photo-credit-label {
+  font-family: 'Raleway', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(49, 46, 45, 0.4);
+}
+
+.photo-credit-text {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 11px;
+  color: rgba(49, 46, 45, 0.5);
 }
 
 .detail-cta {

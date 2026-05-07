@@ -199,6 +199,10 @@
           <label>설명 (선택)</label>
           <textarea v-model="editDescription" rows="3"></textarea>
         </div>
+        <div class="field">
+          <label>사진 출처 (선택)</label>
+          <input v-model="editPhotoCredit" type="text" placeholder="예: © 행복이 가득한 집 / KBS 드라마 제작팀" />
+        </div>
         <p v-if="editError" class="error-msg">{{ editError }}</p>
         <div class="modal-actions">
           <button class="btn-cancel" @click="showEditModal = false">취소</button>
@@ -224,7 +228,7 @@ const CATEGORIES = [
 ]
 
 interface PortfolioImage { id: string; image_url: string; display_order: number }
-interface Portfolio { id: string; title: string; category: string; description: string | null; cover_image_url: string | null; images: PortfolioImage[] }
+interface Portfolio { id: string; title: string; category: string; description: string | null; cover_image_url: string | null; photo_credit: string | null; images: PortfolioImage[] }
 
 const selectedCategory = ref('residential')
 const portfolios = ref<Portfolio[]>([])
@@ -342,6 +346,7 @@ const editingPortfolio = ref<Portfolio | null>(null)
 const editTitle = ref('')
 const editDescription = ref('')
 const editCategory = ref('')
+const editPhotoCredit = ref('')
 const editing = ref(false)
 const editError = ref('')
 
@@ -508,6 +513,7 @@ function openEditModal(p: Portfolio) {
   editTitle.value = p.title
   editDescription.value = p.description ?? ''
   editCategory.value = p.category
+  editPhotoCredit.value = p.photo_credit ?? ''
   editError.value = ''
   showEditModal.value = true
 }
@@ -522,6 +528,7 @@ async function patchPortfolio() {
       title: editTitle.value.trim(),
       description: editDescription.value.trim() || null,
       category: editCategory.value,
+      photo_credit: editPhotoCredit.value.trim() || null,
     })
     showEditModal.value = false
     await loadPortfolios(selectedCategory.value)

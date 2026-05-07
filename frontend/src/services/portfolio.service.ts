@@ -12,6 +12,7 @@ export interface Portfolio {
   title: string
   description: string | null
   cover_image_url: string | null
+  photo_credit: string | null
   images: PortfolioImage[]
 }
 

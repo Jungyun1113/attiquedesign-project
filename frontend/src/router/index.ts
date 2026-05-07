@@ -49,6 +49,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'register', name: 'Register', component: () => import('@/views/RegisterView.vue') },
       { path: 'mypage', name: 'MyPage', component: () => import('@/views/MyPageView.vue') },
       { path: 'brand', name: 'Brand', component: () => import('@/views/BrandView.vue') },
+      { path: 'privacy', name: 'Privacy', component: () => import('@/views/PrivacyView.vue') },
+      { path: 'terms', name: 'Terms', component: () => import('@/views/TermsView.vue') },
     ],
   },
 
