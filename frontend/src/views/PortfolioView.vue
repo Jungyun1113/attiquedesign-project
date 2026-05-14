@@ -235,7 +235,7 @@ const catLabel = (catId: string) => (catId ?? '').toUpperCase()
 const catKr = (catId: string) =>
   categories.value.find(c => c.id === catId)?.name ?? ''
 const firstImg = (p: Portfolio) =>
-  p.images[0]?.image_url ?? p.cover_image_url ?? ''
+  p.cover_image_url ?? p.images[0]?.image_url ?? ''
 const secondImg = (p: Portfolio) =>
   p.images[1]?.image_url ?? ''
 </script>

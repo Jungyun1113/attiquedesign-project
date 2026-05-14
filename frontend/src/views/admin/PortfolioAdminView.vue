@@ -144,9 +144,11 @@
                 @dragover.prevent="onDragOver(idx)"
                 @dragend="onDragEnd"
               >
-                <span v-if="idx === 0" class="main-badge">메인</span>
+                <span v-if="isCoverImage(img)" class="cover-badge">대표</span>
+                <span v-else-if="idx === 0 && !selectedPortfolio?.cover_image_url" class="main-badge">메인</span>
                 <span class="order-badge">{{ idx + 1 }}</span>
                 <img :src="img.image_url" :alt="`이미지 ${idx + 1}`" />
+                <button class="btn-set-cover" :class="{ active: isCoverImage(img) }" @click="setCoverImage(img)" title="대표 사진으로 설정">★</button>
                 <button class="btn-delete-img" @click="deleteImage(img.id)" title="삭제">✕</button>
               </div>
             </div>
@@ -471,6 +473,21 @@ async function uploadImages() {
   }
 }
 
+function isCoverImage(img: PortfolioImage) {
+  return selectedPortfolio.value?.cover_image_url === img.image_url
+}
+
+async function setCoverImage(img: PortfolioImage) {
+  if (!selectedPortfolio.value) return
+  const newCover = isCoverImage(img) ? null : img.image_url
+  try {
+    await api.patch(`/portfolios/${selectedPortfolio.value.id}`, { cover_image_url: newCover })
+    await selectPortfolio(selectedPortfolio.value)
+  } catch {
+    alert('대표 사진 설정 실패')
+  }
+}
+
 async function deleteImage(imageId: string) {
   if (!selectedPortfolio.value) return
   if (!confirm('이미지를 삭제하시겠습니까?')) return
@@ -670,6 +687,10 @@ onMounted(() => loadPortfolios('residential'))
 .order-badge { position: absolute; bottom: 6px; left: 6px; background: rgba(0,0,0,0.55); color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1; }
 .btn-delete-img { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
 .image-card:hover .btn-delete-img { opacity: 1; }
+.btn-set-cover { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.45); color: #ccc; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; }
+.btn-set-cover.active { background: #7E1A2C; color: #fff; opacity: 1; }
+.image-card:hover .btn-set-cover { opacity: 1; }
+.cover-badge { position: absolute; top: 6px; left: 6px; background: #7E1A2C; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px; z-index: 1; }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
 .modal { background: #fff; padding: 32px; width: 400px; border-radius: 8px; }

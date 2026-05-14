@@ -23,22 +23,16 @@
         </header>
 
         <section class="gallery-section">
-          <div v-if="portfolio.cover_image_url && portfolio.images.length === 0" class="gallery-hero-wrap">
-            <img :src="portfolio.cover_image_url" :alt="portfolio.title" class="gallery-hero-image" loading="lazy" />
+          <div v-if="portfolio.cover_image_url && portfolio.images.length === 0" class="gallery-item">
+            <img :src="portfolio.cover_image_url" :alt="portfolio.title" class="gallery-image" loading="lazy" />
           </div>
 
-          <div v-if="portfolio.images.length > 0" class="gallery-hero-wrap">
-            <img :src="portfolio.images[0].image_url" :alt="portfolio.title + ' — 1'" class="gallery-hero-image" loading="lazy" />
-          </div>
-
-          <div v-if="portfolio.images.length > 1" class="gallery-grid">
-            <div
-              v-for="(img, idx) in portfolio.images.slice(1)"
-              :key="img.id"
-              class="gallery-grid-item"
-            >
-              <img :src="img.image_url" :alt="portfolio.title + ' — ' + (idx + 2)" class="gallery-grid-image" loading="lazy" />
-            </div>
+          <div
+            v-for="(img, idx) in portfolio.images"
+            :key="img.id"
+            class="gallery-item"
+          >
+            <img :src="img.image_url" :alt="portfolio.title + ' — ' + (idx + 1)" class="gallery-image" loading="lazy" />
           </div>
         </section>
 
@@ -156,48 +150,20 @@ onMounted(async () => {
   margin-bottom: 4rem;
 }
 
-.gallery-hero-wrap {
+.gallery-item {
   width: 100%;
-  aspect-ratio: 16/9;
   background-color: #ECEAE5;
   overflow: hidden;
 }
 
-.gallery-hero-image {
+.gallery-image {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: block;
-  object-fit: cover;
-  object-position: center;
   transition: transform 0.8s ease;
 }
 
-.gallery-hero-wrap:hover .gallery-hero-image {
-  transform: scale(1.03);
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.gallery-grid-item {
-  aspect-ratio: 4/3;
-  background-color: #ECEAE5;
-  overflow: hidden;
-}
-
-.gallery-grid-image {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 0.8s ease;
-}
-
-.gallery-grid-item:hover .gallery-grid-image {
+.gallery-item:hover .gallery-image {
   transform: scale(1.03);
 }
 
